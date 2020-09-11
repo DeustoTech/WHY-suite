@@ -10,32 +10,35 @@ library(lubridate)
 library(forecast)
 library(moments)
 
-#-- GLOBAL VARS
+# Load config file
+source("config.R")
 
-glb_basic_analysis_list <- c(
-  "stat_moments", "quantiles", "electricity",
-  "frequency" , "stl_features", "entropy", "acf_features"
-)
-glb_all_analysis_list <- c(
-  "stat_moments", "quantiles", "electricity",
-  "frequency", "stl_features", "entropy", "acf_features" , "max_kl_shift",
-  "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
-  "crossing_points", "max_var_shift", "nonlinearity",
-  "spreadrandomlocal_meantaul" , "flat_spots", "pacf_features", "firstmin_ac",
-  "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num", 
-  "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss",
-  "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
-  "motiftwo_entro3"
-  # TAKE A LOT OF TIME: "compengine", "sampenc", "sampen_first",
-  #     "fluctanal_prop_r1"
-  # DON'T WORK: "binarize_mean", "embed2_incircle" (require param),
-  #     "hw_parameters"
-)
-glb_root_folder <- "G:/Mi unidad/WHY/Datasets/" 
-  #"D:/Quesada/Documents/__TRABAJO/Deusto/WHY/Datasets/"
-glb_subfolders <- list(
-  lcl = "lcl/"
-)
+# #-- GLOBAL VARS
+# 
+# glb_basic_analysis_list <- c(
+#   "stat_moments", "quantiles", "electricity",
+#   "frequency" , "stl_features", "entropy", "acf_features"
+# )
+# glb_all_analysis_list <- c(
+#   "stat_moments", "quantiles", "electricity",
+#   "frequency", "stl_features", "entropy", "acf_features" , "max_kl_shift",
+#   "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
+#   "crossing_points", "max_var_shift", "nonlinearity",
+#   "spreadrandomlocal_meantaul" , "flat_spots", "pacf_features", "firstmin_ac",
+#   "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num", 
+#   "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss",
+#   "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
+#   "motiftwo_entro3"
+#   # TAKE A LOT OF TIME: "compengine", "sampenc", "sampen_first",
+#   #     "fluctanal_prop_r1"
+#   # DON'T WORK: "binarize_mean", "embed2_incircle" (require param),
+#   #     "hw_parameters"
+# )
+# glb_root_folder <- "G:/Mi unidad/WHY/Datasets/" 
+#   #"D:/Quesada/Documents/__TRABAJO/Deusto/WHY/Datasets/"
+# glb_subfolders <- list(
+#   lcl = "lcl/"
+# )
 
 # FEATURE FUNCTIONS
 stat_moments <- function(x) {
