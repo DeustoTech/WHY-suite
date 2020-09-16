@@ -1,2 +1,2 @@
 # why-wp2
- WP2 of WHY project
+WP2 program files of the WHY project
