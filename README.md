@@ -1,5 +1,5 @@
 # why-T2.1
-Programs to carry out the task T2.1 of the WHY project.
+Programs to carry out WHY project's task T2.1.
 
 ## why-source.R
 This is the main file that must be sourced by the rest of the scripts.
