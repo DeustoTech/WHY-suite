@@ -26,7 +26,8 @@ The output is a plot of the time series in the chosen principal components.
 Given a CSV file of features (such as `feats.csv`), it computes k-means.
 
 The output can be a plot of either the elbow curve or the resulting clusters.
-* For the elbow curve, the maximum number of clusters to analyze must be provided. * For the resulting clusters, the number of clusters must be provided. The output is a plot of points, representing the time series, clustered by colors and represented in 2D via the first two principal components.
+* For the elbow curve, the maximum number of clusters to analyze must be provided.
+* For the resulting clusters, the number of clusters must be provided. The output is a plot of points, representing the time series, clustered by colors and represented in 2D via the first two principal components.
 
 ### compute-combined-pca-kmeans.R
 Given a CSV file of features (such as `feats.csv`), it computes PCA. Then, k-means is computed from the resulting PCA scores.
