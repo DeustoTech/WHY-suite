@@ -10,7 +10,7 @@ It contains useful links to libraries, global variables and function definitions
 ### get-features.R
 This script extracts features from all time series in a dataset.
 
-Given a dataset folder, it makes a file-by-file analysis. The analysis consists in extracting a time series between the start date and the end date provided by the user. If this interval does not exist in the file or it contains more than the desirable NaNs, the time series is discarded. If the time series is OK, it extracts its features.
+Given a dataset folder, it makes a file-by-file analysis. The analysis consists in extracting a time series between the start and end dates provided by the user. If this interval does not exist in the file or it contains more than the desirable NaNs, that time series is discarded. If the time series is OK, its features are extracted.
 
 It generates 3 outputs:
 * `feats.csv`: the features of the analyzed files;
