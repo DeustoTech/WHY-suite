@@ -18,5 +18,6 @@ It generates 3 outputs:
 * `rejected.csv`: info about the rejected files.
 
 ### compute-pca.R
+Computes and plots the PCA from a CSV file of features (such as `feats.csv`).
 
 ## Not-so-relevant files

@@ -3,11 +3,16 @@
 # Compute PCA from a CSV file of features
 
 # Load source file and libraries
-source("why-source_v04.R")
+source("why-source.R")
+
+################################################################################
+# -- User parameters
+################################################################################
 
 # Dataset key
 dset_key <- "lcl"
-feats_folder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
+root_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
+feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/feats.csv"
 # Observations to plot
 otp <- 1:4605
 
@@ -27,18 +32,14 @@ ftp <- c(1:10, 15:34)
 axis_x <- 1
 axis_y <- 2
 
+################################################################################
+
 # Path to features
-feats_subfolder <- paste(
-  "G:/Mi unidad/WHY/Resultados/", 
-  dset_key,
-  "/features/",
-  feats_folder,
-  sep = ""
-)
+feats_folder <- paste(results_folder, feats_subfolder, sep="")
 
 # Load data from CSV file
 feats <- read.table(
-  file = paste(feats_subfolder, "feats.csv", sep = ""),
+  file = feats_folder,
   header = TRUE,
   sep = ","
 )
