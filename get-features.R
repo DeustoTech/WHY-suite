@@ -8,31 +8,33 @@ source("why-source.R")
 
 # User parameters
 dset_key <- "lcl"
+# Date can be an ISOdate or either "first" to indicate the first timestamp in
+# the dataset or "last" to indicate the last one
 from_date <- ISOdate(2013, 2, 1, 0, 0, 0)  #"first"
 to_date <- ISOdate(2013, 2, 28, 23, 30, 0) #"last"
+# Accepted percentage of NaN values between the start and end dates provided.
+# If the time series exceeds that percentage, it will be discarded
 accepted_na_rate <- 0.0
 
 # Initialize outputs
 op_feats <- NULL
 op_dset_info <- NULL
 op_rejected <- NULL
-samples_per_day <- list(lcl = 48)
 
 # Get list of filenames in dataset folder 
-dset_filenames <- Get_File_List(dset_key, dset_tseries)
+dset_filenames <- list.files(DATASET_PATH)
 
 # Randomize list of filenames
 set.seed(2411)
-##dset_filenames <- sample(dset_filenames) #[1:5]
 
 # Analysis loop
-for (dset_filename in dset_filenames[1:20]) {
+for (dset_filename in dset_filenames[1:5]) {
   # Load dataset file
   print(dset_filename)
-  dset_data <- Load_Dataset_File(dset_key, dset_tseries, dset_filename)
+  dset_data <- Load_Dataset_File(DATASET_PATH, dset_filename)
   
   # Set values
-  ts_freq <- samples_per_day[[dset_key]]
+  ts_freq <- SAMPLES_PER_DAY[[dset_key]]
   
   # Check interval left end
   if (any(class(from_date) == "character")) {
@@ -101,7 +103,7 @@ for (dset_filename in dset_filenames[1:20]) {
     # Analyze time series
     feats <- tsfeatures(
       list(vals_msts),
-      features = glb_all_analysis_list,
+      features = BASIC_ANALYSIS_LIST,
       scale = FALSE,
       na.action = na.interp
     )

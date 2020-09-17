@@ -14,6 +14,11 @@ library(moments)
 
 # Path to the dataset folder
 DATASET_PATH <- "G:/Mi unidad/WHY/Datasets/lcl/"
+# Number of samples in a day for the dataset
+SAMPLES_PER_DAY <-
+  list(
+    lcl = 48
+  )
 
 # List of functions that will be passed to tsfeatures.
 # -- Some functions were not included because they:
@@ -24,6 +29,11 @@ DATASET_PATH <- "G:/Mi unidad/WHY/Datasets/lcl/"
 BASIC_ANALYSIS_LIST <-
   c(
     "stat_moments", "quantiles", "electricity",
+    "frequency" , "stl_features", "entropy", "acf_features"
+  )
+EXTRA_ANALYSIS_LIST <-
+  c(
+    "stat_moments", "quantiles", "electricity",
     "frequency", "stl_features", "entropy", "acf_features" , "max_kl_shift",
     "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
     "crossing_points", "max_var_shift", "nonlinearity",
@@ -32,11 +42,6 @@ BASIC_ANALYSIS_LIST <-
     "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss",
     "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
     "motiftwo_entro3"
-  )
-EXTRA_ANALYSIS_LIST <-
-  c(
-    "stat_moments", "quantiles", "electricity",
-    "frequency" , "stl_features", "entropy", "acf_features"
   )
 
 # FEATURE FUNCTIONS
@@ -68,33 +73,14 @@ electricity <- function(x) {
 
 # PROGRAM FUNCTIONS
 
-#-- Get File List
-Get_File_List <- function(dset_key, dset_tseries) {
-  # Get folder
-  folder <- paste(
-    glb_root_folder, 
-    glb_subfolders[[dset_key]],
-    dset_tseries,
-    "/",
-    sep = ""
-  )
-  # Get list of files
-  list.files(folder)
-}
-
+################################################################################
 #-- Load dataset file
-Load_Dataset_File <- function(dset_key, dset_tseries, filename) {
-  # Get folder
-  folder <- paste(
-    glb_root_folder, 
-    glb_subfolders[[dset_key]],
-    dset_tseries,
-    "/",
-    sep = ""
-  )
+################################################################################
+
+Load_Dataset_File <- function(dataset_path, filename) {
   # Load data from CSV file
   data <- read.table(
-    file = paste(folder, filename, sep = ""),
+    file = paste(dataset_path, filename, sep = ""),
     header = FALSE,
     sep = ","
   )
@@ -106,7 +92,10 @@ Load_Dataset_File <- function(dset_key, dset_tseries, filename) {
   tibble(times = times, values = values)
 }
 
+################################################################################
 #-- Get dataset values inside a time interval
+################################################################################
+
 Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
   # Time series ends
   first_ts_date <- tm_series[[1, 1]]
