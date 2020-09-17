@@ -1,21 +1,26 @@
 # Carlos Quesada - Universidad de Deusto
 # 2020.09.02
+
 # Compute k-means from a CSV file of features
 
 # Load source file and libraries
-source("why-source_v04.R")
+source("why-source.R")
 # Cluster-PCA visualization
 library(factoextra)
 
+################################################################################
+# -- User parameters
+################################################################################
+
 # Dataset key
-dset_key <- "lcl"
-feats_folder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
+root_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
+feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
 
 # Elbow method or standard k-means?
 elbow_method <- F
 max_clusters <- 20
 # In case elbow_method is FALSE
-number_of_centers <- 16
+number_of_centers <- 8
 
 # Observations to plot
 otp <- 1:4605
@@ -34,30 +39,25 @@ ftp <- c(1:10, 28:34)
 # -- Stats + STL + Acorr + Entropy features
 #ftp <- c(1:10, 15:34)
 
+################################################################################
 
 # Path to features
-feats_subfolder <- paste(
-  "G:/Mi unidad/WHY/Resultados/", 
-  dset_key,
-  "/features/",
-  feats_folder,
-  sep = ""
-)
+feats_folder <- paste(root_folder, feats_subfolder, "feats.csv", sep="")
+datainfo_folder <- paste(root_folder, feats_subfolder, "data_info.csv", sep="")
 
 # Load data from CSV file
 feats <- read.table(
-  file = paste(feats_subfolder, "feats.csv", sep = ""),
+  file = feats_folder,
   header = TRUE,
   sep = ","
 )
 
 # Load data info
 data_info <- read.table(
-  file = paste(feats_subfolder, "data_info.csv", sep = ""),
+  file = datainfo_folder,
   header = TRUE,
   sep = ","
 )
-
 
 x <- feats[otp, ftp]
 

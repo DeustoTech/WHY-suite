@@ -11,9 +11,8 @@ source("why-source.R")
 ################################################################################
 
 # Dataset key
-dset_key <- "lcl"
 root_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
-feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/feats.csv"
+feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
 # Observations to plot
 otp <- 1:4605
 
@@ -36,7 +35,7 @@ axis_y <- 2
 ################################################################################
 
 # Path to features
-feats_folder <- paste(results_folder, feats_subfolder, sep="")
+feats_folder <- paste(results_folder, feats_subfolder, "feats.csv", sep="")
 
 # Load data from CSV file
 feats <- read.table(
