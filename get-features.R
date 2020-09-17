@@ -1,6 +1,6 @@
 # Carlos Quesada - Universidad de Deusto
 # 2020.07.11
-# Compute FFORMA features for a particular dataset
+# Compute features for a particular dataset
 # Analysis for just February 2013
 
 # Load source file and libraries
