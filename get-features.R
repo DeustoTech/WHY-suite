@@ -1,12 +1,21 @@
 # Carlos Quesada - Universidad de Deusto
 # 2020.07.11
-# Compute features for a particular dataset
-# Analysis for just February 2013
+
+# This script extracts features from all files in a dataset.
+# Given a dataset folder, it makes a file-by-file analysis.
+# The analysis consists in extracting a time series between the start date and 
+# the end date provided by the user. If this interval does not exist in the file
+# or it contains more than the desirable NaNs, the time series is discarded.
+# If the time series is OK, it extracts the features.
 
 # Load source file and libraries
 source("why-source.R")
 
-# User parameters
+################################################################################
+# -- User parameters
+################################################################################
+
+# Code of the dataset
 dset_key <- "lcl"
 # Date can be an ISOdate or either "first" to indicate the first timestamp in
 # the dataset or "last" to indicate the last one
@@ -16,6 +25,8 @@ to_date <- ISOdate(2013, 2, 28, 23, 30, 0) #"last"
 # If the time series exceeds that percentage, it will be discarded
 accepted_na_rate <- 0.0
 
+################################################################################
+
 # Initialize outputs
 op_feats <- NULL
 op_dset_info <- NULL
@@ -24,11 +35,8 @@ op_rejected <- NULL
 # Get list of filenames in dataset folder 
 dset_filenames <- list.files(DATASET_PATH)
 
-# Randomize list of filenames
-set.seed(2411)
-
 # Analysis loop
-for (dset_filename in dset_filenames[1:5]) {
+for (dset_filename in dset_filenames) {
   # Load dataset file
   print(dset_filename)
   dset_data <- Load_Dataset_File(DATASET_PATH, dset_filename)
