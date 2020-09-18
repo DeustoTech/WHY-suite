@@ -34,6 +34,9 @@ Given a CSV file of features (such as `feats.csv`), it computes PCA. Then, k-mea
 
 The number of principal components of the scores from which k-means is computed can be selected by the user to reduce the noise of the model. The output is a plot of points, representing the time series, clustered by colors and represented in 2D via the first two principal components (of the new reduced set).
 
-The accumulated values of energy consumption over the month can be represented for each cluster.
+The daily accumulated values of energy consumption over the month can be represented for each cluster.
 
 ## Not-so-relevant files
+### gratis-test.R
+Test of the [GRATIS method](https://onlinelibrary.wiley.com/doi/abs/10.1002/sam.11461) for generating time series from features.
+
