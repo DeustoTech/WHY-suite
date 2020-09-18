@@ -1,9 +1,9 @@
 # Carlos Quesada - Universidad de Deusto
 # 2020.07.21
-# Create a library of features so they can be visually understood
+# Create a visual library of features so they can be easily understood
 
 # Load source file and libraries
-source("why-source_v03.R")
+source("why-source.R")
 library(plotly)
 
 # User parameters

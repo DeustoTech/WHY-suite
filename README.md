@@ -36,7 +36,15 @@ The number of principal components of the scores from which k-means is computed 
 
 The daily accumulated values of energy consumption over the month can be represented for each cluster.
 
-## Not-so-relevant files
-### gratis-test.R
-Test of the [GRATIS method](https://onlinelibrary.wiley.com/doi/abs/10.1002/sam.11461) for generating time series from features.
+### feats-to-ts.R
+Simple implementation of the [GRATIS method](https://onlinelibrary.wiley.com/doi/abs/10.1002/sam.11461) for generating time series from features.
 
+## Not-so-relevant files
+### features-library.R
+Create a visual library of features so that they can be easily understood.
+
+### plot-lcl.R
+Plot as PDF files the time series analyzed in `get-features.R`.
+
+### ts-vs-msts-comparison.R
+This file is just to compare whether the function `ts` gives the same results as the function `msts`, with one seasonal period being equal to the frequency of `ts`. (Spoiler: [yes](https://docs.google.com/spreadsheets/d/1uKM50_3fQVKlFBdOtd9o47aULvEy91RGXDwSKua90qI/edit?usp=sharing)).

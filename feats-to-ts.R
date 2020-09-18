@@ -1,5 +1,9 @@
+# Carlos Quesada - Universidad de Deusto
+# 2020.07.09
 # Generated time series
+
 library(gratis)
+
 gen_ts <- generate_ts_with_target(
   n = 1,
   ts.length = length(values$values),
