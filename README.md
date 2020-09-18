@@ -47,4 +47,4 @@ Create a visual library of features so that they can be easily understood.
 Plot as PDF files the time series analyzed in `get-features.R`.
 
 ### ts-vs-msts-comparison.R
-Simple check that the function `ts` gives the same results as the function `msts`, with one seasonal period being equal to the frequency of `ts` (spoiler: [yes](https://docs.google.com/spreadsheets/d/1uKM50_3fQVKlFBdOtd9o47aULvEy91RGXDwSKua90qI/edit?usp=sharing)).
+Simple check that the function `ts` gives [the same results](https://docs.google.com/spreadsheets/d/1uKM50_3fQVKlFBdOtd9o47aULvEy91RGXDwSKua90qI/edit?usp=sharing) as the function `msts`, with one seasonal period being equal to the frequency of `ts`.
