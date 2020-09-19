@@ -119,8 +119,8 @@ for (dset_filename in dset_filenames) {
     print(
       paste(
         dset_filename,
-        "from", from_date,
-        "to", to_date
+        "from", format(from_date, "%Y-%m-%d"),
+        "to", format(to_date, "%Y-%m-%d")
       )
     )
     
@@ -185,7 +185,7 @@ for (dset_filename in dset_filenames) {
         scale = FALSE,
         na.action = na.interp
       )
-      print(feats)
+      print("OK!")
     
       # Create tibble of dataset info
       dset_info <- tibble(
