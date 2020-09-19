@@ -99,16 +99,16 @@ for (dset_filename in dset_filenames) {
   for (dd in 1:length(from_dates)) {
     
     # Check interval left end
-    if (any(class(from_date) == "character")) {
-      if (from_date == "first") {
+    if (any(class(from_dates) == "character")) {
+      if (from_dates == "first") {
         from_date <- dset_data[[1, 1]]
       } 
     } else {
       from_date <- from_dates[dd]
     }
     # Check interval right end
-    if (any(class(to_date) == "character")) {
-      if (to_date == "last") {
+    if (any(class(to_dates) == "character")) {
+      if (to_dates == "last") {
         to_date <- tail(dset_data, 1)[[1, 1]]
       }
     } else {
@@ -135,6 +135,7 @@ for (dset_filename in dset_filenames) {
     # Check correctness of "dset_data_intvl"
     seas_periods <- NULL
     ts_is_0 <- FALSE
+    many_na <- FALSE
     if (!is.null(dset_data_intvl)) {
       # Get seasonal periods
       len_data_intvl <- length(dset_data_intvl)
