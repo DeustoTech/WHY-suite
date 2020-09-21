@@ -115,3 +115,32 @@ Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
     return(NULL)
   }
 }
+
+################################################################################
+#-- Plot a data_info row
+################################################################################
+
+Plot_Data_Info_Row <- function(di_row, dset_key) {
+  # Load a complete time series from the dataset
+  dset_data <- Load_Dataset_File(DATASET_PATH, di_row[[1]])
+  # Dates
+  from_date <- as.POSIXct(a[[2]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
+  to_date   <- as.POSIXct(a[[3]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
+  # Interval
+  dset_data_intvl <- Get_Data_Interval(
+    tm_series = dset_data,
+    from_date = from_date,
+    to_date = to_date,
+    step = 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
+  )
+  # Plot
+  plot(
+    seq(from_date, to_date, as.difftime(step_in_secs, units = "secs")),
+    dset_data_intvl,
+    type = "l",
+    main = dset_filename,
+    xlab = "Date",
+    ylab = "kWh",
+    ylim = c(0,5)
+  )
+}
