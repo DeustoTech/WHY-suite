@@ -11,10 +11,12 @@ source("why-source.R")
 ################################################################################
 
 # Dataset key
-root_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
-feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
+results_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
+#feats_subfolder <- "2013 Feb, 0% NA, scale=FALSE, 70 feats/"
+feats_subfolder <- "2012-2013, 0% NA, scale=FALSE, 70 feats/"
 # Observations to plot
-otp <- 1:4605
+#otp <- 1:4605
+otp <- 1:84129
 
 # Features to plot
 # -- All features
