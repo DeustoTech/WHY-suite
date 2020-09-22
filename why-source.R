@@ -100,8 +100,14 @@ Get_Data_Interval <- function(tm_series, from_date, to_date) {
   # Logic selection of dates
   date_selec <- tm_series[["times"]] >= from_date & 
     tm_series[["times"]] <= to_date
+  # Selected data
+  new_tm_series <- tm_series[date_selec,]
   # Return
-  return(tm_series[date_selec,])
+  if (dim(new_tm_series)[1] == 0) {
+    return(NULL)
+  } else {
+    return(new_tm_series)
+  }
 }
 
 ################################################################################
