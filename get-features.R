@@ -91,7 +91,7 @@ dset_filenames <- list.files(DATASET_PATH)
 ts_freq <- SAMPLES_PER_DAY[[dset_key]]
 
 # Analysis loop
-for (dset_filename in dset_filenames[1:10]) {
+for (dset_filename in dset_filenames) {
   # Load dataset file
   dset_data <- Load_Dataset_File(DATASET_PATH, dset_filename)
   
