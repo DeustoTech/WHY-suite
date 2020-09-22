@@ -16,7 +16,7 @@ res_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/"
 feats_subfolder <- "2012-2013, 0% NA, scale=FALSE, 70 feats/"
 # Observations to plot
 #otp <- 1:4605
-otp <- 1:1000#1:84129
+otp <- 1:84129
 
 # Features to plot
 # -- All features
@@ -45,18 +45,10 @@ get_point_identity <- TRUE
 
 # Path to features and data info
 feats_folder <- paste(res_folder, feats_subfolder, "feats.csv", sep="")
-data_info_folder <- paste(res_folder, feats_subfolder, "data_info.csv", sep="")
 
 # Load features from CSV file
 feats <- read.table(
   file = feats_folder,
-  header = TRUE,
-  sep = ","
-)
-
-# Load data info from CSV file
-data_info <- read.table(
-  file = data_info_folder,
   header = TRUE,
   sep = ","
 )
@@ -75,7 +67,23 @@ plot(
 )
 
 # Get point identification
+
 if (get_point_identity == TRUE) {
+  # Folder
+  data_info_folder <- paste(
+    res_folder, 
+    feats_subfolder, 
+    "data_info.csv", 
+    sep=""
+  )
+  
+  # Load data info from CSV file
+  data_info <- read.table(
+    file = data_info_folder,
+    header = TRUE,
+    sep = ","
+  )
+  
   # Get points
   ts_ids <- identify(
     x = pca[["x"]][, axis_x], 

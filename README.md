@@ -20,6 +20,8 @@ It generates 3 outputs:
 ### compute-pca.R
 Given a CSV file of features (such as `feats.csv`), it computes PCA.
 
+It is also possible to identify the plotted elements.
+
 The output is a plot of the time series in the chosen principal components.
 
 ### compute-kmeans.R

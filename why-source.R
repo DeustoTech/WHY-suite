@@ -119,6 +119,8 @@ Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
 ################################################################################
 #-- Plot a data_info row
 ################################################################################
+# EXAMPLE OF USE:
+# Plot_Data_Info_Row(data_info["75220",])
 
 Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
   # How long a step is in seconds
