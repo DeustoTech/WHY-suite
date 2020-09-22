@@ -96,7 +96,30 @@ Load_Dataset_File <- function(dataset_path, filename) {
 #-- Get dataset values inside a time interval
 ################################################################################
 
-Get_Data_Interval <- function(tm_series, from_date, to_date, step_in_secs) {
+Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
+  # Time series ends
+  first_ts_date <- tm_series[[1, 1]]
+  last_ts_date <- tail(tm_series, 1)[[1, 1]]
+  # Interval is included in time series
+  if (first_ts_date <= from_date & to_date <= last_ts_date) {
+    # Step as difftime
+    step_in_secs <- as.difftime(step, units = "secs")
+    # Create time sequence
+    time_seq <- seq(from_date, to_date, step_in_secs)
+    # Find matches in timeseries
+    mm <- match(time_seq, tm_series$times)
+    # Output 
+    output <- data.frame(times = time_seq, values = tm_series$values[mm])
+    return(output)
+    # Interval is NOT included in time series
+  } else {
+    return(NULL)
+  }
+}
+
+#-- DELETE BELOW
+
+Get_Data_Interval.OLD <- function(tm_series, from_date, to_date, step_in_secs) {
   # Logic selection of dates
   date_selec <- tm_series[["times"]] >= from_date & 
     tm_series[["times"]] <= to_date
@@ -113,28 +136,6 @@ Get_Data_Interval <- function(tm_series, from_date, to_date, step_in_secs) {
     return(NULL)
   } else {
     return(new_tm_series)
-  }
-}
-
-#-- DELETE BELOW
-
-Get_Data_Interval.OLD <- function(tm_series, from_date, to_date, step) {
-  # Time series ends
-  first_ts_date <- tm_series[[1, 1]]
-  last_ts_date <- tail(tm_series, 1)[[1, 1]]
-  # Interval is included in time series
-  if (first_ts_date <= from_date & to_date <= last_ts_date) {
-    # Step as difftime
-    step_in_secs <- as.difftime(step, units = "secs")
-    # Create time sequence
-    time_seq <- seq(from_date, to_date, step_in_secs)
-    # Find matches in timeseries
-    mm <- match(time_seq, tm_series$times)
-    # Output vector
-    return(tm_series$values[mm])
-  # Interval is NOT included in time series
-  } else {
-    return(NULL)
   }
 }
 
