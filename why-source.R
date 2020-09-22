@@ -95,6 +95,9 @@ Load_Dataset_File <- function(dataset_path, filename) {
 ################################################################################
 #-- Get dataset values inside a time interval
 ################################################################################
+# REMARKS:
+# "step" is needed to be passed as an input parameter since NaN values are required for non-existing dates.
+################################################################################
 
 Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
   # Time series ends
@@ -114,28 +117,6 @@ Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
     # Interval is NOT included in time series
   } else {
     return(NULL)
-  }
-}
-
-#-- DELETE BELOW
-
-Get_Data_Interval.OLD <- function(tm_series, from_date, to_date, step_in_secs) {
-  # Logic selection of dates
-  date_selec <- tm_series[["times"]] >= from_date & 
-    tm_series[["times"]] <= to_date
-  # Selected data
-  new_tm_series <- tm_series[date_selec,]
-  # Create time sequence
-  time_seq <- seq(from_date, to_date, step_in_secs)
-  new_tm_series <- data.frame(
-    times = time_seq,
-    values = new_tm_series[new_tm_series[["times"]] == times, 2]
-  )
-  # Return
-  if (dim(new_tm_series)[1] == 0) {
-    return(NULL)
-  } else {
-    return(new_tm_series)
   }
 }
 

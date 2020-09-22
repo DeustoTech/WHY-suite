@@ -91,7 +91,7 @@ dset_filenames <- list.files(DATASET_PATH)
 ts_freq <- SAMPLES_PER_DAY[[dset_key]]
 
 # Analysis loop
-for (dset_filename in dset_filenames) {
+for (dset_filename in dset_filenames[1:10]) {
   # Load dataset file
   dset_data <- Load_Dataset_File(DATASET_PATH, dset_filename)
   
@@ -115,7 +115,7 @@ for (dset_filename in dset_filenames) {
       to_date <- to_dates[dd]
     }
     
-    # Print current time series
+    # Print current time series being analyzed
     print(
       paste(
         dset_filename,
@@ -138,7 +138,7 @@ for (dset_filename in dset_filenames) {
     many_na <- FALSE
     if (!is.null(dset_data_intvl)) {
       # Get seasonal periods
-      len_data_intvl <- length(dset_data_intvl)
+      len_data_intvl <- dim(dset_data_intvl)[1]
       if (len_data_intvl > 2 * ts_freq) {
         seas_periods <- c(seas_periods, ts_freq)
       }
@@ -149,9 +149,10 @@ for (dset_filename in dset_filenames) {
         seas_periods <- c(seas_periods, 365 * ts_freq)
       }
       # Check if all values are 0 (it happens with LCL4067)
-      ts_is_0 <- all(dset_data_intvl[!is.na(dset_data_intvl)] == 0.0)
+      ts_is_0 <- all(dset_data_intvl[!is.na(dset_data_intvl),2] == 0.0)
       # Check NAs
-      many_na <- sum(is.na(dset_data_intvl))/len_data_intvl > accepted_na_rate
+      many_na <- sum(is.na(dset_data_intvl[,2])) /
+        len_data_intvl > accepted_na_rate
     }
     
     # Not analyze features
@@ -172,7 +173,7 @@ for (dset_filename in dset_filenames) {
     } else {
       # Convert to time series
       vals_msts <- msts(
-        data = dset_data_intvl,
+        data = dset_data_intvl[,2],
         start = c(1, 1),
         ts.frequency = ts_freq,
         seasonal.periods = seas_periods
@@ -193,7 +194,7 @@ for (dset_filename in dset_filenames) {
         from_date = format(from_date, "%Y-%m-%d %H:%M:%S"),
         to_date = format(to_date, "%Y-%m-%d %H:%M:%S"),
         total_samples = len_data_intvl,
-        total_NAs = sum(is.na(dset_data_intvl))
+        total_NAs = sum(is.na(dset_data_intvl[,2]))
       )
       
       # Bind tibble rows
