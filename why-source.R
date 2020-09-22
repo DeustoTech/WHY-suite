@@ -96,7 +96,7 @@ Load_Dataset_File <- function(dataset_path, filename) {
 #-- Get dataset values inside a time interval
 ################################################################################
 # REMARKS:
-# "step" is needed to be passed as an input parameter since NaN values are required for non-existing dates.
+# "step" is needed to be passed as an input parameter since NaN values are required at the output for non-existing dates.
 ################################################################################
 
 Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
