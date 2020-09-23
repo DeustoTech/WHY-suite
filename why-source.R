@@ -99,10 +99,15 @@ Load_Dataset_File <- function(dataset_path, filename) {
 # "sampling_period" (measured in seconds) is needed to be passed as an input parameter to check non-existing dates, which must be indicated as NaN.
 ################################################################################
 
-Get_Data_Interval <- function(dset_data, from_date, to_date, sampling_period) {
+Get_Data_Interval <- function(dset_data,
+                              from_date,
+                              to_date,
+                              sampling_period
+                              )
+{
   # Time series ends
-  first_ts_date <- tm_series[[1, 1]]
-  last_ts_date <- tail(tm_series, 1)[[1, 1]]
+  first_ts_date <- dset_data[[1, 1]]
+  last_ts_date <- tail(dset_data, 1)[[1, 1]]
   # Interval is included in time series
   if (first_ts_date <= from_date & to_date <= last_ts_date) {
     # Step as difftime
@@ -221,9 +226,12 @@ Create_Features_Library <- function(sampling_period,
     sorted_col    <- sort(feats[[ii]], index.return = TRUE)
     selected_idx  <- sorted_col$ix[seq_idx]
     repres_fnames <- data_info$filename[selected_idx]
-    repres_from_D <- data_info$from_date[selected_idx]
-    repres_to_D   <- data_info$to_date[selected_idx]
+    repres_from_D <- as.POSIXct(data_info$from_date[selected_idx], tz="GMT")
+    repres_to_D   <- as.POSIXct(data_info$to_date[selected_idx], tz="GMT")
     repres_values <- sorted_col$x[seq_idx]
+    
+    browser()
+    
     # Plot
     pdf(
       file = paste(ii, " - ", feat_name, ".pdf", sep = ""),
@@ -232,8 +240,6 @@ Create_Features_Library <- function(sampling_period,
       height = 15
     )
     par(mfrow = c(3,3))
-    
-    browser()
     
     for (jj in 1:9) {
       Plot_TS_Interval(
