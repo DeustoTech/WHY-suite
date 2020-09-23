@@ -180,12 +180,13 @@ Plot_TS_Interval <- function(feature_name,
     to_date         = to_date,
     sampling_period = sampling_period
   )
+  
   # Create plot
   p <- plot(
-    seq(from_date, to_date, as.difftime(sampling_period, units = "secs")),
-    dset_data_intvl,
+    x    = dset_data_intvl[[1]],
+    y    = dset_data_intvl[[2]],
     type = "l",
-    main = paste(feature, "=", value),
+    main = paste(feature_name, "=", value),
     xlab = "Date",
     ylab = "kWh",
     ylim = c(0,5)
@@ -206,20 +207,21 @@ Create_Features_Library <- function(sampling_period,
   
   # Load data from CSV file
   feats <- read.table(
-    file = paste(results_folder, "feats.csv", sep = ""),
+    file   = paste(results_folder, "feats.csv", sep = ""),
     header = TRUE,
-    sep = ","
+    sep    = ","
   )
   data_info <- read.table(
-    file = paste(results_folder, "data_info.csv", sep = ""),
+    file   = paste(results_folder, "data_info.csv", sep = ""),
     header = TRUE,
-    sep = ","
+    sep    = ","
   )
   
   # Indices of series to be plotted
   seq_idx <- seq(1, nrow(feats), length=9)
   
   for (ii in feats_to_plot) {
+    print(ii)
     # Feature name
     feat_name <- names(feats)[ii]
     # Get representative filenames of this feature ii
@@ -230,13 +232,11 @@ Create_Features_Library <- function(sampling_period,
     repres_to_D   <- as.POSIXct(data_info$to_date[selected_idx], tz="GMT")
     repres_values <- sorted_col$x[seq_idx]
     
-    browser()
-    
     # Plot
     pdf(
-      file = paste(ii, " - ", feat_name, ".pdf", sep = ""),
-      paper = "special", #"a4r",
-      width = 20,
+      file   = paste(ii, " - ", feat_name, ".pdf", sep = ""),
+      paper  = "special", #"a4r",
+      width  = 20,
       height = 15
     )
     par(mfrow = c(3,3))
