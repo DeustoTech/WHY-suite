@@ -163,12 +163,11 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
 #-- Function to plot an interval of a time series 
 ################################################################################
 
-Plot_TS_Interval <- function(feature_name, 
-                             filename, 
-                             value, 
+Plot_TS_Interval <- function(filename, 
                              from_date, 
                              to_date,
-                             sampling_period
+                             sampling_period,
+                             title=NULL
                              )
 {
   # Load dataset file
@@ -186,7 +185,7 @@ Plot_TS_Interval <- function(feature_name,
     x    = dset_data_intvl[[1]],
     y    = dset_data_intvl[[2]],
     type = "l",
-    main = paste(feature_name, "=", value),
+    main = title,
     xlab = "Date",
     ylab = "kWh",
     ylim = c(0,5)
@@ -243,12 +242,11 @@ Create_Features_Library <- function(sampling_period,
     
     for (jj in 1:9) {
       Plot_TS_Interval(
-        feature_name    = feat_name,
         filename        = repres_fnames[jj],
-        value           = repres_values[jj],
         from_date       = repres_from_D[jj],
         to_date         = repres_to_D[jj],
-        sampling_period = sampling_period
+        sampling_period = sampling_period,
+        title           = paste(feat_name, "=", repres_values[jj])
       )
     }
     dev.off()
