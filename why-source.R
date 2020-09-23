@@ -96,23 +96,23 @@ Load_Dataset_File <- function(dataset_path, filename) {
 #-- Get dataset values inside a time interval
 ################################################################################
 # REMARKS:
-# "step" is needed to be passed as an input parameter since NaN values are required at the output for non-existing dates.
+# "sampling_period" (measured in seconds) is needed to be passed as an input parameter to check non-existing dates, which must be indicated as NaN.
 ################################################################################
 
-Get_Data_Interval <- function(tm_series, from_date, to_date, step) {
+Get_Data_Interval <- function(dset_data, from_date, to_date, sampling_period) {
   # Time series ends
   first_ts_date <- tm_series[[1, 1]]
   last_ts_date <- tail(tm_series, 1)[[1, 1]]
   # Interval is included in time series
   if (first_ts_date <= from_date & to_date <= last_ts_date) {
     # Step as difftime
-    step_in_secs <- as.difftime(step, units = "secs")
+    period_in_secs <- as.difftime(sampling_period, units = "secs")
     # Create time sequence
-    time_seq <- seq(from_date, to_date, step_in_secs)
+    time_seq <- seq(from_date, to_date, period_in_secs)
     # Find matches in timeseries
-    mm <- match(time_seq, tm_series$times)
+    mm <- match(time_seq, dset_data$times)
     # Output 
-    output <- data.frame(times = time_seq, values = tm_series$values[mm])
+    output <- data.frame(times = time_seq, values = dset_data$values[mm])
     return(output)
     # Interval is NOT included in time series
   } else {
@@ -158,19 +158,26 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
 #-- Function to plot an interval of a time series 
 ################################################################################
 
-Plot_TS_Interval <- function(feature, filename, value) {
+Plot_TS_Interval <- function(feature_name, 
+                             filename, 
+                             value, 
+                             from_date, 
+                             to_date,
+                             sampling_period
+                             )
+{
   # Load dataset file
-  dset_data <- Load_Dataset_File(dset_key, filename)
+  dset_data <- Load_Dataset_File(DATASET_PATH, filename)
   # Get values from dataset file
   dset_data_intvl <- Get_Data_Interval(
-    tm_series = dset_data,
-    from_date = from_date,
-    to_date = to_date,
-    step = step_in_secs # 30 * 60
+    dset_data       = dset_data,
+    from_date       = from_date,
+    to_date         = to_date,
+    sampling_period = sampling_period
   )
   # Create plot
   p <- plot(
-    seq(from_date, to_date, as.difftime(step_in_secs, units = "secs")),
+    seq(from_date, to_date, as.difftime(sampling_period, units = "secs")),
     dset_data_intvl,
     type = "l",
     main = paste(feature, "=", value),
@@ -184,7 +191,11 @@ Plot_TS_Interval <- function(feature, filename, value) {
 #-- Function to create a library of features
 ################################################################################
 
-Create_Features_Library <- function(results_folder, feats_to_plot) {
+Create_Features_Library <- function(sampling_period,
+                                    results_folder, 
+                                    feats_to_plot
+                                    )
+{
   # Libraries
   library(plotly)
   
@@ -210,6 +221,8 @@ Create_Features_Library <- function(results_folder, feats_to_plot) {
     sorted_col    <- sort(feats[[ii]], index.return = TRUE)
     selected_idx  <- sorted_col$ix[seq_idx]
     repres_fnames <- data_info$filename[selected_idx]
+    repres_from_D <- data_info$from_date[selected_idx]
+    repres_to_D   <- data_info$to_date[selected_idx]
     repres_values <- sorted_col$x[seq_idx]
     # Plot
     pdf(
@@ -219,8 +232,18 @@ Create_Features_Library <- function(results_folder, feats_to_plot) {
       height = 15
     )
     par(mfrow = c(3,3))
+    
+    browser()
+    
     for (jj in 1:9) {
-      Plot_TS_Interval(feat_name, repres_fnames[jj], repres_values[jj])
+      Plot_TS_Interval(
+        feature_name    = feat_name,
+        filename        = repres_fnames[jj],
+        value           = repres_values[jj],
+        from_date       = repres_from_D[jj],
+        to_date         = repres_to_D[jj],
+        sampling_period = sampling_period
+      )
     }
     dev.off()
   }
