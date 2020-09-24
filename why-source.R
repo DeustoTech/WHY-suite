@@ -242,3 +242,64 @@ Create_Features_Library <- function(sampling_period,
     dev.off()
   }
 }
+
+################################################################################
+#-- Compute PCA of features
+################################################################################
+
+Compute_Features_PCA <- function(observations,
+                                 features,
+                                 axes,
+                                 point_identif
+                                 ) {
+  
+  browser()
+  # Load data from CSV files
+  feats <- read.table(
+    file   = paste(feats_folder, "feats.csv", sep = ""),
+    header = TRUE,
+    sep    = ","
+  )
+  
+  # PCA
+  pca <- prcomp(feats[otp, features], scale. = TRUE)
+  
+  # Plot PCA
+  plot(
+    pca[["x"]][, axes[1]],
+    pca[["x"]][, axes[2]],
+    col = "blue",
+    pch = "+",
+    xlab = axis_x,
+    ylab = axis_y
+  )
+  
+  # # Get point identification
+  # if (get_point_identity == TRUE) {
+  #   # Folder
+  #   data_info_folder <- paste(
+  #     res_folder,
+  #     feats_subfolder,
+  #     "data_info.csv",
+  #     sep=""
+  #   )
+  # 
+  #   # Load data info from CSV file
+  #   data_info <- read.table(
+  #     file = data_info_folder,
+  #     header = TRUE,
+  #     sep = ","
+  #   )
+  # 
+  #   # Get points
+  #   ts_ids <- identify(
+  #     x = pca[["x"]][, axis_x],
+  #     y = pca[["x"]][, axis_y],
+  #     plot = FALSE
+  #   )
+  #   # Print points
+  #   for (ts_id in ts_ids) {
+  #     print(ts_id)
+  #   }
+  # }
+}
