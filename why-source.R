@@ -180,10 +180,7 @@ Plot_Data <- function(dset_data, title=NULL) {
 #-- Function to create a library of features
 ################################################################################
 
-Create_Features_Library <- function(sampling_period,
-                                    feats_folder, 
-                                    feats_to_plot
-                                    ) {
+Create_Features_Library <- function() {
   # Libraries
   library(plotly)
   
@@ -247,13 +244,7 @@ Create_Features_Library <- function(sampling_period,
 #-- Compute PCA of features
 ################################################################################
 
-Compute_Features_PCA <- function(observations,
-                                 features,
-                                 axes,
-                                 point_identif
-                                 ) {
-  
-  browser()
+Compute_PCA_From_Features <- function() {
   # Load data from CSV files
   feats <- read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
@@ -261,45 +252,65 @@ Compute_Features_PCA <- function(observations,
     sep    = ","
   )
   
+  if (color_by_SE_vars | get_point_identity) {
+    # Load data from CSV files
+    data_info <- read.table(
+      file   = paste(feats_folder, "data_info.csv", sep = ""),
+      header = TRUE,
+      sep    = ","
+    )
+  }
+  
+  # Color by socioeconomic variables?
+  if (color_by_SE_vars) {
+    # Load data from CSV files
+    SE_vars <- read.table(
+      file   = SE_data_file,
+      header = TRUE,
+      sep    = ","
+    )
+    # List of analyzed series
+    analyzed_series <- substr(data_info[,1], 1, 9)
+    # Find analyzed series in SE_vars
+    SE_indices <- match(analyzed_series, SE_vars[,1])
+    # Get grouped ACORN
+    grouped_ACORN <- SE_vars[SE_indices,4]
+    grouped_ACORN[grouped_ACORN == "Affluent"]    = "green"
+    grouped_ACORN[grouped_ACORN == "Comfortable"] = "orange"
+    grouped_ACORN[grouped_ACORN == "Adversity"]   = "red"
+    grouped_ACORN[grouped_ACORN == "ACORN-U"]     = "blue"
+    # color
+    color <- grouped_ACORN
+  } else {
+    color <- "blue"
+  }
+  
   # PCA
-  pca <- prcomp(feats[otp, features], scale. = TRUE)
+  pca <- prcomp(feats[otp, ftp], scale. = TRUE)
   
   # Plot PCA
   plot(
-    pca[["x"]][, axes[1]],
-    pca[["x"]][, axes[2]],
-    col = "blue",
+    pca[["x"]][, axis_x],
+    pca[["x"]][, axis_y],
+    col = color,
     pch = "+",
-    xlab = axis_x,
-    ylab = axis_y
+    xlab = paste("PC #", axis_x, sep = ""),
+    ylab = paste("PC #", axis_y, sep = "")
   )
   
-  # # Get point identification
-  # if (get_point_identity == TRUE) {
-  #   # Folder
-  #   data_info_folder <- paste(
-  #     res_folder,
-  #     feats_subfolder,
-  #     "data_info.csv",
-  #     sep=""
-  #   )
-  # 
-  #   # Load data info from CSV file
-  #   data_info <- read.table(
-  #     file = data_info_folder,
-  #     header = TRUE,
-  #     sep = ","
-  #   )
-  # 
-  #   # Get points
-  #   ts_ids <- identify(
-  #     x = pca[["x"]][, axis_x],
-  #     y = pca[["x"]][, axis_y],
-  #     plot = FALSE
-  #   )
-  #   # Print points
-  #   for (ts_id in ts_ids) {
-  #     print(ts_id)
-  #   }
-  # }
+  # Get point identification
+  if (get_point_identity) {
+    # Get points
+    ts_ids <- identify(
+      x = pca[["x"]][, axis_x],
+      y = pca[["x"]][, axis_y],
+      plot = FALSE
+    )
+    # Print points
+    for (ts_id in ts_ids) {
+      print(ts_id)
+    }
+  }
+  
+  return(pca)
 }
