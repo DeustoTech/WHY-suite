@@ -7,12 +7,12 @@ source("why-source.R")
 
 # User parameters
 sampling_period <- 86400 / SAMPLES_PER_DAY[["lcl"]]
-results_folder <- "G:/Mi unidad/WHY/Resultados/lcl/features/2012-2013, 0% NA, scale=FALSE, 70 feats/"
-feats_to_plot <- c(1:10, 15:70)
+feats_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/2012-2013, 0% NA, scale=FALSE, 70 feats/"
+feats_to_plot   <- c(1:10, 15:70)
 
 # Function call
 Create_Features_Library(
   sampling_period = sampling_period,
-  results_folder  = results_folder,
+  feats_folder    = feats_folder,
   feats_to_plot   = feats_to_plot
 )

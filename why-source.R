@@ -96,15 +96,15 @@ Load_Dataset_File <- function(dataset_path, filename) {
 #-- Get dataset values inside a time interval
 ################################################################################
 # REMARKS:
-# "sampling_period" (measured in seconds) is needed to be passed as an input parameter to check non-existing dates, which must be indicated as NaN.
+# "sampling_period" (measured in seconds) is needed as an input parameter to 
+# check non-existing dates, which must be indicated as NaN.
 ################################################################################
 
 Get_Data_Interval <- function(dset_data,
                               from_date,
                               to_date,
                               sampling_period
-                              )
-{
+                              ) {
   # Time series ends
   first_ts_date <- dset_data[[1, 1]]
   last_ts_date <- tail(dset_data, 1)[[1, 1]]
@@ -144,8 +144,8 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
   dset_data_intvl <- Get_Data_Interval(
     tm_series = dset_data,
     from_date = from_date,
-    to_date = to_date,
-    step = step_in_secs 
+    to_date   = to_date,
+    step      = step_in_secs 
   )
   # Plot
   plot(
@@ -163,27 +163,11 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
 #-- Function to plot an interval of a time series 
 ################################################################################
 
-Plot_TS_Interval <- function(filename, 
-                             from_date, 
-                             to_date,
-                             sampling_period,
-                             title=NULL
-                             )
-{
-  # Load dataset file
-  dset_data <- Load_Dataset_File(DATASET_PATH, filename)
-  # Get values from dataset file
-  dset_data_intvl <- Get_Data_Interval(
-    dset_data       = dset_data,
-    from_date       = from_date,
-    to_date         = to_date,
-    sampling_period = sampling_period
-  )
-  
+Plot_Data <- function(dset_data, title=NULL) {
   # Create plot
   p <- plot(
-    x    = dset_data_intvl[[1]],
-    y    = dset_data_intvl[[2]],
+    x    = dset_data[[1]],
+    y    = dset_data[[2]],
     type = "l",
     main = title,
     xlab = "Date",
@@ -197,21 +181,20 @@ Plot_TS_Interval <- function(filename,
 ################################################################################
 
 Create_Features_Library <- function(sampling_period,
-                                    results_folder, 
+                                    feats_folder, 
                                     feats_to_plot
-                                    )
-{
+                                    ) {
   # Libraries
   library(plotly)
   
-  # Load data from CSV file
+  # Load data from CSV files
   feats <- read.table(
-    file   = paste(results_folder, "feats.csv", sep = ""),
+    file   = paste(feats_folder, "feats.csv", sep = ""),
     header = TRUE,
     sep    = ","
   )
   data_info <- read.table(
-    file   = paste(results_folder, "data_info.csv", sep = ""),
+    file   = paste(feats_folder, "data_info.csv", sep = ""),
     header = TRUE,
     sep    = ","
   )
@@ -231,7 +214,7 @@ Create_Features_Library <- function(sampling_period,
     repres_to_D   <- as.POSIXct(data_info$to_date[selected_idx], tz="GMT")
     repres_values <- sorted_col$x[seq_idx]
     
-    # Plot
+    # Plot in PDF file
     pdf(
       file   = paste(ii, " - ", feat_name, ".pdf", sep = ""),
       paper  = "special", #"a4r",
@@ -241,12 +224,19 @@ Create_Features_Library <- function(sampling_period,
     par(mfrow = c(3,3))
     
     for (jj in 1:9) {
-      Plot_TS_Interval(
-        filename        = repres_fnames[jj],
+      # Load dataset file
+      dset_data <- Load_Dataset_File(DATASET_PATH, repres_fnames[jj])
+      # Get values from dataset file
+      dset_data_intvl <- Get_Data_Interval(
+        dset_data       = dset_data,
         from_date       = repres_from_D[jj],
         to_date         = repres_to_D[jj],
-        sampling_period = sampling_period,
-        title           = paste(feat_name, "=", repres_values[jj])
+        sampling_period = sampling_period
+      )
+      # Plot interval
+      Plot_Data(
+        dset_data = dset_data_intvl,
+        title     = paste(feat_name, "=", repres_values[jj])
       )
     }
     dev.off()
