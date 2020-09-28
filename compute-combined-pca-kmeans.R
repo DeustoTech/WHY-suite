@@ -7,6 +7,7 @@ source("why-source.R")
 # Cluster-PCA visualization
 library(factoextra)
 
+
 ################################################################################
 # -- User parameters
 ################################################################################
@@ -53,6 +54,9 @@ axis_y <- 2
 
 # Plot accumulated months of each cluster?
 month_accumul <- FALSE
+
+# Plot mean and variance of all TS in cluster
+cluster_accumul <- TRUE
 
 ################################################################################
 
@@ -126,8 +130,57 @@ if (only_pca == F) {
 }
 
 ################################################################################
+# Plot cluster accumulated 
+################################################################################
+
+# library(matrixStats)
+
+if (cluster_accumul == TRUE) {
+  for (center in 1:number_of_centers) {
+    # Initialization
+    all_ts <- data.frame()
+    # Load data
+    ts_ids   <- as.numeric(names(km$cluster[km$cluster == center]))
+    ts_names <- data_info[ts_ids, 1]
+    
+    for (ts_name in ts_names) {
+      print(ts_name)
+      ts <- Load_Dataset_File(DATASET_PATH, ts_name)
+      dset_data_intvl <- Get_Data_Interval(
+        dset_data = ts,
+        from_date = as.POSIXct("2013-02-01 00:00:00", tz="GMT"),
+        to_date   = as.POSIXct("2013-02-28 23:30:00", tz="GMT"),
+        sampling_period = 86400 / SAMPLES_PER_DAY[["lcl"]] # 30 * 60
+      )
+      all_ts <- rbind(all_ts, dset_data_intvl$values)
+    }
+    
+    all_means <- colMeans(all_ts)
+    # all_sds   <- colSds(data.matrix(all_ts))
+    
+    plot(dset_data_intvl$times, 
+         all_means,
+         type = "l", 
+         xlab = "February 2013", 
+         ylab = "kWh",
+         main = paste("Cluster #", center, sep=""),
+         col  = "blue",
+         ylim = c(0,2)
+    )
+    # lines(dset_data_intvl$times,
+    #       all_means + all_sds,
+    #       col  = "red"
+    # )
+    # lines(dset_data_intvl$times,
+    #       all_means - all_sds,
+    #       col  = "red"
+    # )
+
+  }
+}
+
+################################################################################
 # Plot month accumulated consumption of each cluster
-# (CONSIDER MOVE TO why-source.R)
 ################################################################################
 
 if (month_accumul == TRUE) {

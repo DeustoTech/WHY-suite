@@ -15,7 +15,7 @@ otp <- 1:4605
 
 # Features to plot
 # -- All features
-ftp <- c(1:10, 15:70)
+#ftp <- c(1:10, 15:70)
 # -- Statistical features
 #ftp <- 1:10
 # -- STL features
@@ -23,7 +23,7 @@ ftp <- c(1:10, 15:70)
 # -- Autocorrelation features
 #ftp <- 28:34
 # -- Stats + STL + Acorr + Entropy features
-# <- c(1:10, 15:34)
+ftp <- c(1:10, 15:34)
 # -- Quantiles + seasonal strengths
 # <- c(5:9, 21:22)
 # -- Mean, variance + seasonal strengths
