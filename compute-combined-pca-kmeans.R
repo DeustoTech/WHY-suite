@@ -163,7 +163,12 @@ if (cluster_accumul == TRUE) {
          type = "l", 
          xlab = "February 2013", 
          ylab = "kWh",
-         main = paste("Cluster #", center, sep=""),
+         main = paste("Cluster #", 
+                      center, 
+                      " (", 
+                      length(ts_names), 
+                      "time series)", 
+                      sep=""),
          col  = "blue",
          ylim = c(0,2)
     )
