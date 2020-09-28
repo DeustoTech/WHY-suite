@@ -27,7 +27,7 @@ pca_components <- 4
 elbow_method <- F
 max_clusters <- 20
 # In case elbow_method is FALSE
-number_of_centers <- 4
+number_of_centers <- 8
 
 # Observations to plot
 otp <- 1:4605
@@ -167,7 +167,7 @@ if (cluster_accumul == TRUE) {
                       center, 
                       " (", 
                       length(ts_names), 
-                      "time series)", 
+                      " time series)", 
                       sep=""),
          col  = "blue",
          ylim = c(0,2)
