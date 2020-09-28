@@ -78,8 +78,9 @@ electricity <- function(x) {
 ################################################################################
 
 Load_Dataset_File <- function(dataset_path, filename) {
+  library(data.table)
   # Load data from CSV file
-  data <- read.table(
+  data <- fread(#read.table(
     file = paste(dataset_path, filename, sep = ""),
     header = FALSE,
     sep = ","
@@ -168,6 +169,7 @@ Plot_Data <- function(dset_data, title=NULL) {
   p <- plot(
     x    = dset_data[[1]],
     y    = dset_data[[2]],
+    col  = "blue",
     type = "l",
     main = title,
     xlab = "Date",
