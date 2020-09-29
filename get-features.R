@@ -22,56 +22,10 @@ analysis_list <- EXTRA_ANALYSIS_LIST
 # Date can be an ISOdate or either "first" to indicate the first timestamp in
 # the dataset or "last" to indicate the last one
 from_dates <- c(
-  ISOdate(2012, 1, 1, 0, 0, 0),
-  ISOdate(2012, 2, 1, 0, 0, 0),
-  ISOdate(2012, 3, 1, 0, 0, 0),
-  ISOdate(2012, 4, 1, 0, 0, 0),
-  ISOdate(2012, 5, 1, 0, 0, 0),
-  ISOdate(2012, 6, 1, 0, 0, 0),
-  ISOdate(2012, 7, 1, 0, 0, 0),
-  ISOdate(2012, 8, 1, 0, 0, 0),
-  ISOdate(2012, 9, 1, 0, 0, 0),
-  ISOdate(2012, 10, 1, 0, 0, 0),
-  ISOdate(2012, 11, 1, 0, 0, 0),
-  ISOdate(2012, 12, 1, 0, 0, 0),
-  ISOdate(2013, 1, 1, 0, 0, 0),
   ISOdate(2013, 2, 1, 0, 0, 0),
-  ISOdate(2013, 3, 1, 0, 0, 0),
-  ISOdate(2013, 4, 1, 0, 0, 0),
-  ISOdate(2013, 5, 1, 0, 0, 0),
-  ISOdate(2013, 6, 1, 0, 0, 0),
-  ISOdate(2013, 7, 1, 0, 0, 0),
-  ISOdate(2013, 8, 1, 0, 0, 0),
-  ISOdate(2013, 9, 1, 0, 0, 0),
-  ISOdate(2013, 10, 1, 0, 0, 0),
-  ISOdate(2013, 11, 1, 0, 0, 0),
-  ISOdate(2013, 12, 1, 0, 0, 0)
 )
 to_dates <- c(
-  ISOdate(2012, 1, 31, 23, 30, 0),
-  ISOdate(2012, 2, 29, 23, 30, 0),
-  ISOdate(2012, 3, 31, 23, 30, 0),
-  ISOdate(2012, 4, 30, 23, 30, 0),
-  ISOdate(2012, 5, 31, 23, 30, 0),
-  ISOdate(2012, 6, 30, 23, 30, 0),
-  ISOdate(2012, 7, 31, 23, 30, 0),
-  ISOdate(2012, 8, 31, 23, 30, 0),
-  ISOdate(2012, 9, 30, 23, 30, 0),
-  ISOdate(2012, 10, 31, 23, 30, 0),
-  ISOdate(2012, 11, 30, 23, 30, 0),
-  ISOdate(2012, 12, 31, 23, 30, 0),
-  ISOdate(2013, 1, 31, 23, 30, 0),
   ISOdate(2013, 2, 28, 23, 30, 0),
-  ISOdate(2013, 3, 31, 23, 30, 0),
-  ISOdate(2013, 4, 30, 23, 30, 0),
-  ISOdate(2013, 5, 31, 23, 30, 0),
-  ISOdate(2013, 6, 30, 23, 30, 0),
-  ISOdate(2013, 7, 31, 23, 30, 0),
-  ISOdate(2013, 8, 31, 23, 30, 0),
-  ISOdate(2013, 9, 30, 23, 30, 0),
-  ISOdate(2013, 10, 31, 23, 30, 0),
-  ISOdate(2013, 11, 30, 23, 30, 0),
-  ISOdate(2013, 12, 31, 23, 30, 0)
 )
 # Accepted percentage of NaN values between the start and end dates provided.
 # If the time series exceeds that percentage, it will be discarded
