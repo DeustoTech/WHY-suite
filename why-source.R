@@ -10,6 +10,9 @@ library(lubridate)
 library(forecast)
 library(moments)
 
+#-- ESTABLISH A SEED FOR THE RANDOM NUMBERS
+set.seed(1981)
+
 #-- GLOBAL VARS (IN CAPITAL LETTERS)
 
 # Path to the dataset folder
