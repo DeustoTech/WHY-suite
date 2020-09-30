@@ -69,6 +69,7 @@ quantiles <- function(x) {
 }
   
 electricity <- function(x) {
+  print(x)
   list(
     load_factor = mean(x)/max(x)
   )
