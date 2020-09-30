@@ -22,10 +22,10 @@ analysis_list <- EXTRA_ANALYSIS_LIST
 # Date can be an ISOdate or either "first" to indicate the first timestamp in
 # the dataset or "last" to indicate the last one
 from_dates <- c(
-  ISOdate(2013, 2, 1, 0, 0, 0),
+  ISOdate(2013, 2, 1, 0, 0, 0)
 )
 to_dates <- c(
-  ISOdate(2013, 2, 28, 23, 30, 0),
+  ISOdate(2013, 2, 28, 23, 30, 0)
 )
 # Accepted percentage of NaN values between the start and end dates provided.
 # If the time series exceeds that percentage, it will be discarded
@@ -80,10 +80,10 @@ for (dset_filename in dset_filenames) {
     
     # Get values from dataset file
     dset_data_intvl <- Get_Data_Interval(
-      tm_series = dset_data,
-      from_date = from_date,
-      to_date = to_date,
-      step = 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
+      dset_data       = dset_data,
+      from_date       = from_date,
+      to_date         = to_date,
+      sampling_period = 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
     )
     
     # Check correctness of "dset_data_intvl"
@@ -113,13 +113,13 @@ for (dset_filename in dset_filenames) {
     if (is.null(dset_data_intvl) | is.null(seas_periods) | ts_is_0 | many_na) {
       # Select rejection reason
       rejected <- tibble(
-        filename = dset_filename,
-        from_date = format(from_date, "%Y-%m-%d %H:%M:%S"),
-        to_date = format(to_date, "%Y-%m-%d %H:%M:%S"),
-        null_dataset = is.null(dset_data_intvl),
+        filename          = dset_filename,
+        from_date         = format(from_date, "%Y-%m-%d %H:%M:%S"),
+        to_date           = format(to_date, "%Y-%m-%d %H:%M:%S"),
+        null_dataset      = is.null(dset_data_intvl),
         null_seas_periods = is.null(seas_periods),
-        ts_is_0 = ts_is_0,
-        many_na = many_na
+        ts_is_0           = ts_is_0,
+        many_na           = many_na
       )
       # Bind tibble rows
       op_rejected <- bind_rows(op_rejected, rejected)
@@ -127,28 +127,28 @@ for (dset_filename in dset_filenames) {
     } else {
       # Convert to time series
       vals_msts <- msts(
-        data = dset_data_intvl[,2],
-        start = c(1, 1),
-        ts.frequency = ts_freq,
+        data             = dset_data_intvl[,2],
+        start            = c(1, 1),
+        ts.frequency     = ts_freq,
         seasonal.periods = seas_periods
       )
       
       # Analyze time series
       feats <- tsfeatures(
-        list(vals_msts),
-        features = analysis_list,
-        scale = FALSE,
+        tslist    = list(vals_msts),
+        features  = analysis_list,
+        scale     = FALSE,
         na.action = na.interp
       )
       print("OK!")
     
       # Create tibble of dataset info
       dset_info <- tibble(
-        filename = dset_filename,
-        from_date = format(from_date, "%Y-%m-%d %H:%M:%S"),
-        to_date = format(to_date, "%Y-%m-%d %H:%M:%S"),
+        filename      = dset_filename,
+        from_date     = format(from_date, "%Y-%m-%d %H:%M:%S"),
+        to_date       = format(to_date, "%Y-%m-%d %H:%M:%S"),
         total_samples = len_data_intvl,
-        total_NAs = sum(is.na(dset_data_intvl[,2]))
+        total_NAs     = sum(is.na(dset_data_intvl[,2]))
       )
       
       # Bind tibble rows
