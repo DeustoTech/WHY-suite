@@ -69,9 +69,16 @@ quantiles <- function(x) {
 }
   
 electricity <- function(x) {
-  print(x[1:10])
+  # CHANGE THIS VALUE ACCORDINGLY TO THE DATASET
+  samples_per_day <- 48
+  # Convert TS to matrix of 28 days x "samples_per_day"
+  x_matrix <- t(matrix(x, nrow=samples_per_day))
+  # List of load factors (one per day)
+  load_factors <- rowMeans(x_matrix)/rowMaxs(x_matrix)
+  # Return
   list(
-    load_factor = mean(x)/max(x)
+    load_factors_mean = mean(load_factors),
+    load_factors_var  = var(load_factors)
   )
 }
 
