@@ -17,13 +17,13 @@ otp <- 1:4605
 # -- All features
 #ftp <- c(1:10, 15:70)
 # -- Statistical features
-#ftp <- 1:10
+ftp <- 1:10
 # -- STL features
 #ftp <- 15:26
 # -- Autocorrelation features
 #ftp <- 28:34
 # -- Stats + STL + Acorr + Entropy features
-ftp <- c(1:10, 15:34)
+#ftp <- c(1:10, 15:34)
 # -- Quantiles + seasonal strengths
 # <- c(5:9, 21:22)
 # -- Mean, variance + seasonal strengths
@@ -34,7 +34,7 @@ axis_x <- 1
 axis_y <- 2
 
 # Color by socioeconomic variables
-color_by_SE_vars <- FALSE
+color_by_SE_vars <- TRUE
 SE_data_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
 
 # Get the identification of a point on a plot window

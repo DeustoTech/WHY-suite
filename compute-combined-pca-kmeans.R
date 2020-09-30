@@ -56,7 +56,7 @@ axis_y <- 2
 month_accumul <- FALSE
 
 # Plot mean and variance of all TS in cluster
-cluster_accumul <- TRUE
+cluster_accumul <- FALSE
 
 ################################################################################
 
