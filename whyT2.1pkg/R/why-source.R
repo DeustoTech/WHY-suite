@@ -141,7 +141,7 @@ Load_Dataset_File <- function(dataset_path, filename) {
   data.frame(times = times, values = values)
 }
 
-#' Extraction of a time series according to a time interval
+#' Extraction of an interval from the time series
 #'
 #' @description
 #' Extract a time series contained between two dates.
