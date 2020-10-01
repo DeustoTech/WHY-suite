@@ -47,7 +47,14 @@ EXTRA_ANALYSIS_LIST <-
     "motiftwo_entro3"
   )
 
-# FEATURE FUNCTIONS
+#' Statistical moments
+#' 
+#' @description
+#' Compute the mean, variance, skewness and kurtosis of a time series.
+#' 
+#' @param x Time series of class `msts`.
+#' 
+#' @return A list with the mean, variance, skewness and kurtosis of the time series.
 stat_moments <- function(x) {
   list(
     mean     = mean(x),
@@ -57,6 +64,14 @@ stat_moments <- function(x) {
   )
 }
 
+#' Quantiles
+#' 
+#' @description
+#' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series.
+#' 
+#' @param x Time series of class `msts`.
+#' 
+#' @return A list with the minimum, lower quartile, median, upper quartile and maximum of the time series.
 quantiles <- function(x) {
   q <- quantile(x)
   list(
