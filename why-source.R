@@ -86,11 +86,11 @@ quantiles <- function(x) {
 #' Features of electricity
 #' 
 #' @description
-#' Compute the load factor for each day of a time series.
+#' Compute the load factor across days of a time series.
 #' 
 #' @param x Time series of class `msts`.
 #' 
-#' @return A list with the mean and variance of the load factors of all days in the time series.
+#' @return A list with the mean and variance of the load factors across days in the time series.
 electricity <- function(x) {
   # Get samples per day
   samples_per_day <- attr(x, "msts")[1]
@@ -100,8 +100,8 @@ electricity <- function(x) {
   load_factors <- rowMeans(x_matrix)/rowMaxs(x_matrix)
   # Return
   list(
-    load_factors_mean = mean(load_factors),
-    load_factors_var  = var(load_factors)
+    mean_load_factors = mean(load_factors),
+    var_load_factors = var(load_factors)
   )
 }
 
