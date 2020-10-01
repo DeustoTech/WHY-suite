@@ -1,7 +1,7 @@
 Package: whyT2.1
 Type: Package
 Title: WHY Task 2.1
-Version: 0.1.0
+Version: 0.1.1
 Authors: Carlos Quesada <carlos.quesada@deusto.es>
 Maintainer: Carlos Quesada <carlos.quesada@deusto.es>
 Description: Implementation of WHY Task 2.1
@@ -9,5 +9,12 @@ License: See LICENSE file
 Encoding: UTF-8
 LazyData: true
 Imports:
+  tidyverse,
+  tsfeatures,
+  lubridate,
+  forecast,
+  moments,
+  data.table,
+  Rfast
 Depends:
 RoxygenNote: 7.1.1

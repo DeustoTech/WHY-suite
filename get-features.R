@@ -9,7 +9,9 @@
 # If the time series is OK, it extracts the features.
 
 # Load source file and libraries
-source("why-source.R")
+#source("why-source.R")
+library(whyT2.1)
+library(tidyverse)
 
 ################################################################################
 # -- User parameters
@@ -45,7 +47,7 @@ dset_filenames <- list.files(DATASET_PATH)
 ts_freq <- SAMPLES_PER_DAY[[dset_key]]
 
 # Analysis loop
-for (dset_filename in dset_filenames) {
+for (dset_filename in dset_filenames[1:5]) {
   # Load dataset file
   dset_data <- Load_Dataset_File(DATASET_PATH, dset_filename)
   
@@ -126,7 +128,7 @@ for (dset_filename in dset_filenames) {
     # Do analyze features
     } else {
       # Convert to time series
-      vals_msts <- msts(
+      vals_msts <- forecast::msts(
         data             = dset_data_intvl[,2],
         start            = c(1, 1),
         ts.frequency     = ts_freq,
@@ -134,16 +136,16 @@ for (dset_filename in dset_filenames) {
       )
       
       # Analyze time series
-      feats <- tsfeatures(
+      feats <- tsfeatures::tsfeatures(
         tslist    = list(vals_msts),
         features  = analysis_list,
         scale     = FALSE,
-        na.action = na.interp
+        na.action = forecast::na.interp
       )
       print("OK!")
     
       # Create tibble of dataset info
-      dset_info <- tibble(
+      dset_info <- tibble::tibble(
         filename      = dset_filename,
         from_date     = format(from_date, "%Y-%m-%d %H:%M:%S"),
         to_date       = format(to_date, "%Y-%m-%d %H:%M:%S"),

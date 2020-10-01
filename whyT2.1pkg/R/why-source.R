@@ -4,11 +4,11 @@
 
 #-- LIBRARIES
 
-library(tidyverse)
-library(tsfeatures)
-library(lubridate)
-library(forecast)
-library(moments)
+# library(tidyverse)
+# library(tsfeatures)
+# library(lubridate)
+# library(forecast)
+# library(moments)
 
 #-- ESTABLISH A SEED FOR THE RANDOM NUMBERS
 set.seed(1981)
@@ -62,8 +62,8 @@ stat_moments <- function(x) {
   list(
     mean     = mean(x),
     variance = var(x),
-    skewness = skewness(x),
-    kurtosis = kurtosis(x)
+    skewness = moments::skewness(x),
+    kurtosis = moments::kurtosis(x)
   )
 }
 
@@ -105,7 +105,7 @@ electricity <- function(x) {
   # Convert TS to matrix of 28 days x "samples_per_day"
   x_matrix <- t(matrix(x, nrow=samples_per_day))
   # List of load factors (one per day)
-  load_factors <- rowMeans(x_matrix)/rowMaxs(x_matrix)
+  load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
   # Return
   list(
     mean_load_factors = mean(load_factors),
@@ -126,15 +126,14 @@ electricity <- function(x) {
 #' @export
 
 Load_Dataset_File <- function(dataset_path, filename) {
-  library(data.table)
   # Load data from CSV file
-  data <- fread(#read.table(
+  data <- data.table::fread(
     file = paste(dataset_path, filename, sep = ""),
     header = FALSE,
     sep = ","
   )
   # Times
-  times <- ymd_hms(data$V1)
+  times <- as.POSIXct(data$V1, tz="GMT")
   # Values
   values <- data$V2
   # Create dataframe
