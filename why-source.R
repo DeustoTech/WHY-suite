@@ -47,7 +47,7 @@ EXTRA_ANALYSIS_LIST <-
     "motiftwo_entro3"
   )
 
-#' Statistical moments
+#' Features of statistical moments
 #' 
 #' @description
 #' Compute the mean, variance, skewness and kurtosis of a time series.
@@ -64,7 +64,7 @@ stat_moments <- function(x) {
   )
 }
 
-#' Quantiles
+#' Features of quantiles
 #' 
 #' @description
 #' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series.
@@ -82,9 +82,17 @@ quantiles <- function(x) {
     maximum        = q[[5]]
   )
 }
-  
+
+#' Features of electricity
+#' 
+#' @description
+#' Compute the load factor for each day of a time series.
+#' 
+#' @param x Time series of class `msts`.
+#' 
+#' @return A list with the mean and variance of the load factors of all days in the time series.
 electricity <- function(x) {
-  # CHANGE THIS VALUE ACCORDINGLY TO THE DATASET
+  # Get samples per day
   samples_per_day <- attr(x, "msts")[1]
   # Convert TS to matrix of 28 days x "samples_per_day"
   x_matrix <- t(matrix(x, nrow=samples_per_day))
@@ -97,12 +105,15 @@ electricity <- function(x) {
   )
 }
 
-# PROGRAM FUNCTIONS
-
-################################################################################
-#-- Load dataset file
-################################################################################
-
+#' Loading of time series
+#' 
+#' @description
+#' Load a time series contained in a proper CSV file.
+#' 
+#' @param dataset_path Path to the proper CSV file.
+#' @param filename Name of the proper CSV file.
+#' 
+#' @return A data.frame containing GMT dates and values.
 Load_Dataset_File <- function(dataset_path, filename) {
   library(data.table)
   # Load data from CSV file
@@ -115,18 +126,24 @@ Load_Dataset_File <- function(dataset_path, filename) {
   times <- ymd_hms(data$V1)
   # Values
   values <- data$V2
-  # Create tibble
+  # Create dataframe
   data.frame(times = times, values = values)
 }
 
-################################################################################
-#-- Get dataset values inside a time interval
-################################################################################
-# REMARKS:
-# "sampling_period" (measured in seconds) is needed as an input parameter to 
-# check non-existing dates, which must be indicated as NaN.
-################################################################################
-
+#' Extraction of a time series according a time interval
+#' 
+#' @description
+#' Extract a time series contained between two dates.
+#' 
+#' @details 
+#' `sampling_period` (measured in seconds) is needed as an input parameter to check non-existing dates, which must be indicated as `NaN`.
+#' 
+#' @param dset_data Time series in the proper data.frame format.
+#' @param from_date The initial GMT date of the interval.
+#' @param to_date The final GMT date of the interval.
+#' @param sampling_period Sampling period of the data.frame.
+#' 
+#' @return A data.frame containing GMT dates and values.
 Get_Data_Interval <- function(dset_data,
                               from_date,
                               to_date,
