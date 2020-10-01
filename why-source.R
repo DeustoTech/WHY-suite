@@ -85,7 +85,7 @@ quantiles <- function(x) {
   
 electricity <- function(x) {
   # CHANGE THIS VALUE ACCORDINGLY TO THE DATASET
-  samples_per_day <- 48
+  samples_per_day <- attr(x, "msts")[1]
   # Convert TS to matrix of 28 days x "samples_per_day"
   x_matrix <- t(matrix(x, nrow=samples_per_day))
   # List of load factors (one per day)
