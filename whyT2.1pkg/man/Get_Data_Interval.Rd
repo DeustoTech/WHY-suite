@@ -2,7 +2,7 @@
 % Please edit documentation in R/why-source.R
 \name{Get_Data_Interval}
 \alias{Get_Data_Interval}
-\title{Extraction of a time series according to a time interval}
+\title{Extraction of an interval from the time series}
 \usage{
 Get_Data_Interval(dset_data, from_date, to_date, sampling_period)
 }

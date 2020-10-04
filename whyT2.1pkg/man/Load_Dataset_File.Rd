@@ -2,7 +2,7 @@
 % Please edit documentation in R/why-source.R
 \name{Load_Dataset_File}
 \alias{Load_Dataset_File}
-\title{Loading of time series}
+\title{Get a time series from a dataset}
 \usage{
 Load_Dataset_File(dataset_path, filename)
 }

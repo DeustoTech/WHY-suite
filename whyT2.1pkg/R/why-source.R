@@ -47,6 +47,10 @@ EXTRA_ANALYSIS_LIST <-
     "motiftwo_entro3"
   )
 
+################################################################################
+##  stat_moments()
+################################################################################
+
 #' Features of statistical moments
 #'
 #' @description
@@ -66,6 +70,10 @@ stat_moments <- function(x) {
     kurtosis = moments::kurtosis(x)
   )
 }
+
+################################################################################
+##  quantiles()
+################################################################################
 
 #' Features of quantiles
 #'
@@ -88,6 +96,10 @@ quantiles <- function(x) {
     maximum        = q[[5]]
   )
 }
+
+################################################################################
+##  electricity()
+################################################################################
 
 #' Features of electricity
 #'
@@ -113,22 +125,26 @@ electricity <- function(x) {
   )
 }
 
-#' Loading of time series
+################################################################################
+##  dataset_to_raw_dataframe()
+################################################################################
+
+#' Raw dataframe from dataset
 #'
 #' @description
-#' Load a time series contained in a proper CSV file.
+#' Get a dataframe from a dataset contained in a CSV file.
 #'
-#' @param dataset_path Path to the proper CSV file.
-#' @param filename Name of the proper CSV file.
+#' @param csv_file Path (string) to the CSV file containing the dataset.
 #'
-#' @return A data.frame containing GMT dates and values.
+#' @return Raw dataframe, i.e. without checking missing samples.
 #'
 #' @export
 
-Load_Dataset_File <- function(dataset_path, filename) {
+#Load_Dataset_File <- function(csv_file) {
+dataset_to_raw_dataframe <- function(csv_file) {
   # Load data from CSV file
   data <- data.table::fread(
-    file = paste(dataset_path, filename, sep = ""),
+    file = csv_file,
     header = FALSE,
     sep = ","
   )
@@ -140,28 +156,27 @@ Load_Dataset_File <- function(dataset_path, filename) {
   data.frame(times = times, values = values)
 }
 
-#' Extraction of an interval from the time series
+################################################################################
+##  raw_to_cooked_dataframe()
+################################################################################
+
+#' Cooked dataframe from raw dataframe
 #'
 #' @description
-#' Extract a time series contained between two dates.
+#' Cook a raw dataframe. Cooking consists in completing missing samples with NA values and extracting a time interval out of the raw dataframe.
 #'
-#' @details
-#' `sampling_period` (measured in seconds) is needed as an input parameter to check non-existing dates, which must be indicated as `NaN`.
+#' @param dset_data Raw dataframe.
+#' @param from_date Initial GMT date of the interval.
+#' @param to_date Last GMT date of the interval.
+#' @param sampling_period Sampling period (measured in seconds) of the raw dataframe. This value is required to complete missing samples with `NaN`.
 #'
-#' @param dset_data Time series in the proper data.frame format.
-#' @param from_date The initial GMT date of the interval.
-#' @param to_date The final GMT date of the interval.
-#' @param sampling_period Sampling period of the data.frame.
-#'
-#' @return A data.frame containing GMT dates and values.
+#' @return Cooked dataframe.
 #'
 #' @export
 
-Get_Data_Interval <- function(dset_data,
-                              from_date,
-                              to_date,
-                              sampling_period
-                              ) {
+# RENAME TO: raw_to_cooked_dataframe()
+# Get_Data_Interval <- function(dset_data, from_date, to_date, sampling_period) {
+raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, sampling_period) {
   # Time series ends
   first_ts_date <- dset_data[[1, 1]]
   last_ts_date <- tail(dset_data, 1)[[1, 1]]
@@ -183,12 +198,27 @@ Get_Data_Interval <- function(dset_data,
 }
 
 ################################################################################
-#-- Plot a data_info row
-################################################################################
-# EXAMPLE OF USE:
-# Plot_Data_Info_Row(data_info["75220",])
+##  Plot_Data_Info_Row()
 ################################################################################
 
+#' Plot of a row of `data_info`
+#'
+#' @description
+#' Plot the time series contained in a row of the file `data_info.csv` (once loaded).
+#'
+#' @param di_row Row of `data_info`.
+#' @param dset_key Key of the dataset.
+#'
+#' @return Plot of the time series.
+#'
+#' @example
+#' \dontrun{
+#' Plot_Data_Info_Row(data_info["75220",])
+#' }
+#'
+#' @export
+
+# RENAME TO: plot_datainfo_row()
 Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
   # How long a step is in seconds
   step_in_secs <- 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
@@ -217,9 +247,22 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
 }
 
 ################################################################################
-#-- Function to plot an interval of a time series
+##  Plot_Data()
 ################################################################################
 
+#' Plot of a time series contained in a data.frame
+#'
+#' @description
+#' Plot a time series contained in a proper data.frame.
+#'
+#' @param dset_data The data.frame to be plotted.
+#' @param title Optional title (`NULL` by default).
+#'
+#' @return Plot of the time series.
+#'
+#' @export
+
+# RENAME TO: plot_dataframe()
 Plot_Data <- function(dset_data, title=NULL) {
   # Create plot
   p <- plot(
@@ -235,10 +278,24 @@ Plot_Data <- function(dset_data, title=NULL) {
 }
 
 ################################################################################
-#-- Function to create a library of features
+##  Create_Features_Library()
 ################################################################################
 
-Create_Features_Library <- function() {
+#' Creation of a PDF library of features
+#'
+#' @description
+#' For each feature, the nine most representative values are plotted (including the minimum, the median and the maximum values).
+#'
+#' @param sampling_period Sampling period of the data.frame.
+#' @param feats_folder String with a path to the folder where the features are contained.
+#' @param feats_to_plot Vector of the features to be plotted.
+#'
+#' @return A PDF file per feature with nine plots each.
+#'
+#' @export
+
+# RENAME TO: plot_features_library()
+Create_Features_Library <- function(sampling_period, feats_folder, feats_to_plot) {
   # Libraries
   library(plotly)
 
@@ -299,10 +356,29 @@ Create_Features_Library <- function() {
 }
 
 ################################################################################
-#-- Compute PCA of features
+##  Compute_PCA_From_Features()
 ################################################################################
 
-Compute_PCA_From_Features <- function() {
+#' PCA from features
+#'
+#' @description
+#' Compute and plot PCA from the features of the time series.
+#'
+#' @param feats_folder String with the path to the folder where the features are contained.
+#' @param otp Vector of the observations to plot.
+#' @param ftp Vector of the features to plot.
+#' @param axis_x Integer indicating the principal component to be plotted as axis x.
+#' @param axis_y Integer indicating the principal component to be plotted as axis y.
+#' @param color_by_SE_vars Boolean indicating if plotted points must be colored according to the socioeconomical variables.
+#' @param SE_data_file String with the path to the file with the socioeconomical variables.
+#' @param get_point_identity Boolean indicating if plotted points must be identified by clicking on them.
+#'
+#' @return A list with class `princomp`.
+#'
+#' @export
+
+# RENAME TO: compute_pca_from_features()
+Compute_PCA_From_Features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
   # Load data from CSV files
   feats <- read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),

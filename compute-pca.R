@@ -41,4 +41,13 @@ SE_data_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_hou
 get_point_identity <- FALSE
 
 # Function call
-pca <- Compute_PCA_From_Features()
+pca <- Compute_PCA_From_Features(
+  feats_folder       = feats_folder,
+  otp                = otp,
+  ftp                = ftp,
+  axis_x             = axis_x,
+  axis_y             = axis_y,
+  color_by_SE_vars   = color_by_SE_vars,
+  SE_data_file       = SE_data_file,
+  get_point_identity = get_point_identity
+)
