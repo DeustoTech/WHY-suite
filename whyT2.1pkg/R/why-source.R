@@ -127,6 +127,7 @@ electricity <- function(x) {
 
 ################################################################################
 ##  dataset_to_raw_dataframe()
+##  OLD: Load_Dataset_File()
 ################################################################################
 
 #' Raw dataframe from dataset
@@ -140,7 +141,6 @@ electricity <- function(x) {
 #'
 #' @export
 
-#Load_Dataset_File <- function(csv_file) {
 dataset_to_raw_dataframe <- function(csv_file) {
   # Load data from CSV file
   data <- data.table::fread(
@@ -158,6 +158,7 @@ dataset_to_raw_dataframe <- function(csv_file) {
 
 ################################################################################
 ##  raw_to_cooked_dataframe()
+##  OLD: Get_Data_Interval()
 ################################################################################
 
 #' Cooked dataframe from raw dataframe
@@ -166,16 +167,14 @@ dataset_to_raw_dataframe <- function(csv_file) {
 #' Cook a raw dataframe. Cooking consists in completing missing samples with NA values and extracting a time interval out of the raw dataframe.
 #'
 #' @param dset_data Raw dataframe.
-#' @param from_date Initial GMT date of the interval.
-#' @param to_date Last GMT date of the interval.
+#' @param from_date Initial date and time of the interval of class `POSIXct` and time zone GMT.
+#' @param to_date Final date and time of the interval of class `POSIXct` and time zone GMT.
 #' @param sampling_period Sampling period (measured in seconds) of the raw dataframe. This value is required to complete missing samples with `NaN`.
 #'
 #' @return Cooked dataframe.
 #'
 #' @export
 
-# RENAME TO: raw_to_cooked_dataframe()
-# Get_Data_Interval <- function(dset_data, from_date, to_date, sampling_period) {
 raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, sampling_period) {
   # Time series ends
   first_ts_date <- dset_data[[1, 1]]
@@ -198,28 +197,28 @@ raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, sampling_peri
 }
 
 ################################################################################
-##  Plot_Data_Info_Row()
+##  plot_datainfo_row()
+##  OLD: Plot_Data_Info_Row()
 ################################################################################
 
-#' Plot of a row of `data_info`
+#' Plotting of a row of `data_info` plotting
 #'
 #' @description
-#' Plot the time series contained in a row of the file `data_info.csv` (once loaded).
+#' Plot the dataset indicated in a row of the file `data_info.csv`.
 #'
 #' @param di_row Row of `data_info`.
 #' @param dset_key Key of the dataset.
 #'
-#' @return Plot of the time series.
+#' @return Plot of the dataset.
 #'
 #' @example
 #' \dontrun{
-#' Plot_Data_Info_Row(data_info["75220",])
+#' plot_datainfo_row(data_info["75220",])
 #' }
 #'
 #' @export
 
-# RENAME TO: plot_datainfo_row()
-Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
+plot_datainfo_row  <- function(di_row, dset_key="lcl") {
   # How long a step is in seconds
   step_in_secs <- 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
   # Load a complete time series from the dataset
@@ -247,23 +246,23 @@ Plot_Data_Info_Row <- function(di_row, dset_key="lcl") {
 }
 
 ################################################################################
-##  Plot_Data()
+##  plot_dataframe()
+##  OLD: Plot_Data()
 ################################################################################
 
-#' Plot of a time series contained in a data.frame
+#' Plotting of a dataframe
 #'
 #' @description
-#' Plot a time series contained in a proper data.frame.
+#' Plot a dataframe (either raw or cooked).
 #'
-#' @param dset_data The data.frame to be plotted.
+#' @param dset_data The dataframe to be plotted.
 #' @param title Optional title (`NULL` by default).
 #'
-#' @return Plot of the time series.
+#' @return Plot of the dataset.
 #'
 #' @export
 
-# RENAME TO: plot_dataframe()
-Plot_Data <- function(dset_data, title=NULL) {
+plot_dataframe <- function(dset_data, title=NULL) {
   # Create plot
   p <- plot(
     x    = dset_data[[1]],
@@ -278,15 +277,16 @@ Plot_Data <- function(dset_data, title=NULL) {
 }
 
 ################################################################################
-##  Create_Features_Library()
+##  plot_features_library()
+##  OLD: Create_Features_Library()
 ################################################################################
 
 #' Creation of a PDF library of features
 #'
 #' @description
-#' For each feature, the nine most representative values are plotted (including the minimum, the median and the maximum values).
+#' For each feature, the nine most representative values are plotted, including the minimum, the median and the maximum values.
 #'
-#' @param sampling_period Sampling period of the data.frame.
+#' @param sampling_period Sampling period of the dataframe.
 #' @param feats_folder String with a path to the folder where the features are contained.
 #' @param feats_to_plot Vector of the features to be plotted.
 #'
@@ -294,8 +294,7 @@ Plot_Data <- function(dset_data, title=NULL) {
 #'
 #' @export
 
-# RENAME TO: plot_features_library()
-Create_Features_Library <- function(sampling_period, feats_folder, feats_to_plot) {
+plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) {
   # Libraries
   library(plotly)
 
@@ -356,7 +355,8 @@ Create_Features_Library <- function(sampling_period, feats_folder, feats_to_plot
 }
 
 ################################################################################
-##  Compute_PCA_From_Features()
+##  compute_pca_from_features()
+##  OLD: Compute_PCA_From_Features()
 ################################################################################
 
 #' PCA from features
@@ -377,8 +377,7 @@ Create_Features_Library <- function(sampling_period, feats_folder, feats_to_plot
 #'
 #' @export
 
-# RENAME TO: compute_pca_from_features()
-Compute_PCA_From_Features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
+compute_pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
   # Load data from CSV files
   feats <- read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
