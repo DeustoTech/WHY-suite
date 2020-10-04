@@ -222,12 +222,12 @@ plot_datainfo_row  <- function(di_row, dset_key="lcl") {
   # How long a step is in seconds
   step_in_secs <- 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
   # Load a complete time series from the dataset
-  dset_data <- Load_Dataset_File(DATASET_PATH, di_row[[1]])
+  dset_data <- dataset_to_raw_dataframe(DATASET_PATH, di_row[[1]])
   # Dates
   from_date <- as.POSIXct(di_row[[2]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
   to_date   <- as.POSIXct(di_row[[3]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
   # Interval
-  dset_data_intvl <- Get_Data_Interval(
+  dset_data_intvl <- raw_to_cooked_dataframe(
     dset_data       = dset_data,
     from_date       = from_date,
     to_date         = to_date,
@@ -336,16 +336,16 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 
     for (jj in 1:9) {
       # Load dataset file
-      dset_data <- Load_Dataset_File(DATASET_PATH, repres_fnames[jj])
+      dset_data <- dataset_to_raw_dataframe(DATASET_PATH, repres_fnames[jj])
       # Get values from dataset file
-      dset_data_intvl <- Get_Data_Interval(
+      dset_data_intvl <- raw_to_cooked_dataframe(
         dset_data       = dset_data,
         from_date       = repres_from_D[jj],
         to_date         = repres_to_D[jj],
         sampling_period = sampling_period
       )
       # Plot interval
-      Plot_Data(
+      plot_dataframe(
         dset_data = dset_data_intvl,
         title     = paste(feat_name, "=", repres_values[jj])
       )
