@@ -2,7 +2,7 @@
 % Please edit documentation in R/why-source.R
 \name{get_features_from_cooked_dataframe}
 \alias{get_features_from_cooked_dataframe}
-\title{Features from a cooked dataframe}
+\title{Features of a cooked dataframe}
 \usage{
 get_features_from_cooked_dataframe(df, type_of_analysis)
 }
@@ -15,5 +15,5 @@ get_features_from_cooked_dataframe(df, type_of_analysis)
 List of features.
 }
 \description{
-Get features from a cooked dataframe.
+Get features of a cooked dataframe.
 }

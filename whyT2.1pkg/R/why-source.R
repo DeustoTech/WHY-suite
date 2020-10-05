@@ -81,8 +81,8 @@ electricity <- function(x) {
 }
 
 ################################################################################
-##  dataset_to_raw_dataframe()
-##  OLD: Load_Dataset_File()
+##  get_raw_dataframe_from_dataset()
+##  OLD: dataset_to_raw_dataframe(); Load_Dataset_File()
 ################################################################################
 
 #' Raw dataframe from dataset
@@ -90,13 +90,13 @@ electricity <- function(x) {
 #' @description
 #' Get a dataframe from a dataset contained in a CSV file.
 #'
-#' @param csv_file Path (string) to the CSV file containing the dataset.
+#' @param csv_file String with the absolute path to the CSV file containing the dataset.
 #'
 #' @return Raw dataframe, i.e. without checking missing samples.
 #'
 #' @export
 
-dataset_to_raw_dataframe <- function(csv_file) {
+get_raw_dataframe_from_dataset <- function(csv_file) {
   # Load data from CSV file
   data <- data.table::fread(
     file = csv_file,
@@ -112,13 +112,13 @@ dataset_to_raw_dataframe <- function(csv_file) {
 }
 
 ################################################################################
-##  get_features_from_cooked_dataframe()
+##  get_features_of_cooked_dataframe()
 ################################################################################
 
-#' Features from a cooked dataframe
+#' Features of a cooked dataframe
 #'
 #' @description
-#' Get features from a cooked dataframe.
+#' Get features of a cooked dataframe.
 #'
 #' @param cooked_df Cooked dataframe.
 #' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.
@@ -132,24 +132,24 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
   set.seed(1981)
   # Analysis list
   analysis_list <- list(
-    basic = c("stat_moments", "quantiles", "electricity", "frequency" , 
+    basic = c("stat_moments", "quantiles", "electricity", "frequency",
               "stl_features", "entropy", "acf_features"),
-    extra = c("stat_moments", "quantiles", "electricity", "frequency", 
-              "stl_features", "entropy", "acf_features" , "max_kl_shift", 
-              "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9", 
-              "crossing_points", "max_var_shift", "nonlinearity", 
-              "spreadrandomlocal_meantaul", "flat_spots", "pacf_features", 
-              "firstmin_ac", "std1st_der", "heterogeneity", "stability", 
+    extra = c("stat_moments", "quantiles", "electricity", "frequency",
+              "stl_features", "entropy", "acf_features" , "max_kl_shift",
+              "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
+              "crossing_points", "max_var_shift", "nonlinearity",
+              "spreadrandomlocal_meantaul", "flat_spots", "pacf_features",
+              "firstmin_ac", "std1st_der", "heterogeneity", "stability",
               "firstzero_ac", "trev_num", "holt_parameters", "walker_propcross",
-              "hurst", "unitroot_kpss", "histogram_mode", "unitroot_pp", 
+              "hurst", "unitroot_kpss", "histogram_mode", "unitroot_pp",
               "localsimple_taures", "lumpiness", "motiftwo_entro3")
   )
   # Convert to time series
   vals_msts <- forecast::msts(
-    data             = df$cooked_df[,2],
-    seasonal.periods = df$seasonal_periods
-    # start            = c(1, 1),
-    # ts.frequency     = ts_freq,
+    data             = df$df[,2],
+    seasonal.periods = df$seasonal_periods,
+    ts.frequency     = df$seasonal_periods[1],
+    start            = c(1, 1)
   )
   # Extract features
   feats <- tsfeatures::tsfeatures(
@@ -162,8 +162,8 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
 }
 
 ################################################################################
-##  raw_to_cooked_dataframe()
-##  OLD: Get_Data_Interval()
+##  cook_raw_dataframe()
+##  OLD: raw_to_cooked_dataframe(); Get_Data_Interval()
 ################################################################################
 
 #' Cooked dataframe from raw dataframe
@@ -171,7 +171,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
 #' @description
 #' Cook a raw dataframe. Cooking consists in completing missing samples with NA values, removing extra samples (those not matching the sampling period), extracting a user-defined time interval out of the raw dataframe, and checking its validity to be feature-analyzed.
 #'
-#' @param dset_data Raw dataframe.
+#' @param raw_df Raw dataframe.
 #' @param from_date Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.
 #' @param to_date Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.
 #' @param dset_key String indicating the key of the dataset. `lcl` for `Low Carbon London`.
@@ -180,26 +180,26 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
 #'
 #' @export
 
-raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, dset_key) {
+cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
   SAMPLES_PER_DAY <- list(lcl = 48)
   # Selection
   spd <- SAMPLES_PER_DAY[[dset_key]]
 
   # Time series ends
-  first_ts_date <- dset_data[[1, 1]]
-  last_ts_date <- tail(dset_data, 1)[[1, 1]]
+  first_ts_date <- raw_df[[1, 1]]
+  last_ts_date <- tail(raw_df, 1)[[1, 1]]
 
   # Check interval left end
   if (class(from_date) == "character") {
     if (from_date == "first") {
-      from_date <- dset_data[[1, 1]]
+      from_date <- raw_df[[1, 1]]
     }
   }
   # Check interval right end
   if (class(to_date) == "character") {
     if (to_date == "last") {
-      to_date <- tail(dset_data, 1)[[1, 1]]
+      to_date <- tail(raw_df, 1)[[1, 1]]
     }
   }
 
@@ -212,9 +212,9 @@ raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, dset_key) {
   time_seq <- seq(from_date, to_date, period_in_secs)
   # Find matches in dataframe (this completes missing samples with NA values
   # and removes extra samples out of the sampling period)
-  mm <- match(time_seq, dset_data$times)
+  mm <- match(time_seq, raw_df$times)
   # Output
-  cooked_df <- data.frame(times = time_seq, values = dset_data$values[mm])
+  cooked_df <- data.frame(times = time_seq, values = raw_df$values[mm])
 
   # Get seasonal periods
   seasonal_periods <- NULL
@@ -234,16 +234,16 @@ raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, dset_key) {
 
   # NA percentage
   na_percentage <- sum(is.na(cooked_df[,2])) / cooked_df_length
-  
+
   # Check if all values are 0
   cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
-  
+
   # Returned list
   output <- list(
-    cooked_df        = cooked_df,
+    df               = cooked_df,
     seasonal_periods = seasonal_periods,
     na_percentage    = na_percentage,
-    cooked_df_is_0   = cooked_df_is_0
+    is_0             = cooked_df_is_0
   )
   return(output)
 }
@@ -275,21 +275,21 @@ plot_datainfo_row  <- function(di_row, dset_key="lcl") {
   step_in_secs <- 86400 / SAMPLES_PER_DAY[[dset_key]] # 30 * 60
   # Load a complete time series from the dataset
   csv_path <- paste(DATASET_PATH, di_row[[1]], sep="")
-  dset_data <- dataset_to_raw_dataframe(csv_path)
+  raw_df   <- get_raw_dataframe_from_dataset(csv_path)
   # Dates
   from_date <- as.POSIXct(di_row[[2]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
   to_date   <- as.POSIXct(di_row[[3]], format = "%Y-%m-%d %H:%M:%S", tz="GMT")
   # Interval
-  dset_data_intvl <- raw_to_cooked_dataframe(
-    dset_data       = dset_data,
-    from_date       = from_date,
-    to_date         = to_date,
-    sampling_period = step_in_secs
+  cooked_df <- cook_raw_dataframe(
+    raw_df    = raw_df,
+    from_date = from_date,
+    to_date   = to_date,
+    dset_key  = dset_key
   )
   # Plot
   plot(
     seq(from_date, to_date, as.difftime(step_in_secs, units = "secs")),
-    dset_data_intvl,
+    cooked_df,
     type = "l",
     main = di_row[[1]],
     xlab = "Date",
@@ -330,7 +330,7 @@ plot_dataframe <- function(dset_data, title=NULL) {
 }
 
 ################################################################################
-##  plot_features_library()
+##  plot_library_of_features()
 ##  OLD: Create_Features_Library()
 ################################################################################
 
@@ -390,17 +390,17 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
     for (jj in 1:9) {
       # Load dataset file
       csv_path <- paste(DATASET_PATH, repres_fnames[jj], sep="")
-      dset_data <- dataset_to_raw_dataframe(csv_path)
+      raw_df <- get_raw_dataframe_from_dataset(csv_path)
       # Get values from dataset file
-      dset_data_intvl <- raw_to_cooked_dataframe(
-        dset_data       = dset_data,
-        from_date       = repres_from_D[jj],
-        to_date         = repres_to_D[jj],
-        sampling_period = sampling_period
+      cooked_df <- cook_raw_dataframe(
+        raw_df    = raw_df,
+        from_date = repres_from_D[jj],
+        to_date   = repres_to_D[jj],
+        dset_key  = "lcl"
       )
       # Plot interval
       plot_dataframe(
-        dset_data = dset_data_intvl,
+        dset_data = cooked_df,
         title     = paste(feat_name, "=", repres_values[jj])
       )
     }
@@ -409,14 +409,14 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 }
 
 ################################################################################
-##  compute_pca_from_features()
+##  get_pca_of_features()
 ##  OLD: Compute_PCA_From_Features()
 ################################################################################
 
-#' PCA from features
+#' PCA of features
 #'
 #' @description
-#' Compute and plot PCA from the features of the time series.
+#' Compute and plot PCA of the features of the datasets.
 #'
 #' @param feats_folder String with the path to the folder where the features are contained.
 #' @param otp Vector of the observations to plot.
@@ -431,7 +431,7 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 #'
 #' @export
 
-compute_pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
+pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
   # Load data from CSV files
   feats <- read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
