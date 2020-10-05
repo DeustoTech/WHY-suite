@@ -10,18 +10,14 @@
 # library(forecast)
 # library(moments)
 
+
 #-- ESTABLISH A SEED FOR THE RANDOM NUMBERS
 set.seed(1981)
 
 #-- GLOBAL VARS (IN CAPITAL LETTERS)
 
 # Path to the dataset folder
-DATASET_PATH <- "G:/Mi unidad/WHY/Datasets/lcl/"
-# Number of samples in a day for the dataset
-SAMPLES_PER_DAY <-
-  list(
-    lcl = 48
-  )
+# DATASET_PATH <- "G:/Mi unidad/WHY/Datasets/lcl/"
 
 # List of functions that will be passed to tsfeatures.
 # -- Some functions were not included because they:
@@ -153,7 +149,40 @@ dataset_to_raw_dataframe <- function(csv_file) {
   # Values
   values <- data$V2
   # Create dataframe
-  data.frame(times = times, values = values)
+  return(data.frame(times = times, values = values))
+}
+
+################################################################################
+##  get_features_from_cooked_dataframe()
+################################################################################
+
+#' Features from a cooked dataframe
+#'
+#' @description
+#' Get features from a cooked dataframe.
+#'
+#' @param cooked_df Cooked dataframe.
+#'
+#' @return List of features.
+#'
+#' @export
+
+get_features_from_cooked_dataframe <- function(df) {
+  # Convert to time series
+  vals_msts <- forecast::msts(
+    data             = df$cooked_df[,2],
+    start            = c(1, 1),
+    ts.frequency     = ts_freq,
+    seasonal.periods = seas_periods
+  )
+  # Extract features
+  feats <- tsfeatures::tsfeatures(
+    tslist    = list(vals_msts),
+    features  = analysis_list,
+    scale     = FALSE,
+    na.action = forecast::na.interp
+  )
+  return(feats)
 }
 
 ################################################################################
@@ -164,36 +193,83 @@ dataset_to_raw_dataframe <- function(csv_file) {
 #' Cooked dataframe from raw dataframe
 #'
 #' @description
-#' Cook a raw dataframe. Cooking consists in completing missing samples with NA values and extracting a time interval out of the raw dataframe.
+#' Cook a raw dataframe. Cooking consists in completing missing samples with NA values, removing extra samples (those not matching the sampling period), extracting a user-defined time interval out of the raw dataframe, and checking its validity to be feature-analyzed.
 #'
 #' @param dset_data Raw dataframe.
-#' @param from_date Initial date and time of the interval of class `POSIXct` and time zone GMT.
-#' @param to_date Final date and time of the interval of class `POSIXct` and time zone GMT.
-#' @param sampling_period Sampling period (measured in seconds) of the raw dataframe. This value is required to complete missing samples with `NaN`.
+#' @param from_date Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.
+#' @param to_date Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.
+#' @param dset_key String indicating the key of the dataset. `lcl` for `Low Carbon London`.
 #'
-#' @return Cooked dataframe.
+#' @return List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros.
 #'
 #' @export
 
-raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, sampling_period) {
+raw_to_cooked_dataframe <- function(dset_data, from_date, to_date, dset_key) {
+  # List of samples per day (REMARK: ADD AS NEEDED!)
+  SAMPLES_PER_DAY <- list(lcl = 48)
+  # Selection
+  spd <- SAMPLES_PER_DAY[[dset_key]]
+
   # Time series ends
   first_ts_date <- dset_data[[1, 1]]
   last_ts_date <- tail(dset_data, 1)[[1, 1]]
-  # Interval is included in time series
-  if (first_ts_date <= from_date & to_date <= last_ts_date) {
-    # Step as difftime
-    period_in_secs <- as.difftime(sampling_period, units = "secs")
-    # Create time sequence
-    time_seq <- seq(from_date, to_date, period_in_secs)
-    # Find matches in timeseries
-    mm <- match(time_seq, dset_data$times)
-    # Output
-    output <- data.frame(times = time_seq, values = dset_data$values[mm])
-    return(output)
-    # Interval is NOT included in time series
-  } else {
-    return(NULL)
+
+  # Check interval left end
+  if (class(from_date) == "character") {
+    if (from_date == "first") {
+      from_date <- dset_data[[1, 1]]
+    }
   }
+  # Check interval right end
+  if (class(to_date) == "character") {
+    if (to_date == "last") {
+      to_date <- tail(dset_data, 1)[[1, 1]]
+    }
+  }
+
+  # Sampling period in seconds obtained from the dataset key
+  sampling_period_in_secs <- 86400 / spd
+  # Step as difftime
+  period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
+
+  # Create time sequence
+  time_seq <- seq(from_date, to_date, period_in_secs)
+  # Find matches in dataframe (this completes missing samples with NA values
+  # and removes extra samples out of the sampling period)
+  mm <- match(time_seq, dset_data$times)
+  # Output
+  cooked_df <- data.frame(times = time_seq, values = dset_data$values[mm])
+
+  # Get seasonal periods
+  seasonal_periods <- NULL
+  cooked_df_length <- dim(cooked_df)[1]
+  # Days
+  if (cooked_df_length > 2 * spd) {
+    seasonal_periods <- c(seasonal_periods, spd)
+  }
+  # Weeks
+  if (cooked_df_length > 2 * 7 * spd) {
+    seasonal_periods <- c(seasonal_periods, 7 * spd)
+  }
+  # Years
+  if (cooked_df_length > 2 * 365 * spd) {
+    seasonal_periods <- c(seasonal_periods, 365 * spd)
+  }
+
+  # NA percentage
+  na_percentage <- sum(is.na(cooked_df[,2])) / cooked_df_length
+  
+  # Check if all values are 0
+  cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
+  
+  # Returned list
+  output <- list(
+    cooked_df        = cooked_df,
+    seasonal_periods = seasonal_periods,
+    na_percentage    = na_percentage,
+    cooked_df_is_0   = cooked_df_is_0
+  )
+  return(output)
 }
 
 ################################################################################
