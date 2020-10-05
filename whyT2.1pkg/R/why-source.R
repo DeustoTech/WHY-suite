@@ -25,23 +25,23 @@ set.seed(1981)
 # -- "compengine", "sampenc", "sampen_first", "fluctanal_prop_r1"
 # -- DIDN'T WORK:
 # -- "binarize_mean", "embed2_incircle" (require param), "hw_parameters"
-BASIC_ANALYSIS_LIST <-
-  c(
-    "stat_moments", "quantiles", "electricity",
-    "frequency" , "stl_features", "entropy", "acf_features"
-  )
-EXTRA_ANALYSIS_LIST <-
-  c(
-    "stat_moments", "quantiles", "electricity",
-    "frequency", "stl_features", "entropy", "acf_features" , "max_kl_shift",
-    "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
-    "crossing_points", "max_var_shift", "nonlinearity",
-    "spreadrandomlocal_meantaul" , "flat_spots", "pacf_features", "firstmin_ac",
-    "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
-    "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss",
-    "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
-    "motiftwo_entro3"
-  )
+# BASIC_ANALYSIS_LIST <-
+#   c(
+#     "stat_moments", "quantiles", "electricity",
+#     "frequency" , "stl_features", "entropy", "acf_features"
+#   )
+# EXTRA_ANALYSIS_LIST <-
+#   c(
+#     "stat_moments", "quantiles", "electricity",
+#     "frequency", "stl_features", "entropy", "acf_features" , "max_kl_shift",
+#     "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9",
+#     "crossing_points", "max_var_shift", "nonlinearity",
+#     "spreadrandomlocal_meantaul" , "flat_spots", "pacf_features", "firstmin_ac",
+#     "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
+#     "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss",
+#     "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
+#     "motiftwo_entro3"
+#   )
 
 ################################################################################
 ##  stat_moments()
@@ -162,23 +162,40 @@ dataset_to_raw_dataframe <- function(csv_file) {
 #' Get features from a cooked dataframe.
 #'
 #' @param cooked_df Cooked dataframe.
+#' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.
 #'
 #' @return List of features.
 #'
 #' @export
 
-get_features_from_cooked_dataframe <- function(df) {
+get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
+  # Set a seed for random numbers
+  set.seed(1981)
+  # Analysis list
+  analysis_list <- list(
+    basic = c("stat_moments", "quantiles", "electricity", "frequency" , 
+              "stl_features", "entropy", "acf_features"),
+    extra = c("stat_moments", "quantiles", "electricity", "frequency", 
+              "stl_features", "entropy", "acf_features" , "max_kl_shift", 
+              "outlierinclude_mdrmd", "arch_stat", "max_level_shift", "ac_9", 
+              "crossing_points", "max_var_shift", "nonlinearity", 
+              "spreadrandomlocal_meantaul", "flat_spots", "pacf_features", 
+              "firstmin_ac", "std1st_der", "heterogeneity", "stability", 
+              "firstzero_ac", "trev_num", "holt_parameters", "walker_propcross",
+              "hurst", "unitroot_kpss", "histogram_mode", "unitroot_pp", 
+              "localsimple_taures", "lumpiness", "motiftwo_entro3")
+  )
   # Convert to time series
   vals_msts <- forecast::msts(
     data             = df$cooked_df[,2],
-    start            = c(1, 1),
-    ts.frequency     = ts_freq,
-    seasonal.periods = seas_periods
+    seasonal.periods = df$seasonal_periods
+    # start            = c(1, 1),
+    # ts.frequency     = ts_freq,
   )
   # Extract features
   feats <- tsfeatures::tsfeatures(
     tslist    = list(vals_msts),
-    features  = analysis_list,
+    features  = analysis_list[[type_of_analysis]],
     scale     = FALSE,
     na.action = forecast::na.interp
   )
