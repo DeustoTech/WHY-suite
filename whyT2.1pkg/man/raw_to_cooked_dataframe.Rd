@@ -4,20 +4,20 @@
 \alias{raw_to_cooked_dataframe}
 \title{Cooked dataframe from raw dataframe}
 \usage{
-raw_to_cooked_dataframe(dset_data, from_date, to_date, sampling_period)
+raw_to_cooked_dataframe(dset_data, from_date, to_date, dset_key)
 }
 \arguments{
 \item{dset_data}{Raw dataframe.}
 
-\item{from_date}{Initial date and time of the interval of class `POSIXct` and time zone GMT.}
+\item{from_date}{Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.}
 
-\item{to_date}{Final date and time of the interval of class `POSIXct` and time zone GMT.}
+\item{to_date}{Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.}
 
-\item{sampling_period}{Sampling period (measured in seconds) of the raw dataframe. This value is required to complete missing samples with `NaN`.}
+\item{dset_key}{String indicating the key of the dataset. `lcl` for `Low Carbon London`.}
 }
 \value{
-Cooked dataframe.
+List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros.
 }
 \description{
-Cook a raw dataframe. Cooking consists in completing missing samples with NA values and extracting a time interval out of the raw dataframe.
+Cook a raw dataframe. Cooking consists in completing missing samples with NA values, removing extra samples (those not matching the sampling period), extracting a user-defined time interval out of the raw dataframe, and checking its validity to be feature-analyzed.
 }
