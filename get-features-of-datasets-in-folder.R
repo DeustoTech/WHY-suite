@@ -17,7 +17,7 @@ library(whyT2.1)
 #' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`.
 #' @param output_folder_path String with the absolute path to the output folder (ending in `/`).
 #'
-#' @return List with dataframes of the features and the accepted and rejected files for which to extract the features.
+#' @return List of dataframes of (1) extracted features and (2) accepted and (3) rejected files for feature extraction.
 #'
 #' @export
 
