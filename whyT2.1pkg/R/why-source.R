@@ -191,13 +191,13 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
   last_ts_date <- tail(raw_df, 1)[[1, 1]]
 
   # Check interval left end
-  if (class(from_date) == "character") {
+  if (any(class(from_date) == "character")) {
     if (from_date == "first") {
       from_date <- raw_df[[1, 1]]
     }
   }
   # Check interval right end
-  if (class(to_date) == "character") {
+  if (any(class(to_date) == "character")) {
     if (to_date == "last") {
       to_date <- tail(raw_df, 1)[[1, 1]]
     }
