@@ -1,6 +1,11 @@
 # why-T2.1
 Programs to carry out task T2.1 of the WHY project.
 
+The code in this repository is currently under development, so the files and their content can change very quickly.
+
+There is a package in the `whyT2.1pkg` folder with the most useful functions. All of them are documented in the `man` folder via Roxygen2.
+
+<!--
 ## Relevant files
 ### why-source.R
 This file must be sourced by the rest of the scripts.
@@ -48,3 +53,4 @@ Plot as PDF files the time series analyzed in `get-features.R`.
 
 ### ts-vs-msts-comparison.R
 Simple check that the function `ts` gives [the same results](https://docs.google.com/spreadsheets/d/1uKM50_3fQVKlFBdOtd9o47aULvEy91RGXDwSKua90qI/edit?usp=sharing) as the function `msts`, with one seasonal period being equal to the frequency of `ts`.
+-->
