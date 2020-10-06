@@ -3,7 +3,7 @@ Programs to carry out task T2.1 of the WHY project.
 
 The code in this repository is currently under development, so the files and their content can change very quickly.
 
-There is a package in the `whyT2.1pkg` folder with the most useful functions. All of them are documented in the `man` folder via Roxygen2.
+The `whyT2.1pkg` folder contains a package with the most useful functions of the project. All of them are documented in the `man` folder via Roxygen2.
 
 <!--
 ## Relevant files
