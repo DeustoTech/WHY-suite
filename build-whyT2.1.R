@@ -1,6 +1,6 @@
 library(roxygen2)
 library(devtools)
-setwd("whyT2.1pkg")
+setwd("whyT2.1-pkg")
 roxygen2::roxygenize()
 devtools::build()
 devtools::check()

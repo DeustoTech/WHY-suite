@@ -1,9 +1,9 @@
 # why-T2.1
-Programs to carry out task T2.1 of the WHY project.
+Here you'll find R scripts to carry out the task T2.1 of the **WHY** H2020 project.
 
-The code in this repository is currently under development, so the files and their content can change very quickly.
+The code in this repository is currently under development, so the files and their content change very quickly.
 
-The `whyT2.1pkg` folder contains a package with the most useful functions of the project. All of them are documented in the `man` folder via Roxygen2.
+The `whyT2.1-pkg` folder contains a package with the most useful functions of the project. All of them are documented in the `man` folder via Roxygen2.
 
 <!--
 ## Relevant files
