@@ -5,7 +5,7 @@ Version: 0.2
 Author: Carlos Quesada <carlos.quesada@deusto.es>
 Maintainer: Carlos Quesada <carlos.quesada@deusto.es>
 Description: Implementation of WHY Task 2.1
-License: See LICENSE file
+License: The Unlicense
 Encoding: UTF-8
 LazyData: true
 Imports:
