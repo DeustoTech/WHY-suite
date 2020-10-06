@@ -8,7 +8,7 @@
 #'
 #' @return Plot of the dataset.
 #'
-#' @example
+#' @examples
 #' \dontrun{
 #' plot_datainfo_row(data_info["75220",])
 #' }

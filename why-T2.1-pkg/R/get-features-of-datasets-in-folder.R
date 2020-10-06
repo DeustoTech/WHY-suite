@@ -67,7 +67,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
   }
 
   # Save dataframes as CSV
-  write.table(
+  utils::write.table(
     features,
     file = paste(output_folder_path, "features.csv", sep=""),
     row.names = FALSE,
@@ -75,7 +75,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
     na = "",
     quote = FALSE
   )
-  write.table(
+  utils::write.table(
     accepted,
     file = paste(output_folder_path, "accepted.csv", sep=""),
     row.names = FALSE,
@@ -83,7 +83,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
     na = "",
     quote = FALSE
   )
-  write.table(
+  utils::write.table(
     rejected,
     file = paste(output_folder_path, "rejected.csv", sep=""),
     row.names = FALSE,

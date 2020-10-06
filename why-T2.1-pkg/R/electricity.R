@@ -18,6 +18,6 @@ electricity <- function(x) {
   # Return
   list(
     mean_load_factors = mean(load_factors),
-    var_load_factors = var(load_factors)
+    var_load_factors = stats::var(load_factors)
   )
 }

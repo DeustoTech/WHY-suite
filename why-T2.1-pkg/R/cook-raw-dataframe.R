@@ -20,7 +20,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
 
   # Time series ends
   first_ts_date <- raw_df[[1, 1]]
-  last_ts_date <- tail(raw_df, 1)[[1, 1]]
+  last_ts_date <- utils::tail(raw_df, 1)[[1, 1]]
 
   # Check interval left end
   if (any(class(from_date) == "character")) {
@@ -31,7 +31,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
   # Check interval right end
   if (any(class(to_date) == "character")) {
     if (to_date == "last") {
-      to_date <- tail(raw_df, 1)[[1, 1]]
+      to_date <- utils::tail(raw_df, 1)[[1, 1]]
     }
   }
 

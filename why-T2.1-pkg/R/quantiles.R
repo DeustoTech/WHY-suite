@@ -10,7 +10,7 @@
 #' @export
 
 quantiles <- function(x) {
-  q <- quantile(x)
+  q <- stats::quantile(x)
   list(
     minimum        = q[[1]],
     lower_quartile = q[[2]],

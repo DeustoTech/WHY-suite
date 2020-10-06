@@ -12,7 +12,7 @@
 stat_moments <- function(x) {
   list(
     mean     = mean(x),
-    variance = var(x),
+    variance = stats::var(x),
     skewness = moments::skewness(x),
     kurtosis = moments::kurtosis(x)
   )

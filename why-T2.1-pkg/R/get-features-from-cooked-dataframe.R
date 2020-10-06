@@ -3,7 +3,7 @@
 #' @description
 #' Get features of a cooked dataframe.
 #'
-#' @param cooked_df Cooked dataframe.
+#' @param df Cooked dataframe.
 #' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.
 #'
 #' @return List of features.

@@ -17,3 +17,9 @@ Plot of the dataset.
 \description{
 Plot the dataset indicated in a row of the file `data_info.csv`.
 }
+\examples{
+\dontrun{
+plot_datainfo_row(data_info["75220",])
+}
+
+}

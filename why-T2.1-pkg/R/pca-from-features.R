@@ -18,7 +18,7 @@
 
 pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
   # Load data from CSV files
-  feats <- read.table(
+  feats <- utils::read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
     header = TRUE,
     sep    = ","
@@ -26,7 +26,7 @@ pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_S
 
   if (color_by_SE_vars | get_point_identity) {
     # Load data from CSV files
-    data_info <- read.table(
+    data_info <- utils::read.table(
       file   = paste(feats_folder, "data_info.csv", sep = ""),
       header = TRUE,
       sep    = ","
@@ -36,7 +36,7 @@ pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_S
   # Color by socioeconomic variables?
   if (color_by_SE_vars) {
     # Load data from CSV files
-    SE_vars <- read.table(
+    SE_vars <- utils::read.table(
       file   = SE_data_file,
       header = TRUE,
       sep    = ","
@@ -58,7 +58,7 @@ pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_S
   }
 
   # PCA
-  pca <- prcomp(feats[otp, ftp], scale. = TRUE)
+  pca <- stats::prcomp(feats[otp, ftp], scale. = TRUE)
 
   # Plot PCA
   plot(
@@ -73,7 +73,7 @@ pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_S
   # Get point identification
   if (get_point_identity) {
     # Get points
-    ts_ids <- identify(
+    ts_ids <- graphics::identify(
       x = pca[["x"]][, axis_x],
       y = pca[["x"]][, axis_y],
       plot = FALSE

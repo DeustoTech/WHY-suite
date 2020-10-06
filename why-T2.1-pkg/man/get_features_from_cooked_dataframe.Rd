@@ -7,9 +7,9 @@
 get_features_from_cooked_dataframe(df, type_of_analysis)
 }
 \arguments{
-\item{type_of_analysis}{A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.}
+\item{df}{Cooked dataframe.}
 
-\item{cooked_df}{Cooked dataframe.}
+\item{type_of_analysis}{A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.}
 }
 \value{
 List of features.
