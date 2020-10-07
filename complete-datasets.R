@@ -23,11 +23,8 @@ summarize_datasets_in_folder <- function(folder_path) {
     total_na <- sum(is.na(cdf$df[,2]))
     # Sequence of NA
     na_seq <- rle(is.na(cdf$df[,2]))
-    na_indices <- cumsum(c(1, na_seq$lengths))
-    # Indices of interest
-    na_iof <- na_seq$values == TRUE
-    na_seq <- list(lenghts = na_seq$lengths[na_iof],
-                   indices = na_indices[na_iof])
+    na_seq <- list(lenghts = na_seq$lengths[na_seq$values == T],
+                   indices = cumsum(c(1, na_seq$lengths))[na_seq$values == T])
   }
 }
 
