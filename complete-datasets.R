@@ -37,17 +37,19 @@ summarize_datasets_in_folder <- function(folder_path) {
 
 impute_cooked_dataframe <- function(cdf) {
   # Interval to plot
-  interv <- 1300:2000
+  interv <- 1300:2100
   # Sequences of NA before imputation
   na_seqs <- get_na_sequences(cdf$df)
   print(na_seqs)
   plot_dataframe(cdf$df[interv,])
   # Time series pending imputation
-  not_imputed <- ts(data=cdf$df[,2], frequency=48)
+  not_imputed <- ts(data=cdf$df[,2], frequency=336)
   # Imputed time series
-  imputed <- imputeTS::na_seasplit(not_imputed, algorithm="interpolation")
+  imputed <- imputeTS::na_seasplit(not_imputed, algorithm="mean")
   # Imputed dataframe
-  imp_df <- data.frame(cdf$df[,1], imputed)
+  imp_df <- data.frame(times=cdf$df[,1], 
+                       values=imputed, 
+                       imputed=as.integer(is.na(not_imputed)))
   # Sequences of NA after imputation
   na_seqs_2 <- get_na_sequences(imp_df) 
   print(na_seqs_2)
