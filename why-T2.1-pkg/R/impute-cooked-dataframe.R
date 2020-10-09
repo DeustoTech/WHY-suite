@@ -17,14 +17,14 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
   # Time series pending imputation
   not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
   # Imputed time series
-  imp_ts <- imputeTS::na_seasplit(not_imp_ts, 
+  imp_ts <- imputeTS::na_seasplit(not_imp_ts,
                                   algorithm = short_algorithm,
-                                  maxgap = short_gap) 
-  imp_ts <- imputeTS::na_seasplit(imp_ts, 
+                                  maxgap = short_gap)
+  imp_ts <- imputeTS::na_seasplit(imp_ts,
                                   algorithm = long_algorithm)
   # Imputed dataframe
-  imp_df <- data.frame(times   = cdf$df[,1], 
-                       values  = imp_ts, 
+  imp_df <- data.frame(times   = cdf$df[,1],
+                       values  = as.double(imp_ts),
                        imputed = as.integer(is.na(not_imp_ts)))
   return(imp_df)
 }
