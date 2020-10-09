@@ -11,25 +11,33 @@
 #' @export
 
 plot_dataframe <- function(dset_data, title=NULL) {
-  # # Check existence of a 3rd column to apply color
-  # if (dim(dset_data)[2] == 3) {
-  #   # Color vector is blue by default
-  #   coloring = rep("blue", dim(dset_data)[1])
-  #   # Replace ex-NA by red 
-  #   coloring[dset_data[,3] == 1] = "red"
-  # } else {
-  #   coloring = "blue"
-  # }
-  
-  # Create plot
-  p <- plot(
-    x    = dset_data[[1]],
-    y    = dset_data[[2]],
-    col  = "blue",
-    type = "l",
-    main = title,
-    xlab = "Date",
-    ylab = "kWh",
-    ylim = c(0,5)
-  )
+
+  # Check existence of a 3rd column to apply color
+  if (dim(dset_data)[2] == 3) {
+    # Color vector is blue by default
+    coloring = rep("blue", dim(dset_data)[1])
+    # Replace ex-NA by red
+    coloring[dset_data[,3] == 1] = "red"
+  } else {
+    coloring = "blue"
+  }
+
+  plot1 <- ggplot(
+    data = dset_data,
+    mapping = aes(x=times, y=values)) +
+    geom_line(color = coloring)
+
+  print(plot1)
+
+  ## Create plot
+  # p <- plot(
+  #   x    = dset_data[[1]],
+  #   y    = dset_data[[2]],
+  #   col  = "blue",
+  #   type = "l",
+  #   main = title,
+  #   xlab = "Date",
+  #   ylab = "kWh",
+  #   ylim = c(0,5)
+  # )
 }
