@@ -15,6 +15,7 @@ Imports:
   forecast,
   moments,
   data.table,
-  Rfast
+  Rfast,
+  ggplot2
 Depends:
 RoxygenNote: 7.1.1
