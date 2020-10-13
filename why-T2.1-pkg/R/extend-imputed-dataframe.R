@@ -1,15 +1,34 @@
 #' Extension of time series in imputed dataframe
 #'
 #' @description
-#' Impute missing samples in a cooked dataframe. It can use an algorithm for short gaps (e.g. "interpolation") and another one for longer gaps (e.g. "locf").
+#' Replicate the existing values of a periodic time series to obtain a time series with the desired length in months.
 #'
-#' @param cdf Cooked dataframe.
-#' @param season Seasonal period (e.g. 1 week) in number of samples.
-#' @param short_gap Number of samples considered as a short gap.
-#' @param short_algorithm Algorithm used to impute short gaps.
-#' @param long_algorithm Algorithm used to impute long gaps.
+#' @param idf Imputed dataframe.
+#' @param length_in_months Minimum number of months of the extended output.
 #'
 #' @return Imputed dataframe, i.e. a cooked dataframe with a 3rd column indicating if each sample has been imputed or not.
 #'
 #' @export
 
+extend_imputed_dataframe <- function(idf, length_in_months=25) {
+  # Get current length in months of idf
+  initial_date <- idf[1,1]
+  final_date <- tail(idf, n=1)[[1]]
+  wday_fd <- wday(final_date)
+  idf_in_days <- as.numeric(final_date - initial_date)
+  idf_in_months <- idf_in_days/30.4167
+  # If idf is shorter than expected, extend
+  if (idf_in_months < length_in_months) {
+    # Length of the extension in months
+    extension_in_months <- ceiling(length_in_months - idf_in_months)
+    ## Get extraction interval
+    # Subtract one year
+    initial_extract_date <- final_date - years(1)
+    # Check the weekdays: if original ends on Monday, copy must start on Monday
+    wday_ied <- wday(initial_extract_date)
+    days_diff <- (wday_ied - wday_fd) %% 7
+    initial_extract_date <- initial_extract_date - days(days_diff)
+    # final_extract_date <-
+    browser()
+  }
+}

@@ -2,6 +2,7 @@
 
 export(cook_raw_dataframe)
 export(electricity)
+export(extend_imputed_dataframe)
 export(get_features_from_cooked_dataframe)
 export(get_features_of_datasets_in_folder)
 export(get_raw_dataframe_from_dataset)

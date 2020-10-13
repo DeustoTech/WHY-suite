@@ -27,8 +27,7 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
       # If TS is shorter than 760 days, expand
       if (length_in_days < 760) {
         ## EXPAND ##
-        plot_dataframe(idf, title=dset_filename)
-        browser()
+        extend_imputed_dataframe(idf=idf, length_in_months=25)
       }
       ## SAVE IDF ##
     }
