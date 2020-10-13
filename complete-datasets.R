@@ -34,6 +34,7 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
         edf <- extend_imputed_dataframe(idf=idf, length_in_months=25)
       }
       ## SAVE IDF ##
+      plot_dataframe(edf$df)
     }
   }
 }

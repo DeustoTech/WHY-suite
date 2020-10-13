@@ -21,22 +21,36 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
   if (idf_in_months < length_in_months) {
     # Length of the extension in months
     extension_in_months <- ceiling(length_in_months - idf_in_months)
-    ## Get extraction interval
     # Subtract one year
     initial_extract_date <- final_date - years(1)
     # Check the weekdays: if original ends on Monday, copy must start on Monday
     wday_ied <- wday(initial_extract_date)
     days_diff <- (wday_ied - wday_fd) %% 7
+    # Extraction interval
     initial_extract_date <- initial_extract_date - days(days_diff)
     final_extract_date <- initial_extract_date + months(extension_in_months)
-    # Create time sequence
-    time_seq <- seq(initial_extract_date,
-                    final_extract_date,
-                    as.difftime(
-                      86400 / idf$seasonal_periods[1],
-                      units = "secs")
-                    )
-    length_in_samples <- length(time_seq) -1
-
+    extract_idx <- idf$df[,1] > initial_extract_date &
+      idf$df[,1] <= final_extract_date
+    # Extracted times and values
+    extracted_times <- idf$df[extract_idx, 1]
+    extracted_values <- idf$df[extract_idx, 2]
+    # Extended times
+    extended_times <- seq(
+      final_date,
+      final_extract_date + years(1) + days(days_diff),
+      as.difftime(86400/idf$seasonal_periods[1], units = "secs")
+      )
+    # Create the extension dataframe
+    extended_df <- data.frame(
+      times          = extended_times[2:length(extended_times)],
+      values         = extracted_values,
+      imputed        = 2,
+      original_times = extracted_times
+      )
+    # Bind rows
+    idf$df <- dplyr::bind_rows(idf$df, extended_df)
+    return(idf)
+  } else {
+    warning("Time series is not large enough to be extended (1 year required)")
   }
 }
