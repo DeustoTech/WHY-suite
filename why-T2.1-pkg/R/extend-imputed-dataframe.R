@@ -10,7 +10,7 @@
 #'
 #' @export
 
-extend_imputed_dataframe <- function(idf, length_in_months=25, sampling_period_in_secs) {
+extend_imputed_dataframe <- function(idf, length_in_months) {
   # Get current length in months of idf
   initial_date <- idf$df[1,1]
   final_date <- tail(idf$df, n=1)[[1]]
@@ -32,7 +32,11 @@ extend_imputed_dataframe <- function(idf, length_in_months=25, sampling_period_i
     # Create time sequence
     time_seq <- seq(initial_extract_date,
                     final_extract_date,
-                    as.difftime(sampling_period_in_secs, units = "secs"))
-    browser()
+                    as.difftime(
+                      86400 / idf$seasonal_periods[1],
+                      units = "secs")
+                    )
+    length_in_samples <- length(time_seq) -1
+
   }
 }

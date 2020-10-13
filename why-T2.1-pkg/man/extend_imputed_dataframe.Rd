@@ -4,7 +4,7 @@
 \alias{extend_imputed_dataframe}
 \title{Extension of time series in imputed dataframe}
 \usage{
-extend_imputed_dataframe(idf, length_in_months = 25)
+extend_imputed_dataframe(idf, length_in_months)
 }
 \arguments{
 \item{idf}{Imputed dataframe.}

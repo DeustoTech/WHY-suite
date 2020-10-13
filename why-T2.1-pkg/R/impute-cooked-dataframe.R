@@ -26,5 +26,5 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
   cdf$df <- data.frame(times   = cdf$df[,1],
                        values  = as.double(imp_ts),
                        imputed = as.integer(is.na(not_imp_ts)))
-  return(cdf$df)
+  return(cdf)
 }
