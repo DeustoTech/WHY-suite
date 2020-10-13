@@ -23,8 +23,8 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
   imp_ts <- imputeTS::na_seasplit(imp_ts,
                                   algorithm = long_algorithm)
   # Imputed dataframe
-  imp_df <- data.frame(times   = cdf$df[,1],
+  cdf$df <- data.frame(times   = cdf$df[,1],
                        values  = as.double(imp_ts),
                        imputed = as.integer(is.na(not_imp_ts)))
-  return(imp_df)
+  return(cdf$df)
 }

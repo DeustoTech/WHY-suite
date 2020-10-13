@@ -10,10 +10,10 @@
 #'
 #' @export
 
-extend_imputed_dataframe <- function(idf, length_in_months=25) {
+extend_imputed_dataframe <- function(idf, length_in_months=25, sampling_period_in_secs) {
   # Get current length in months of idf
-  initial_date <- idf[1,1]
-  final_date <- tail(idf, n=1)[[1]]
+  initial_date <- idf$df[1,1]
+  final_date <- tail(idf$df, n=1)[[1]]
   wday_fd <- wday(final_date)
   idf_in_days <- as.numeric(final_date - initial_date)
   idf_in_months <- idf_in_days/30.4167
@@ -28,7 +28,11 @@ extend_imputed_dataframe <- function(idf, length_in_months=25) {
     wday_ied <- wday(initial_extract_date)
     days_diff <- (wday_ied - wday_fd) %% 7
     initial_extract_date <- initial_extract_date - days(days_diff)
-    # final_extract_date <-
+    final_extract_date <- initial_extract_date + months(extension_in_months)
+    # Create time sequence
+    time_seq <- seq(initial_extract_date,
+                    final_extract_date,
+                    as.difftime(sampling_period_in_secs, units = "secs"))
     browser()
   }
 }

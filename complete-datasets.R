@@ -21,13 +21,20 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
     initial_date <- cdf$df[1,1]
     final_date <- tail(cdf$df, n=1)[[1]]
     length_in_days <- as.numeric(final_date - initial_date)
-    # If TS is longer than 365 days, impute
-    if (length_in_days >= 365) {
-      idf <- impute_cooked_dataframe(cdf=cdf, season=48*7, short_gap = 48/3)
+    # If TS is longer than 375 days, impute
+    if (length_in_days >= 375) {
+      idf <- impute_cooked_dataframe(
+        cdf       = cdf, 
+        season    = cdf$seasonal_periods[1] * 7, 
+        short_gap = cdf$seasonal_periods[1] / 3
+        )
       # If TS is shorter than 760 days, expand
       if (length_in_days < 760) {
         ## EXPAND ##
-        extend_imputed_dataframe(idf=idf, length_in_months=25)
+        edf <- extend_imputed_dataframe(
+          idf              = idf, 
+          length_in_months = 25
+          )
       }
       ## SAVE IDF ##
     }
