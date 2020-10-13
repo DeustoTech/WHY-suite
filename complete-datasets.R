@@ -32,9 +32,10 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
       if (length_in_days < 760) {
         ## EXPAND ##
         edf <- extend_imputed_dataframe(idf=idf, length_in_months=25)
+        browser()
+        plot_dataframe(edf$df)
       }
       ## SAVE IDF ##
-      plot_dataframe(edf$df)
     }
   }
 }

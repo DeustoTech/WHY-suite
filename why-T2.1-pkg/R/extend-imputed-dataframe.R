@@ -25,9 +25,9 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
     initial_extract_date <- final_date - years(1)
     # Check the weekdays: if original ends on Monday, copy must start on Monday
     wday_ied <- wday(initial_extract_date)
-    days_diff <- (wday_ied - wday_fd) %% 7
+    days_diff <- (wday_fd - wday_ied) %% 7
     # Extraction interval
-    initial_extract_date <- initial_extract_date - days(days_diff)
+    initial_extract_date <- initial_extract_date + days(days_diff)
     final_extract_date <- initial_extract_date + months(extension_in_months)
     extract_idx <- idf$df[,1] > initial_extract_date &
       idf$df[,1] <= final_extract_date
@@ -37,7 +37,7 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
     # Extended times
     extended_times <- seq(
       final_date,
-      final_extract_date + years(1) + days(days_diff),
+      final_extract_date + years(1) - days(days_diff),
       as.difftime(86400/idf$seasonal_periods[1], units = "secs")
       )
     # Create the extension dataframe
