@@ -2,8 +2,12 @@ library(roxygen2)
 library(devtools)
 setwd("why-T2.1-pkg")
 roxygen2::roxygenize()
-devtools::build()
-devtools::check()
-devtools::install(upgrade=FALSE)
+# devtools::build(
+#   binary=TRUE
+# )
+#devtools::check()
+devtools::install(
+  upgrade=FALSE
+  )
 setwd("..")
 library(whyT2.1)
