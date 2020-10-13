@@ -12,7 +12,6 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
   dset_filenames <- list.files(input_folder)
   # Analysis loop
   for (dset_filename in dset_filenames) {
-    save_idf <- F
     # Load raw dataframe from dataset and impute
     print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
@@ -28,7 +27,7 @@ extend_datasets <- function(input_folder, output_folder=NULL) {
       # If TS is shorter than 760 days, expand
       if (length_in_days < 760) {
         ## EXPAND ##
-        plot_dataframe(idf)
+        plot_dataframe(idf, title=dset_filename)
         browser()
       }
       ## SAVE IDF ##

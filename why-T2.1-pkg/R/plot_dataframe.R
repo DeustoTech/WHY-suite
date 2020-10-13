@@ -24,8 +24,12 @@ plot_dataframe <- function(dset_data, title=NULL) {
 
   plot1 <- ggplot(
     data = dset_data,
-    mapping = aes(x=times, y=values)) +
-    geom_line(color = coloring)
+    mapping = aes(x=times, y=values)
+    ) +
+    geom_line(
+      color = coloring
+    ) +
+    ggtitle(title)
 
   print(plot1)
 
