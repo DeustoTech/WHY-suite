@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataset-load-and-processing.R
 \name{extend_imputed_dataframe}
 \alias{extend_imputed_dataframe}
-\title{Extension of time series in imputed dataframe}
+\title{Extended dataframe from imputed dataframe}
 \usage{
 extend_imputed_dataframe(idf, length_in_months)
 }
@@ -12,8 +12,8 @@ extend_imputed_dataframe(idf, length_in_months)
 \item{length_in_months}{Minimum number of months of the extended output.}
 }
 \value{
-Imputed dataframe, i.e. a cooked dataframe with a 3rd column indicating if each sample has been imputed or not.
+Extended dataframe, i.e. an imputed dataframe with a 3rd column indicating if each sample has been extended or not and a 4th column indicating the original date of the replicated sample.
 }
 \description{
-Replicate the existing values of a periodic time series to obtain a time series with the desired length in months.
+Replicate the existing values of a periodic time series to obtain a time series with the desired length in months. Only imputed dataframes larger than 372 days can be extended.
 }

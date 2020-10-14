@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataset-load-and-processing.R
 \name{impute_cooked_dataframe}
 \alias{impute_cooked_dataframe}
-\title{Imputation of missing samples in cooked dataframe}
+\title{Imputed dataframe from cooked dataframe}
 \usage{
 impute_cooked_dataframe(
   cdf,

@@ -7,40 +7,10 @@ get_na_sequences <- function(cdf) {
   return(na_seq)
 }
 
-extend_datasets <- function(input_folder, output_folder=NULL) {
-  # Get list of filenames in dataset folder
-  dset_filenames <- list.files(input_folder)
-  # Analysis loop
-  for (dset_filename in dset_filenames) {
-    # Load raw dataframe from dataset and impute
-    print(dset_filename)
-    file_path <- paste(input_folder, dset_filename, sep="")
-    rdf <- get_raw_dataframe_from_dataset(file_path)
-    cdf <- cook_raw_dataframe(rdf, "first", "last", "lcl")
-    # Get length
-    initial_date <- cdf$df[1,1]
-    final_date <- tail(cdf$df, n=1)[[1]]
-    length_in_days <- as.numeric(final_date - initial_date)
-    # If TS is longer than 375 days, impute
-    if (length_in_days >= 375) {
-      idf <- impute_cooked_dataframe(
-        cdf       = cdf, 
-        season    = cdf$seasonal_periods[1] * 7, 
-        short_gap = cdf$seasonal_periods[1] / 3
-        )
-      # If TS is shorter than 760 days, expand
-      if (length_in_days < 760) {
-        ## EXPAND ##
-        edf <- extend_imputed_dataframe(idf=idf, length_in_months=25)
-        browser()
-        plot_dataframe(edf$df)
-      }
-      ## SAVE IDF ##
-    }
-  }
-}
+
 
 input_folder <- "G:/Mi unidad/WHY/Datasets/lcl/"
+output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
 extend_datasets(input_folder)
 
 ################################################################################
