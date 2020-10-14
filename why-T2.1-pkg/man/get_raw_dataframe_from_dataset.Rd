@@ -2,16 +2,19 @@
 % Please edit documentation in R/dataset-load-and-processing.R
 \name{get_raw_dataframe_from_dataset}
 \alias{get_raw_dataframe_from_dataset}
+\alias{get_dataframe}
 \title{Raw dataframe from dataset}
 \usage{
 get_raw_dataframe_from_dataset(csv_file)
+
+get_dataframe(csv_file)
 }
 \arguments{
 \item{csv_file}{String with the absolute path to the CSV file containing the dataset.}
 }
 \value{
-Raw dataframe, i.e. without checking missing samples.
+Raw (or extended) dataframe.
 }
 \description{
-Get a dataframe from a dataset contained in a CSV file.
+Get a raw (or extended) dataframe from a dataset contained in a CSV file.
 }

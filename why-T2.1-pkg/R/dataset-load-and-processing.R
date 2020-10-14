@@ -1,11 +1,11 @@
 #' Raw dataframe from dataset
 #'
 #' @description
-#' Get a dataframe from a dataset contained in a CSV file.
+#' Get a raw (or extended) dataframe from a dataset contained in a CSV file.
 #'
 #' @param csv_file String with the absolute path to the CSV file containing the dataset.
 #'
-#' @return Raw dataframe, i.e. without checking missing samples.
+#' @return Raw (or extended) dataframe.
 #'
 #' @export
 
@@ -14,15 +14,37 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
   data <- data.table::fread(
     file = csv_file,
     header = FALSE,
-    sep = ","
+    sep = ",",
+    na.strings = ""
   )
+  
   # Times
   times <- as.POSIXct(data$V1, tz="GMT")
   # Values
   values <- data$V2
-  # Create dataframe
-  return(data.frame(times = times, values = values))
+  # 2 columns
+  if (ncol(data) == 2) {
+    return(data.frame(times, values))
+  } else {
+    # Imputed
+    imputed <- data$V3
+    # 3 columns
+    if (ncol(data) == 3) {
+      return(data.frame(times, values, imputed))
+    } else {
+      # Original times
+      original_times <- as.POSIXct(data$V4, tz="GMT")
+      # 4 columns
+      if (ncol(data) == 4) {
+        return(data.frame(times, values, imputed, original_times))
+      }
+    }
+  }
 }
+
+#' @rdname get_raw_dataframe_from_dataset
+#' @export
+get_dataframe <- get_raw_dataframe_from_dataset
 
 #' Cooked dataframe from raw dataframe
 #'
