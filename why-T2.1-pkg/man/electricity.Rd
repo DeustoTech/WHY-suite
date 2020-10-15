@@ -10,8 +10,8 @@ electricity(x)
 \item{x}{Time series of class `msts`.}
 }
 \value{
-A list with the mean and variance of the load factors across days in the time series.
+A list with the mean and variance of the load factors across 24-hour periods.
 }
 \description{
-Compute the load factor across days of a time series.
+Compute the load factor across 24-hour periods.
 }
