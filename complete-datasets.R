@@ -11,7 +11,7 @@ get_na_sequences <- function(cdf) {
 
 input_folder <- "G:/Mi unidad/WHY/Datasets/lcl/"
 output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-extend_datasets(input_folder)
+extend_datasets(input_folder,output_folder)
 
 ################################################################################
 

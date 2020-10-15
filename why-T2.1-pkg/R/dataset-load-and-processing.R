@@ -55,12 +55,15 @@ get_dataframe <- get_raw_dataframe_from_dataset
 #' @param from_date Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.
 #' @param to_date Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.
 #' @param dset_key String indicating the key of the dataset. `lcl` for `Low Carbon London`.
+#' @param filename Filename.
+#' @param acorn_path Path to the file with the ACORN values.
 #'
-#' @return List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros.
+#' @return List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros. Optional members of the list are the filename and the ACORN value.
 #'
 #' @export
 
-cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
+cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, 
+                               filename=NULL, acorn_path=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
   SAMPLES_PER_DAY <- list(lcl = 48)
   # Selection
@@ -112,17 +115,35 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key) {
     seasonal_periods <- c(seasonal_periods, 365 * spd)
   }
   
-  # NA percentage
-  na_percentage <- sum(is.na(cooked_df[,2])) / cooked_df_length
+  # Number of NA
+  number_of_na <- sum(is.na(cooked_df[,2]))
   
   # Check if all values are 0
   cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
   
+  # Get ACORN value
+  acorn         <- NULL
+  acorn_grouped <- NULL
+  if (!is.null(filename) & !is.null(acorn_path)) {
+    acorn_df <- read.csv(file = acorn_path,
+                         header = TRUE,
+                         sep = ",",
+                         na.strings = ""
+    )
+    acorn_tag     <- substr(filename, 1, 9)
+    acorn         <- acorn_df[acorn_df[,1] == acorn_tag, 3]
+    acorn_grouped <- acorn_df[acorn_df[,1] == acorn_tag, 4]
+  }
+  
   # Returned list
   output <- list(
     df               = cooked_df,
+    dset_key         = dset_key,
+    filename         = filename,
+    acorn            = acorn,
+    acorn_grouped    = acorn_grouped,
     seasonal_periods = seasonal_periods,
-    na_percentage    = na_percentage,
+    number_of_na     = number_of_na,
     is_0             = cooked_df_is_0
   )
   return(output)
@@ -173,30 +194,30 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 
 extend_imputed_dataframe <- function(idf, length_in_months) {
   # Get current length in months of idf
-  initial_date <- idf$df[1,1]
-  final_date <- tail(idf$df, n=1)[[1]]
-  wday_fd <- lubridate::wday(final_date)
-  idf_in_days <- as.numeric(final_date - initial_date)
+  initial_date  <- idf$df[1,1]
+  final_date    <- tail(idf$df, n=1)[[1]]
+  wday_fd       <- lubridate::wday(final_date)
+  idf_in_days   <- as.numeric(final_date - initial_date)
   idf_in_months <- idf_in_days/31
   # If idf is shorter than expected, extend
   if (idf_in_months > 12) {
     # Length of the extension in months
     extension_in_months <- ceiling(length_in_months - idf_in_months)
-      if (extension_in_months > 0) {
+    if (extension_in_months > 0) {
       # Subtract one year
       initial_extract_date <- final_date - lubridate::days(365)
       # Check the weekdays: if original ends on Monday, copy must start on Monday
-      wday_ied <- lubridate::wday(initial_extract_date)
+      wday_ied  <- lubridate::wday(initial_extract_date)
       days_diff <- (wday_fd - wday_ied) %% 7
       # Extraction interval
       initial_extract_date <- initial_extract_date + 
-        lubridate::days(days_diff)
-      final_extract_date <- initial_extract_date + 
-        lubridate::days(31*extension_in_months)
-      extract_idx <- idf$df[,1] > initial_extract_date &
-        idf$df[,1] <= final_extract_date
+                              lubridate::days(days_diff)
+      final_extract_date   <- initial_extract_date + 
+                              lubridate::days(31*extension_in_months)
+      extract_idx          <- idf$df[,1] > initial_extract_date &
+                              idf$df[,1] <= final_extract_date
       # Extracted times and values
-      extracted_times <- idf$df[extract_idx, 1]
+      extracted_times  <- idf$df[extract_idx, 1]
       extracted_values <- idf$df[extract_idx, 2]
       # Extended times
       extended_times <- seq(
@@ -212,8 +233,13 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
         original_times = extracted_times
       )
       # Bind rows
-      idf$df <- dplyr::bind_rows(idf$df, extended_df)
+      idf$df            <- dplyr::bind_rows(idf$df, extended_df)
+      idf$number_of_ext <- length(extracted_times)
+      if (length_in_months >= 24) {
+        low_seas <- idf$seasonal_periods[1]
+        idf$seasonal_periods <- c(low_seas, low_seas*7, low_seas*365)
       }
+    }
     return(idf)
   } else {
     stop("372-days-long time series are required.")
@@ -235,6 +261,9 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
 #' @export
 
 extend_datasets <- function(input_folder, output_folder) {
+  # Path to ACORN folder
+  acorn_folder <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/", 
+                        "informations_households.csv", sep="")
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   # Analysis loop
@@ -243,7 +272,12 @@ extend_datasets <- function(input_folder, output_folder) {
     print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
     rdf <- get_raw_dataframe_from_dataset(file_path)
-    cdf <- cook_raw_dataframe(rdf, "first", "last", "lcl")
+    cdf <- cook_raw_dataframe(raw_df     = rdf, 
+                              from_date  = "first", 
+                              to_date    = "last", 
+                              dset_key   = "lcl", 
+                              filename   = dset_filename, 
+                              acorn_path = acorn_folder)
     # Get length
     initial_date <- cdf$df[1,1]
     final_date <- tail(cdf$df, n=1)[[1]]
@@ -258,9 +292,8 @@ extend_datasets <- function(input_folder, output_folder) {
       # Expand if needed
       edf <- extend_imputed_dataframe(idf=idf, length_in_months=25)
       # Save dataframe in output folder
-      path <- paste(output_folder, dset_filename, sep="")
-      utils::write.table(x=edf$df, file=path, na="", sep=",",
-                         row.names=F, col.names=F)
+      path <- paste(output_folder, substr(dset_filename,1,9), sep="")
+      save(edf, file=path)
       print("SAVED!")
     }
     else print("DISCARDED")

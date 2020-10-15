@@ -18,19 +18,19 @@ plot_dataframe <- function(dset_data, title=NULL) {
     coloring = rep("blue", dim(dset_data)[1])
     # Replace ex-NA by red
     coloring[dset_data[,3] == 1] = "red"
-    coloring[dset_data[,3] == 2] = "green"
+    coloring[dset_data[,3] == 2] = "darkgreen" #"green"
   } else {
     coloring = "blue"
   }
 
-  plot1 <- ggplot(
+  plot1 <- ggplot2::ggplot(
     data = dset_data,
     mapping = aes(x=times, y=values)
     ) +
-    geom_line(
+    ggplot2::geom_line(
       color = coloring
     ) +
-    ggtitle(title)
+    ggplot2::ggtitle(title)
 
   print(plot1)
 
