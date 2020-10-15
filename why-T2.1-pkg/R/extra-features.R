@@ -21,11 +21,11 @@ stat_moments <- function(x) {
 #' Features of quantiles
 #'
 #' @description
-#' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series.
+#' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series. Also the Q3 to Q1 range.
 #'
 #' @param x Time series of class `msts`.
 #'
-#' @return A list with the minimum, lower quartile, median, upper quartile and maximum of the time series.
+#' @return A list with the minimum, lower quartile, median, upper quartile, maximum and Q3-Q1 range of the time series.
 #'
 #' @export
 

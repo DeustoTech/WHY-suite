@@ -206,7 +206,7 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
     if (extension_in_months > 0) {
       # Subtract one year
       initial_extract_date <- final_date - lubridate::days(365)
-      # Check the weekdays: if original ends on Monday, copy must start on Monday
+      # Check weekdays: if original ends on Monday, copy must start on Monday
       wday_ied  <- lubridate::wday(initial_extract_date)
       days_diff <- (wday_fd - wday_ied) %% 7
       # Extraction interval

@@ -26,12 +26,20 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
                  "lumpiness", "motiftwo_entro3")
   analysis_fns <- list(basic = basic_fns,
                        extra = c(basic_fns, extra_fns))
+  # Compute delay
+  initial_date  <- df$df[1,1]
+  lowest_season <- df$seasonal_periods[1]
+  hour_factor   <- lowest_season/24
+  start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
+    lubridate::minute(initial_date) / 60 * hour_factor + 
+    lubridate::second(initial_date) / 3600 * hour_factor
+  
   # Convert to time series
   vals_msts <- forecast::msts(
     data             = df$df[,2],
     seasonal.periods = df$seasonal_periods,
-    ts.frequency     = df$seasonal_periods[1],
-    start            = c(1, 1)
+    ts.frequency     = lowest_season,
+    start            = c(1, start_offset)
   )
   # Extract features that DON'T require normalization of the time series
   not_norm_feats <- tsfeatures::tsfeatures(
