@@ -36,7 +36,8 @@ quantiles <- function(x) {
     lower_quartile = q[[2]],
     median         = q[[3]],
     upper_quartile = q[[4]],
-    maximum        = q[[5]]
+    maximum        = q[[5]],
+    q3_to_q1_range = q[[4]] - q[[2]]
   )
 }
 
