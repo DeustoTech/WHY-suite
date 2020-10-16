@@ -6,7 +6,7 @@
 #' `1` Generation of extended datasets from folder of raw datasets
 #' `2` Generation of time series from features using GRATIS
 #' `3` Visual PDF library of features so they can be easily understood
-#' `4` 
+#' `4` Get features of all the datasets contained in a folder
 
 ################################################################################
 script_selection <- 3
@@ -19,8 +19,11 @@ scripts <- function(script_selection) {
   
   # SCRIPT 1
   if (script_selection == 1) {
+    # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
     output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
+    
+    # Function call
     whyT2.1::extend_datasets(input_folder,output_folder)
   }
   
@@ -28,8 +31,12 @@ scripts <- function(script_selection) {
   
   # SCRIPT 2
   if (script_selection == 2) {
+    # Extra libraries
     library(gratis)
     
+    # User parameters
+    
+    # Function call
     gen_ts <- gratis::generate_ts_with_target(
       n = 1,
       ts.length = length(values$values),
@@ -66,7 +73,17 @@ scripts <- function(script_selection) {
   
   # SCRIPT 4
   if (script_selection == 4) {
+    # User parameters
+    folder_path      <- "G:/Mi unidad/WHY/Datasets/lcl/"
+    from_date        <- ISOdate(2013, 2, 1, 0, 0, 0)
+    to_date          <- ISOdate(2013, 2, 28, 23, 30, 0)
+    dset_key         <- "lcl"
+    allowed_na       <- 0
+    type_of_analysis <- "extra"
     
+    # Function call
+    o <- whyT2.1::get_features_of_datasets_in_folder(
+      folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
   }
 
   # ----------------------------------------------------------------------------
