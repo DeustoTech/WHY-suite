@@ -12,7 +12,7 @@
 #' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
 #' 
 #' ** MACHINE LEARNING TOOLS **
-#' `6` Compute PCA from FEATs CSV file
+#' `6` Compute PCA from CSV file of FEATs
 #' 
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
@@ -61,6 +61,7 @@ scripts <- function(script_selection) {
       target = as.vector(t(as.data.frame(feats[1:24]))),
       parallel = FALSE
     )
+    return(gen_ts)
   }
   
   # ----------------------------------------------------------------------------
@@ -98,6 +99,7 @@ scripts <- function(script_selection) {
     # Function call
     o <- whyT2.1::get_features_of_datasets_in_folder(
       folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
+    return(o)
   }
 
   # ----------------------------------------------------------------------------
@@ -137,21 +139,17 @@ scripts <- function(script_selection) {
     # Axes selection
     axis_x <- 1
     axis_y <- 2
+    # Get the identification of a point on a plot window
+    get_point_identity <- FALSE
     # Features to plot
-    # -- All features
-    #ftp <- c(1:10, 15:70)
-    # -- Statistical features
+    # -- All feats                      <- c(1:10, 15:70)
+    # -- Statistical feats              <- 1:10
+    # -- STL features                   <- 15:26
+    # -- Autocorrelation feats          <- 28:34
+    # -- Stats + STL + Acorr + Entropy  <- c(1:10, 15:34)
+    # -- Quantiles + seasonal strengths <- c(5:9, 21:22)
+    # -- Mean, variance + seas. str.    <- c(1:2, 21:22)
     ftp <- 1:10
-    # -- STL features
-    #ftp <- 15:26
-    # -- Autocorrelation features
-    #ftp <- 28:34
-    # -- Stats + STL + Acorr + Entropy features
-    #ftp <- c(1:10, 15:34)
-    # -- Quantiles + seasonal strengths
-    # <- c(5:9, 21:22)
-    # -- Mean, variance + seasonal strengths
-    # ftp <- c(1:2, 21:22)
     
     # Function call
     pca <- whyT2.1::pca_from_features(
@@ -160,6 +158,7 @@ scripts <- function(script_selection) {
       axis_x=axis_x,
       axis_y=axis_y
       )
+    return(pca)
   }
   
   # ----------------------------------------------------------------------------
