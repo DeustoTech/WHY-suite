@@ -1,7 +1,7 @@
 #' This is a compilation of simple scripts to execute functions of the `whyT2.1` library. 
 #' 
 #' KEY OF ABBREVIATIONS:
-#' DSET = dataset | EXT = extended | FEAT = feature | RAW = raw | TS = time series
+#' DSET = dataset | EXT = extended | FEAT = feature | PCA = principal component analysis | RAW = raw | TS = time series
 #' 
 #' LIST OF SCRIPTS:
 #' 
@@ -9,7 +9,10 @@
 #' `1` Create EXT DSETs from folder of RAW DSETs
 #' 
 #' ** FEATURE EXTRACTION **
-#' `4` Get FEATs of (1-month LCL RAW) DSETs from folder 
+#' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
+#' 
+#' ** MACHINE LEARNING TOOLS **
+#' `6` Compute PCA from FEATs CSV file
 #' 
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
@@ -20,7 +23,7 @@
 #' 
 
 ################################################################################
-script_selection <- 5
+script_selection <- 6
 ################################################################################
 
 library(whyT2.1)
@@ -124,7 +127,39 @@ scripts <- function(script_selection) {
   
   # SCRIPT 6
   if (script_selection == 6) {
+    # Folder to features' file
+    feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
+                          "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
+    # Color by socioeconomic variables
+    SE_data_file <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/",
+                          "informations_households.csv", sep="")
+    color_by_SE_vars <- TRUE
+    # Axes selection
+    axis_x <- 1
+    axis_y <- 2
+    # Features to plot
+    # -- All features
+    #ftp <- c(1:10, 15:70)
+    # -- Statistical features
+    ftp <- 1:10
+    # -- STL features
+    #ftp <- 15:26
+    # -- Autocorrelation features
+    #ftp <- 28:34
+    # -- Stats + STL + Acorr + Entropy features
+    #ftp <- c(1:10, 15:34)
+    # -- Quantiles + seasonal strengths
+    # <- c(5:9, 21:22)
+    # -- Mean, variance + seasonal strengths
+    # ftp <- c(1:2, 21:22)
     
+    # Function call
+    pca <- whyT2.1::pca_from_features(
+      feats_folder=feats_folder, 
+      ftp=ftp, 
+      axis_x=axis_x,
+      axis_y=axis_y
+      )
   }
   
   # ----------------------------------------------------------------------------

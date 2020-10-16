@@ -4,7 +4,7 @@
 #' Compute and plot PCA of the features of the datasets.
 #'
 #' @param feats_folder String with the path to the folder where the features are contained.
-#' @param otp Vector of the observations to plot.
+#' @param otp Vector of the observations to plot. `NULL` indicates all observations.
 #' @param ftp Vector of the features to plot.
 #' @param axis_x Integer indicating the principal component to be plotted as axis x.
 #' @param axis_y Integer indicating the principal component to be plotted as axis y.
@@ -16,7 +16,7 @@
 #'
 #' @export
 
-pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_SE_vars, SE_data_file, get_point_identity) {
+pca_from_features <- function(feats_folder, otp=NULL, ftp, axis_x, axis_y, color_by_SE_vars=FALSE, SE_data_file=FALSE, get_point_identity=FALSE) {
   # Load data from CSV files
   feats <- utils::read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
@@ -55,6 +55,11 @@ pca_from_features <- function(feats_folder, otp, ftp, axis_x, axis_y, color_by_S
     color <- grouped_ACORN
   } else {
     color <- "blue"
+  }
+  
+  # 'otp' conversion
+  if (is.null(otp)) {
+    otp <- 1:dim(feats)[1]
   }
 
   # PCA

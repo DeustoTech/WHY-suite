@@ -60,7 +60,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
   return(feats)
 }
 
-#' Features of datasets in a folder
+#' Features of raw datasets in a folder
 #'
 #' @description
 #' Get features of all datasets contained in a folder.
