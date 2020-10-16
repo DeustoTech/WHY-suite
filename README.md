@@ -1,5 +1,5 @@
 # why-T2.1
-Welcome! Here you'll find R scripts to carry out the **task T2.1** of the **WHY H2020 project**.
+Welcome! Here you'll find the R scripts to carry out the **task T2.1** of the **WHY** H2020 project.
 
 The code in this repository is currently under development, so the files and their content may change very quickly. 🏃‍♂️💨
 
