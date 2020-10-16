@@ -23,7 +23,7 @@ plot_dataframe <- function(dset_data, title=NULL) {
     coloring = "blue"
   }
 
-  plot1 <- ggplot2::ggplot(
+  p <- ggplot2::ggplot(
     data = dset_data,
     mapping = aes(x=times, y=values)
     ) +
@@ -32,7 +32,7 @@ plot_dataframe <- function(dset_data, title=NULL) {
     ) +
     ggplot2::ggtitle(title)
 
-  print(plot1)
+  print(p)
 
   ## Create plot
   # p <- plot(
