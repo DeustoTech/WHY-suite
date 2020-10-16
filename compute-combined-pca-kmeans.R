@@ -3,10 +3,11 @@
 # Compute a combination of PCA and k-means from a CSV file of features
 
 # Load source file and libraries
-source("why-source.R")
+library(whyT2.1)
 # Cluster-PCA visualization
 library(factoextra)
-
+# Set a seed for random numbers
+set.seed(1981)
 
 ################################################################################
 # -- User parameters
@@ -27,7 +28,7 @@ pca_components <- 4
 elbow_method <- F
 max_clusters <- 20
 # In case elbow_method is FALSE
-number_of_centers <- 8
+number_of_centers <- 4
 
 # Observations to plot
 otp <- 1:4605
@@ -48,7 +49,7 @@ otp <- 1:4605
 # -- Quantiles + seasonal strengths
 ftp <- c(5:9, 21:22)
 
-# Axes selection
+# Axes selection in PCA
 axis_x <- 1
 axis_y <- 2
 
@@ -56,7 +57,7 @@ axis_y <- 2
 month_accumul <- FALSE
 
 # Plot mean and variance of all TS in cluster
-cluster_accumul <- FALSE
+cluster_accumul <- TRUE
 
 ################################################################################
 
