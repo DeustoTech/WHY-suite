@@ -1,11 +1,11 @@
 #' PCA of features
 #'
 #' @description
-#' Compute and plot PCA of the features of the datasets.
+#' Compute and plot PCA from a dataframe of features.
 #'
-#' @param feats_folder String with the path to the folder where the features are contained.
-#' @param otp Vector of the observations to plot. `NULL` indicates all observations.
-#' @param ftp Vector of the features to plot.
+#' @param feats_folder String with the path to the folder of the features file.
+#' @param otp Vector of observations to plot. `NULL` indicates all observations.
+#' @param ftp Vector of features to plot.
 #' @param axis_x Integer indicating the principal component to be plotted as axis x.
 #' @param axis_y Integer indicating the principal component to be plotted as axis y.
 #' @param color_by_SE_vars Boolean indicating if plotted points must be colored according to the socioeconomical variables.
@@ -16,7 +16,7 @@
 #'
 #' @export
 
-pca_from_features <- function(feats_folder, otp=NULL, ftp, axis_x, axis_y, color_by_SE_vars=FALSE, SE_data_file=FALSE, get_point_identity=FALSE) {
+pca_from_features <- function(feats_folder, otp=NULL, ftp, axis_x, axis_y, color_by_SE_vars=FALSE, SE_data_file=NULL, get_point_identity=FALSE) {
   # Load data from CSV files
   feats <- utils::read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
@@ -47,7 +47,7 @@ pca_from_features <- function(feats_folder, otp=NULL, ftp, axis_x, axis_y, color
     SE_indices <- match(analyzed_series, SE_vars[,1])
     # Get grouped ACORN
     grouped_ACORN <- SE_vars[SE_indices,4]
-    grouped_ACORN[grouped_ACORN == "Affluent"]    = "green"
+    grouped_ACORN[grouped_ACORN == "Affluent"]    = "darkgreen"
     grouped_ACORN[grouped_ACORN == "Comfortable"] = "orange"
     grouped_ACORN[grouped_ACORN == "Adversity"]   = "red"
     grouped_ACORN[grouped_ACORN == "ACORN-U"]     = "blue"

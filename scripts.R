@@ -138,7 +138,7 @@ scripts <- function(script_selection) {
     color_by_SE_vars <- TRUE
     # Axes selection
     axis_x <- 1
-    axis_y <- 2
+    axis_y <- 3
     # Get the identification of a point on a plot window
     get_point_identity <- FALSE
     # Features to plot
@@ -156,7 +156,9 @@ scripts <- function(script_selection) {
       feats_folder=feats_folder, 
       ftp=ftp, 
       axis_x=axis_x,
-      axis_y=axis_y
+      axis_y=axis_y,
+      color_by_SE_vars = TRUE,
+      SE_data_file = SE_data_file
       )
     return(pca)
   }
