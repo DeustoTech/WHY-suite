@@ -1,15 +1,26 @@
-#' This is a compilation of simple scripts to execute functions from the 
-#' `whyT2.1` library. 
+#' This is a compilation of simple scripts to execute functions of the `whyT2.1` library. 
+#' 
+#' KEY OF ABBREVIATIONS:
+#' DSET = dataset | EXT = extended | FEAT = feature | RAW = raw | TS = time series
 #' 
 #' LIST OF SCRIPTS:
 #' 
-#' `1` Generation of extended datasets from folder of raw datasets
-#' `2` Generation of time series from features using GRATIS
-#' `3` Visual PDF library of features so they can be easily understood
-#' `4` Get features of all the datasets contained in a folder
+#' ** DATASET MANAGEMENT **
+#' `1` Create EXT DSETs from folder of RAW DSETs
+#' 
+#' ** FEATURE EXTRACTION **
+#' `4` Get FEATs of (1-month LCL RAW) DSETs from folder 
+#' 
+#' ** PLOTTING DATA **
+#' `5` Plot an LCL EXT DSET
+#' `3` Create visual PDF library of FEATs
+#' 
+#' ** TIME SERIES GENERATION **
+#' `2` Create TS from FEATs using GRATIS
+#' 
 
 ################################################################################
-script_selection <- 3
+script_selection <- 5
 ################################################################################
 
 library(whyT2.1)
@@ -90,7 +101,14 @@ scripts <- function(script_selection) {
   
   # SCRIPT 5
   if (script_selection == 5) {
+    # User parameters
+    folder_path   <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
+    four_digit_id <- "0002"
     
+    # Function call
+    path <- paste(folder_path, "MAC00", four_digit_id, sep="")
+    load(path)
+    whyT2.1::plot_dataframe(dset_data = edf$df, title = four_digit_id)
   }
   
   # ----------------------------------------------------------------------------

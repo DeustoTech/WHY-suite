@@ -25,7 +25,7 @@ plot_dataframe <- function(dset_data, title=NULL) {
 
   p <- ggplot2::ggplot(
     data = dset_data,
-    mapping = aes(x=times, y=values)
+    mapping = ggplot2::aes(x=times, y=values)
     ) +
     ggplot2::geom_line(
       color = coloring
