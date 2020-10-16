@@ -23,24 +23,18 @@ plot_dataframe <- function(dset_data, title=NULL) {
     coloring = "blue"
   }
 
-  p <- ggplot2::ggplot(
+  p <- 
     # Data to be plotted
-    data = dset_data,
-    mapping = ggplot2::aes(x=times, y=values)
+    ggplot2::ggplot(
+      data    = dset_data,
+      mapping = ggplot2::aes(x=times, y=values)
     ) +
     # Type of graph (line in this case)
-    ggplot2::geom_line(
-      color = coloring
-    ) +
+    ggplot2::geom_line(color = coloring) +
     # Title
-    ggplot2::ggtitle(
-      title
-    ) +
+    ggplot2::ggtitle(title) +
     # Labels
-    ggplot2::labs(
-      x = "Date",
-      y = "kWh"
-    ) + 
+    ggplot2::labs(x = "Date", y = "kWh") + 
     # Axis limits
     ggplot2::scale_y_continuous(limits = c(0,5))
 
