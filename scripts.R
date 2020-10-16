@@ -3,23 +3,102 @@
 #' 
 #' LIST OF SCRIPTS:
 #' 
-#' `#1` GENERATION OF EXTENDED DATASETS FROM FOLDER OF RAW DATASETS
-#' Given a folder of raw datasets, generate the extended datasets, i.e. create time series of at least 2 years long.
+#' `1` Generation of extended datasets from folder of raw datasets
+#' `2` Generation of time series from features using GRATIS
+#' `3` Visual PDF library of features so they can be easily understood
+#' `4` 
 
 ################################################################################
-script_selection <- 1
+script_selection <- 3
 ################################################################################
 
 library(whyT2.1)
 
 scripts <- function(script_selection) {
-  # SCRIPT #1
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 1
   if (script_selection == 1) {
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
     output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    extend_datasets(input_folder,output_folder)
+    whyT2.1::extend_datasets(input_folder,output_folder)
   }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 2
+  if (script_selection == 2) {
+    library(gratis)
+    
+    gen_ts <- gratis::generate_ts_with_target(
+      n = 1,
+      ts.length = length(values$values),
+      freq = c(ts_freq, 7 * ts_freq),
+      seasonal = 2,
+      features = c("frequency", "stl_features", "entropy", "acf_features"),
+      selected.features = names(feats)[1:24],
+      target = as.vector(t(as.data.frame(feats[1:24]))),
+      parallel = FALSE
+    )
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 3
+  if (script_selection == 3) {
+    # User parameters
+    SAMPLES_PER_DAY <- 48
+    sampling_period <- 86400 / SAMPLES_PER_DAY
+    feats_folder    <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/", 
+                             "2012-2013, 0% NA, scale=FALSE, 70 feats/", 
+                             sep = "")
+    feats_to_plot   <- c(1:10, 15:70)
+    
+    # Function call
+    whyT2.1::plot_features_library(
+      sampling_period = sampling_period,
+      feats_folder = feats_folder,
+      feats_to_plot = feats_to_plot
+    )
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 4
+  if (script_selection == 4) {
+    
+  }
+
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 5
+  if (script_selection == 5) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 6
+  if (script_selection == 6) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 7
+  if (script_selection == 7) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 8
+  if (script_selection == 8) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
 }
 
-# Execute
+# Execute selected script
 scripts(script_selection)
