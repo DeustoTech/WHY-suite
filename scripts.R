@@ -103,18 +103,21 @@ scripts <- function(script_selection) {
   if (script_selection == 5) {
     # User parameters
     lcl_ext_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    four_digit_id  <- "0003"
-    from_time      <- as.POSIXct("2013-01-01", tz="GMT")
-    to_time        <- as.POSIXct("2013-01-10", tz="GMT")
+    lcl_4_digit_id <- "0023"
+    from_time      <- as.POSIXct("2013-02-01", tz="GMT")
+    to_time        <- as.POSIXct("2013-03-01", tz="GMT")
     
     # Function call
-    path     <- paste(lcl_ext_folder, "MAC00", four_digit_id, sep="")
+    path     <- paste(lcl_ext_folder, "MAC00", lcl_4_digit_id, sep="")
     load(path)
     # Select time interval
     ival_idx <- edf$df$times >= from_time & edf$df$times <= to_time
     ext_dset <- edf$df[ival_idx,]
     
-    whyT2.1::plot_dataframe(dset_data = ext_dset, title = four_digit_id)
+    whyT2.1::plot_dataframe(
+      dset_data = ext_dset, 
+      title     = paste("File", lcl_4_digit_id)
+      )
   }
   
   # ----------------------------------------------------------------------------

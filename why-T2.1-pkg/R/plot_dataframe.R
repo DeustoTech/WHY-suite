@@ -30,7 +30,13 @@ plot_dataframe <- function(dset_data, title=NULL) {
     ggplot2::geom_line(
       color = coloring
     ) +
-    ggplot2::ggtitle(title)
+    ggplot2::ggtitle(
+      title
+    ) +
+    ggplot2::labs(
+      x = "Date",
+      y = "kWh"
+    )
 
   print(p)
 
