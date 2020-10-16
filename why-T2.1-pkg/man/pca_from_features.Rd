@@ -4,37 +4,18 @@
 \alias{pca_from_features}
 \title{PCA of features}
 \usage{
-pca_from_features(
-  feats_folder,
-  otp,
-  ftp,
-  axis_x,
-  axis_y,
-  color_by_SE_vars,
-  SE_data_file,
-  get_point_identity
-)
+pca_from_features(feats_folder, otp = NULL, ftp)
 }
 \arguments{
-\item{feats_folder}{String with the path to the folder where the features are contained.}
+\item{feats_folder}{String with the path to the folder of the features file.}
 
-\item{otp}{Vector of the observations to plot.}
+\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
 
-\item{ftp}{Vector of the features to plot.}
-
-\item{axis_x}{Integer indicating the principal component to be plotted as axis x.}
-
-\item{axis_y}{Integer indicating the principal component to be plotted as axis y.}
-
-\item{color_by_SE_vars}{Boolean indicating if plotted points must be colored according to the socioeconomical variables.}
-
-\item{SE_data_file}{String with the path to the file with the socioeconomical variables.}
-
-\item{get_point_identity}{Boolean indicating if plotted points must be identified by clicking on them.}
+\item{ftp}{Vector of features to plot.}
 }
 \value{
 A list with class `princomp`.
 }
 \description{
-Compute and plot PCA of the features of the datasets.
+Compute and plot PCA from a dataframe of features.
 }

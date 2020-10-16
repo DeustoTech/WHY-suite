@@ -2,7 +2,7 @@
 % Please edit documentation in R/feature-extraction.R
 \name{get_features_of_datasets_in_folder}
 \alias{get_features_of_datasets_in_folder}
-\title{Features of datasets in a folder}
+\title{Features of raw datasets in a folder}
 \usage{
 get_features_of_datasets_in_folder(
   folder_path,

@@ -31,7 +31,7 @@ library(whyT2.1)
 scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 1
+  # SCRIPT 1: Create EXT DSETs from folder of RAW DSETs
   if (script_selection == 1) {
     # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
@@ -43,7 +43,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 2
+  # SCRIPT 2: Create TS from FEATs using GRATIS
   if (script_selection == 2) {
     # Extra libraries
     library(gratis)
@@ -66,7 +66,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 3
+  # SCRIPT 3: Create visual PDF library of FEATs
   if (script_selection == 3) {
     # User parameters
     SAMPLES_PER_DAY <- 48
@@ -86,7 +86,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 4
+  # SCRIPT 4: Get FEATs of (1-month LCL RAW) DSETs from folder
   if (script_selection == 4) {
     # User parameters
     folder_path      <- "G:/Mi unidad/WHY/Datasets/lcl/"
@@ -104,7 +104,7 @@ scripts <- function(script_selection) {
 
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 5
+  # SCRIPT 5: Plot an LCL EXT DSET
   if (script_selection == 5) {
     # User parameters
     lcl_ext_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
@@ -127,7 +127,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 6
+  # SCRIPT 6: Compute PCA from CSV file of FEATs
   if (script_selection == 6) {
     # Folder to features' file
     feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
@@ -140,7 +140,7 @@ scripts <- function(script_selection) {
     axis_x <- 1
     axis_y <- 3
     # Get the identification of a point on a plot window
-    get_point_identity <- FALSE
+    get_point_identity <- TRUE
     # Features to plot
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
@@ -153,12 +153,18 @@ scripts <- function(script_selection) {
     
     # Function call
     pca <- whyT2.1::pca_from_features(
-      feats_folder=feats_folder, 
-      ftp=ftp, 
-      axis_x=axis_x,
-      axis_y=axis_y,
-      color_by_SE_vars = TRUE,
-      SE_data_file = SE_data_file
+      feats_folder = feats_folder, 
+      ftp          = ftp
+      )
+    # Plot PCA scores
+    whyT2.1::plot_pca(
+      pca                = pca,
+      feats_folder       = feats_folder,
+      axis_x             = axis_x,
+      axis_y             = axis_y,
+      color_by_SE_vars   = color_by_SE_vars,
+      SE_data_file       = SE_data_file,
+      get_point_identity = get_point_identity
       )
     return(pca)
   }
@@ -174,6 +180,13 @@ scripts <- function(script_selection) {
   
   # SCRIPT 8
   if (script_selection == 8) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 9
+  if (script_selection == 9) {
     
   }
   
