@@ -1,3 +1,58 @@
+#' Plotting of a dataframe
+#'
+#' @description
+#' Plot a dataframe (either raw or cooked).
+#'
+#' @param dset_data The dataframe to be plotted.
+#' @param title Optional title (`NULL` by default).
+#'
+#' @return Plot of the dataset.
+#'
+#' @export
+
+plot_dataframe <- function(dset_data, title=NULL) {
+
+  # Check existence of a 3rd column to apply color
+  if (dim(dset_data)[2] > 2) {
+    # Color vector is blue by default
+    coloring = rep("blue", dim(dset_data)[1])
+    # Replace ex-NA by red
+    coloring[dset_data[,3] == 1] = "red"
+    coloring[dset_data[,3] == 2] = "darkgreen" #"green"
+  } else {
+    coloring = "blue"
+  }
+
+  p <- 
+    # Data to be plotted
+    ggplot2::ggplot(
+      data    = dset_data,
+      mapping = ggplot2::aes(x=times, y=values)
+    ) +
+    # Type of graph (line in this case)
+    ggplot2::geom_line(color = coloring) +
+    # Title
+    ggplot2::ggtitle(title) +
+    # Labels
+    ggplot2::labs(x = "Date", y = "kWh") + 
+    # Axis limits
+    ggplot2::scale_y_continuous(limits = c(0,5))
+
+  print(p)
+
+  ## Create plot
+  # p <- plot(
+  #   x    = dset_data[[1]],
+  #   y    = dset_data[[2]],
+  #   col  = "blue",
+  #   type = "l",
+  #   main = title,
+  #   xlab = "Date",
+  #   ylab = "kWh",
+  #   ylim = c(0,5)
+  # )
+}
+
 #' Creation of a PDF library of features
 #'
 #' @description
@@ -14,7 +69,7 @@
 plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) {
   # Libraries
   library(plotly)
-
+  
   # Load data from CSV files
   feats <- read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
@@ -26,10 +81,10 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
     header = TRUE,
     sep    = ","
   )
-
+  
   # Indices of series to be plotted
   seq_idx <- seq(1, nrow(feats), length=9)
-
+  
   for (ii in feats_to_plot) {
     print(ii)
     # Feature name
@@ -41,7 +96,7 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
     repres_from_D <- as.POSIXct(data_info$from_date[selected_idx], tz="GMT")
     repres_to_D   <- as.POSIXct(data_info$to_date[selected_idx], tz="GMT")
     repres_values <- sorted_col$x[seq_idx]
-
+    
     # Plot in PDF file
     pdf(
       file   = paste(ii, " - ", feat_name, ".pdf", sep = ""),
@@ -50,7 +105,7 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
       height = 15
     )
     par(mfrow = c(3,3))
-
+    
     for (jj in 1:9) {
       # Load dataset file
       csv_path <- paste(DATASET_PATH, repres_fnames[jj], sep="")
