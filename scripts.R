@@ -139,8 +139,6 @@ scripts <- function(script_selection) {
     # Axes selection
     axis_x <- 1
     axis_y <- 2
-    # Get the identification of a point on a plot window
-    get_point_identity <- F
     # Features to plot
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
@@ -148,7 +146,7 @@ scripts <- function(script_selection) {
     # -- Autocorrelation feats          <- 28:34
     # -- Stats + STL + Acorr + Entropy  <- c(1:10, 15:34)
     # -- Quantiles + seasonal strengths <- c(5:9, 21:22)
-    # -- Mean, variance + seas. str.    <- c(1:2, 21:22)
+    # -- Mean, var, + seas. strengths   <- c(1:2, 21:22)
     ftp <- 1:10
     
     # Function call
@@ -163,8 +161,7 @@ scripts <- function(script_selection) {
       axis_x             = axis_x,
       axis_y             = axis_y,
       color_by_SE_vars   = color_by_SE_vars,
-      SE_data_file       = SE_data_file,
-      get_point_identity = get_point_identity
+      SE_data_file       = SE_data_file
       )
     return(pca)
   }
