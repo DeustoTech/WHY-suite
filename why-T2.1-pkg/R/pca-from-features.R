@@ -9,7 +9,6 @@
 #' @param axis_y Integer indicating the principal component to be plotted as axis y.
 #' @param color_by_SE_vars Boolean indicating if plotted points must be colored according to the socioeconomical variables.
 #' @param SE_data_file String with the path to the file with the socioeconomical variables.
-#' @param get_point_identity Boolean indicating if plotted points must be identified by clicking on them.
 #'
 #' @return Plotting of the PCA scores.
 #'
@@ -68,29 +67,6 @@ plot_pca <- function(pca_sc, feats_folder, axis_x, axis_y, color_by_SE_vars=FALS
     ) 
   
   print(p)
-  
-  # plot(
-  #   pca[["x"]][, axis_x],
-  #   pca[["x"]][, axis_y],
-  #   col = color,
-  #   pch = "+",
-  #   xlab = paste("PC #", axis_x, sep = ""),
-  #   ylab = paste("PC #", axis_y, sep = "")
-  # )
-  
-  # Get point identification
-  if (get_point_identity) {
-    # Get points
-    ts_ids <- graphics::identify(
-      x = pca[["x"]][, axis_x],
-      y = pca[["x"]][, axis_y],
-      plot = FALSE
-    )
-    # Print points
-    for (ts_id in ts_ids) {
-      print(ts_id)
-    }
-  }
 }
 
 #' PCA of features
