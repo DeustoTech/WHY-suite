@@ -39,18 +39,6 @@ plot_dataframe <- function(dset_data, title=NULL) {
     ggplot2::scale_y_continuous(limits = c(0,5))
 
   print(p)
-
-  ## Create plot
-  # p <- plot(
-  #   x    = dset_data[[1]],
-  #   y    = dset_data[[2]],
-  #   col  = "blue",
-  #   type = "l",
-  #   main = title,
-  #   xlab = "Date",
-  #   ylab = "kWh",
-  #   ylim = c(0,5)
-  # )
 }
 
 #' Plotting of PCA scores
