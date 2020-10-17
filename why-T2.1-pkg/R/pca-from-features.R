@@ -3,7 +3,7 @@
 #' @description
 #' Compute and plot PCA from a dataframe of features.
 #'
-#' @param pca A list with class `princomp`.
+#' @param pca_sc A dataframe with PCA scores.
 #' @param feats_folder String with the path to the folder of the features file.
 #' @param axis_x Integer indicating the principal component to be plotted as axis x.
 #' @param axis_y Integer indicating the principal component to be plotted as axis y.
@@ -15,7 +15,7 @@
 #'
 #' @export
 
-plot_pca <- function(pca, feats_folder, axis_x, axis_y, color_by_SE_vars=FALSE, SE_data_file=NULL, get_point_identity=FALSE) {
+plot_pca <- function(pca_sc, feats_folder, axis_x, axis_y, color_by_SE_vars=FALSE, SE_data_file=NULL, get_point_identity=FALSE){
   # Color by socioeconomic variables or get identity of points?
   if (color_by_SE_vars | get_point_identity) {
     # Load data from CSV files
@@ -37,28 +37,46 @@ plot_pca <- function(pca, feats_folder, axis_x, axis_y, color_by_SE_vars=FALSE, 
     # List of analyzed series
     analyzed_series <- substr(data_info[,1], 1, 9)
     # Find analyzed series in SE_vars
-    SE_indices <- match(analyzed_series, SE_vars[,1])
+    SE_indices <- match(analyzed_series, SE_vars[, 1])
     # Get grouped ACORN
-    grouped_ACORN <- SE_vars[SE_indices,4]
-    grouped_ACORN[grouped_ACORN == "Affluent"]    = "darkgreen"
-    grouped_ACORN[grouped_ACORN == "Comfortable"] = "orange"
-    grouped_ACORN[grouped_ACORN == "Adversity"]   = "red"
-    grouped_ACORN[grouped_ACORN == "ACORN-U"]     = "blue"
-    # color
-    color <- grouped_ACORN
+    color <- SE_vars[SE_indices, 4]
   } else {
-    color <- "blue"
+    color <- NULL
   }
   
   # Plot PCA
-  plot(
-    pca[["x"]][, axis_x],
-    pca[["x"]][, axis_y],
-    col = color,
-    pch = "+",
-    xlab = paste("PC #", axis_x, sep = ""),
-    ylab = paste("PC #", axis_y, sep = "")
-  )
+  p <- 
+    # Data to be plotted
+    ggplot2::ggplot(
+      data    = pca_sc,
+      mapping = ggplot2::aes_q(
+        x   = as.name(names(pca_sc)[axis_x]),
+        y   = as.name(names(pca_sc)[axis_y]),
+        col = color
+      )
+    ) +
+    # Color palette
+    ggplot2::scale_color_brewer(palette="Set1") +
+    # Type of graph (line in this case)
+    ggplot2::geom_point() + 
+    # Title
+    ggplot2::ggtitle("PCA scores") +
+    # Labels
+    ggplot2::labs(
+      x    = paste("PC #", axis_x, sep = ""), 
+      y    = paste("PC #", axis_y, sep = "")
+    ) 
+  
+  print(p)
+  
+  # plot(
+  #   pca[["x"]][, axis_x],
+  #   pca[["x"]][, axis_y],
+  #   col = color,
+  #   pch = "+",
+  #   xlab = paste("PC #", axis_x, sep = ""),
+  #   ylab = paste("PC #", axis_y, sep = "")
+  # )
   
   # Get point identification
   if (get_point_identity) {

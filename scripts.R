@@ -135,12 +135,12 @@ scripts <- function(script_selection) {
     # Color by socioeconomic variables
     SE_data_file <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/",
                           "informations_households.csv", sep="")
-    color_by_SE_vars <- TRUE
+    color_by_SE_vars <- T
     # Axes selection
     axis_x <- 1
-    axis_y <- 3
+    axis_y <- 2
     # Get the identification of a point on a plot window
-    get_point_identity <- TRUE
+    get_point_identity <- F
     # Features to plot
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
@@ -158,7 +158,7 @@ scripts <- function(script_selection) {
       )
     # Plot PCA scores
     whyT2.1::plot_pca(
-      pca                = pca,
+      pca                = as.data.frame(pca$x),
       feats_folder       = feats_folder,
       axis_x             = axis_x,
       axis_y             = axis_y,
@@ -194,4 +194,5 @@ scripts <- function(script_selection) {
 }
 
 # Execute selected script
+
 scripts(script_selection)
