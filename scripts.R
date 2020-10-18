@@ -13,7 +13,7 @@
 #' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
 #' 
 #' ** MACHINE LEARNING TOOLS **
-#' `6` Compute PCA from CSV file of FEATs
+#' `6` Compute & plot PCA from CSV file of FEATs
 #' `7` Compute k-means from CSV file of FEATs
 #' 
 #' ** PLOTTING DATA **
@@ -129,12 +129,8 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 6: Compute PCA from CSV file of FEATs
+  # SCRIPT 6: Compute & plot PCA from CSV file of FEATs
   if (script_selection == 6) {
-    # Folder to features' file
-    feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
-                          "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
-    # Features to plot
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
     # -- STL features                   <- 15:26
@@ -142,14 +138,13 @@ scripts <- function(script_selection) {
     # -- Stats + STL + Acorr + Entropy  <- c(1:10, 15:34)
     # -- Quantiles + seasonal strengths <- c(5:9, 21:22)
     # -- Mean, var, + seas. strengths   <- c(1:2, 21:22)
+    
+    #### User parameters
+    # Folder to features' file
+    feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
+                          "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
+    # Features to plot
     ftp <- 1:10
-    
-    # Function call
-    pca <- whyT2.1::pca_from_features(
-      feats_folder = feats_folder, 
-      ftp          = ftp
-      )
-    
     # Color by socioeconomic variables
     SE_data_file <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/",
                           "informations_households.csv", sep="")
@@ -158,6 +153,12 @@ scripts <- function(script_selection) {
     axis_x <- 1
     axis_y <- 2
     
+    #### Function calls
+    # Compute PCA
+    pca <- whyT2.1::pca_from_features(
+      feats_folder = feats_folder, 
+      ftp          = ftp
+      )
     # Plot PCA scores
     pca <- whyT2.1::plot_pca(
       pca              = as.data.frame(pca$x),
