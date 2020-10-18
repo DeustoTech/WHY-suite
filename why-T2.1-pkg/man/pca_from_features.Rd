@@ -4,18 +4,18 @@
 \alias{pca_from_features}
 \title{PCA of features}
 \usage{
-pca_from_features(feats_folder, otp = NULL, ftp)
+pca_from_features(feats_folder, ftp, otp = NULL)
 }
 \arguments{
 \item{feats_folder}{String with the path to the folder of the features file.}
 
-\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
-
 \item{ftp}{Vector of features to plot.}
+
+\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
 }
 \value{
 A list with class `princomp`.
 }
 \description{
-Compute and plot PCA from a dataframe of features.
+Compute PCA from a dataframe of features.
 }

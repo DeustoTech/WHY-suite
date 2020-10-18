@@ -1,7 +1,8 @@
 #' This is a compilation of simple scripts to execute functions of the `whyT2.1` library. 
 #' 
 #' KEY OF ABBREVIATIONS:
-#' DSET = dataset | EXT = extended | FEAT = feature | PCA = principal component analysis | RAW = raw | TS = time series
+#' DSET = dataset | EXT = extended | FEAT = feature
+#' PCA = principal component analysis | RAW = raw | TS = time series
 #' 
 #' LIST OF SCRIPTS:
 #' 
@@ -13,6 +14,7 @@
 #' 
 #' ** MACHINE LEARNING TOOLS **
 #' `6` Compute PCA from CSV file of FEATs
+#' `7` Compute k-means from CSV file of FEATs
 #' 
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
@@ -23,7 +25,7 @@
 #' 
 
 ################################################################################
-script_selection <- 6
+script_selection <- 7
 ################################################################################
 
 library(whyT2.1)
@@ -132,13 +134,6 @@ scripts <- function(script_selection) {
     # Folder to features' file
     feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
                           "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
-    # Color by socioeconomic variables
-    SE_data_file <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/",
-                          "informations_households.csv", sep="")
-    color_by_SE_vars <- T
-    # Axes selection
-    axis_x <- 1
-    axis_y <- 2
     # Features to plot
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
@@ -154,23 +149,44 @@ scripts <- function(script_selection) {
       feats_folder = feats_folder, 
       ftp          = ftp
       )
+    
+    # Color by socioeconomic variables
+    SE_data_file <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/",
+                          "informations_households.csv", sep="")
+    color_by_SE_vars <- T
+    # Axes selection
+    axis_x <- 1
+    axis_y <- 2
+    
     # Plot PCA scores
-    whyT2.1::plot_pca(
-      pca                = as.data.frame(pca$x),
-      feats_folder       = feats_folder,
-      axis_x             = axis_x,
-      axis_y             = axis_y,
-      color_by_SE_vars   = color_by_SE_vars,
-      SE_data_file       = SE_data_file
+    pca <- whyT2.1::plot_pca(
+      pca              = as.data.frame(pca$x),
+      feats_folder     = feats_folder,
+      axis_x           = axis_x,
+      axis_y           = axis_y,
+      color_by_SE_vars = color_by_SE_vars,
+      SE_data_file     = SE_data_file
       )
     return(pca)
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 7
+  # SCRIPT 7: Compute k-means from CSV file of FEATs
   if (script_selection == 7) {
+    # Folder to features' file
+    feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
+                          "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
+    # Features to plot
+    ftp <- 1:10
     
+    # Compute k-means
+    km <- whyT2.1::kmeans_from_features(
+      feats_folder = feats_folder,
+      ftp          = ftp,
+      centers      = 4
+      )
+    return(km)
   }
   
   # ----------------------------------------------------------------------------
