@@ -186,17 +186,17 @@ scripts <- function(script_selection) {
       ftp          = ftp,
       centers      = 3:5
       )
+    # Plot elbow curve
+    whyT2.1::plot_kmeans(
+      km            = km$results,
+      plot_elbow    = TRUE
+    )
     # Plot k-means
     whyT2.1::plot_kmeans(
       km            = km$results[[3]],
       feats_df      = km$feats,
       plot_clusters = TRUE
     )
-    # # Plot elbow curve
-    # whyT2.1::plot_kmeans(
-    #   km            = km$results,
-    #   plot_elbow    = TRUE
-    # )
     return(km)
   }
   

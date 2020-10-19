@@ -112,17 +112,17 @@ plot_pca <- function(pca_sc, feats_folder, axis_x, axis_y, color_by_SE_vars=FALS
   print(p)
 }
 
-#' Plotting of k-means results
+#' Plotting of k-means results or elbow curve
 #'
 #' @description
-#' Plot k-means results.
+#' Plot k-means results or elbow curve.
 #'
 #' @param km An object of class `kmeans`.
 #' @param feats_df Dataframe of features.
 #' @param plot_clusters If `TRUE`, plot k-means clusters.
 #' @param plot_elbow If `TRUE`, plot elbow curve.
 #'
-#' @return Plotting of the k-means results.
+#' @return Plotting of the k-means results or elbow curve.
 #'
 #' @export
 

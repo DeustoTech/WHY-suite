@@ -46,6 +46,9 @@ pca_from_features <- function(feats_folder, ftp, otp=NULL) {
 #' @export
 
 kmeans_from_features <- function(feats_folder, ftp, otp=NULL, centers, iter_max=500, nstart=500) {
+  # Fix random numbers
+  set.seed(1981)
+  
   # Load data from CSV files
   feats <- utils::read.table(
     file   = paste(feats_folder, "feats.csv", sep = ""),
