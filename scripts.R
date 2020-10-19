@@ -2,7 +2,7 @@
 #' 
 #' KEY OF ABBREVIATIONS:
 #' DSET = dataset | EXT = extended | FEAT = feature
-#' PCA = principal component analysis | RAW = raw | TS = time series
+#' PCA = principal component analysis | RAW = raw | TS = time series | W/ = with
 #' 
 #' LIST OF SCRIPTS:
 #' 
@@ -13,9 +13,10 @@
 #' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
 #' 
 #' ** MACHINE LEARNING TOOLS **
-#' `6` Compute & plot PCA from CSV file of FEATs
-#' `7` Compute k-means from CSV file of FEATs & plot clusters & elbow curve
-#' 
+#' `6` Compute PCA from CSV file of FEATs (W/ plots)
+#' `7` Compute k-means from CSV file of FEATs (W/ plots)
+#' `8` Compute k-means of PCA from CSV file of FEATs (W/ plots)
+#'  
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
 #' `3` Create visual PDF library of FEATs
@@ -25,7 +26,7 @@
 #' 
 
 ################################################################################
-script_selection <- 7
+script_selection <- 8
 ################################################################################
 
 library(whyT2.1)
@@ -204,7 +205,25 @@ scripts <- function(script_selection) {
   
   # SCRIPT 8
   if (script_selection == 8) {
-    
+    # Folder to features' file
+    feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
+                          "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
+    ftp          <- 1:10
+    centers      <- 4
+    # Compute k-means
+    km <- whyT2.1::pca_kmeans_analysis(
+      feats_folder = feats_folder,
+      ftp          = ftp,
+      min_var      = 0.95,
+      centers      = centers
+    )
+    # Plot k-means
+    whyT2.1::plot_kmeans(
+      km            = km$results[[centers]],
+      feats_df      = km$feats,
+      plot_clusters = TRUE
+    )
+    return(km)
   }
   
   # ----------------------------------------------------------------------------
