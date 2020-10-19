@@ -16,6 +16,7 @@ Imports:
   moments,
   data.table,
   Rfast,
-  ggplot2
+  ggplot2,
+  factoextra
 Depends:
 RoxygenNote: 7.1.1

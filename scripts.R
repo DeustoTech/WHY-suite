@@ -14,7 +14,7 @@
 #' 
 #' ** MACHINE LEARNING TOOLS **
 #' `6` Compute & plot PCA from CSV file of FEATs
-#' `7` Compute k-means from CSV file of FEATs
+#' `7` Compute k-means from CSV file of FEATs & plot clusters & elbow curve
 #' 
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
@@ -33,7 +33,7 @@ library(whyT2.1)
 scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 1: Create EXT DSETs from folder of RAW DSETs
+  # SCRIPT 1
   if (script_selection == 1) {
     # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
@@ -45,7 +45,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 2: Create TS from FEATs using GRATIS
+  # SCRIPT 2
   if (script_selection == 2) {
     # Extra libraries
     library(gratis)
@@ -68,7 +68,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 3: Create visual PDF library of FEATs
+  # SCRIPT 3
   if (script_selection == 3) {
     # User parameters
     SAMPLES_PER_DAY <- 48
@@ -88,7 +88,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 4: Get FEATs of (1-month LCL RAW) DSETs from folder
+  # SCRIPT 4
   if (script_selection == 4) {
     # User parameters
     folder_path      <- "G:/Mi unidad/WHY/Datasets/lcl/"
@@ -106,7 +106,7 @@ scripts <- function(script_selection) {
 
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 5: Plot an LCL EXT DSET
+  # SCRIPT 5
   if (script_selection == 5) {
     # User parameters
     lcl_ext_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
@@ -129,7 +129,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 6: Compute & plot PCA from CSV file of FEATs
+  # SCRIPT 6
   if (script_selection == 6) {
     # -- All feats                      <- c(1:10, 15:70)
     # -- Statistical feats              <- 1:10
@@ -173,20 +173,30 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 7: Compute k-means from CSV file of FEATs
+  # SCRIPT 7
   if (script_selection == 7) {
     # Folder to features' file
     feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
                           "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
     # Features to plot
     ftp <- 1:10
-    
     # Compute k-means
     km <- whyT2.1::kmeans_from_features(
       feats_folder = feats_folder,
       ftp          = ftp,
-      centers      = 4
+      centers      = 3:5
       )
+    # Plot k-means
+    whyT2.1::plot_kmeans(
+      km            = km$results[[3]],
+      feats_df      = km$feats,
+      plot_clusters = TRUE
+    )
+    # # Plot elbow curve
+    # whyT2.1::plot_kmeans(
+    #   km            = km$results,
+    #   plot_elbow    = TRUE
+    # )
     return(km)
   }
   

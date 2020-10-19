@@ -15,7 +15,7 @@ plot_pca(
 )
 }
 \arguments{
-\item{pca_sc}{A dataframe with PCA scores.}
+\item{pca_sc}{A dataframe of PCA scores.}
 
 \item{feats_folder}{String with the path to the folder of the features file.}
 
@@ -31,5 +31,5 @@ plot_pca(
 Plotting of the PCA scores.
 }
 \description{
-Compute and plot PCA from a dataframe of features.
+Plot PCA scores from a dataframe of PCA scores.
 }

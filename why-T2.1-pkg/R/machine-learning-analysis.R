@@ -57,13 +57,28 @@ kmeans_from_features <- function(feats_folder, ftp, otp=NULL, centers, iter_max=
   if (is.null(otp)) {
     otp <- 1:dim(feats)[1]
   }
+  
+  # Features 
+  km_feats <- feats[otp, ftp]
 
   # Standard k-means method
-  km <- stats::kmeans(
-    x        = feats[otp, ftp],
-    centers  = centers,
-    iter.max = iter_max,
-    nstart   = nstart
+  km_results <- list()
+  for (cc in centers) {
+    print(paste("Computing k-means for", cc, "clusters"))
+    results <- stats::kmeans(
+      x        = km_feats,
+      centers  = cc,
+      iter.max = iter_max,
+      nstart   = nstart
+    )
+    km_results[[cc]] <- results
+  }
+  
+  # Results
+  km <- list(
+    feats   = km_feats,
+    results = km_results
   )
+  
   return(km)
 }

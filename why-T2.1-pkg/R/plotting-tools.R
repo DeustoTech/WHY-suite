@@ -44,9 +44,9 @@ plot_dataframe <- function(dset_data, title=NULL) {
 #' Plotting of PCA scores
 #'
 #' @description
-#' Compute and plot PCA from a dataframe of features.
+#' Plot PCA scores from a dataframe of PCA scores.
 #'
-#' @param pca_sc A dataframe with PCA scores.
+#' @param pca_sc A dataframe of PCA scores.
 #' @param feats_folder String with the path to the folder of the features file.
 #' @param axis_x Integer indicating the principal component to be plotted as axis x.
 #' @param axis_y Integer indicating the principal component to be plotted as axis y.
@@ -110,6 +110,58 @@ plot_pca <- function(pca_sc, feats_folder, axis_x, axis_y, color_by_SE_vars=FALS
     ) 
   
   print(p)
+}
+
+#' Plotting of k-means results
+#'
+#' @description
+#' Plot k-means results.
+#'
+#' @param km An object of class `kmeans`.
+#' @param feats_df Dataframe of features.
+#' @param plot_clusters If `TRUE`, plot k-means clusters.
+#' @param plot_elbow If `TRUE`, plot elbow curve.
+#'
+#' @return Plotting of the k-means results.
+#'
+#' @export
+
+plot_kmeans <- function(km, feats_df=NULL, plot_clusters=FALSE, plot_elbow=FALSE) {
+  # Plot kmeans
+  if (plot_clusters) {
+    f <- factoextra::fviz_cluster(
+      km, 
+      data            = feats_df,
+      show.clust.cent = FALSE,
+      geom            = "point",
+      pointsize       = 1
+    )
+    plot(f)
+  }
+  
+  # Plot elbow
+  if (plot_elbow) {
+    # Initializating values
+    sum_of_squares <- c()
+    cluster_number <- c()
+    # Picking up values
+    for (ii in 1:length(km)) {
+      if (!is.null(km[[ii]])) {
+        sum_of_squares <- c(sum_of_squares, km[[ii]]$tot.withinss)
+        cluster_number <- c(cluster_number, ii)
+      }
+    }
+    # Ploting elbow
+    plot(
+      x    = cluster_number, 
+      y    = sum_of_squares, 
+      col  = "blue", 
+      type = "l",
+      main = "Elbow curve",
+      xlab = "Number of clusters",
+      ylab = "Sum of squares"
+    )
+  }
 }
 
 #' Creation of a PDF library of features
