@@ -111,7 +111,7 @@ scripts <- function(script_selection) {
   if (script_selection == 5) {
     # User parameters
     lcl_ext_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    lcl_4_digit_id <- "0023"
+    lcl_4_digit_id <- "4004"
     from_time      <- as.POSIXct("2013-02-01", tz="GMT")
     to_time        <- as.POSIXct("2013-03-01", tz="GMT")
     
@@ -208,19 +208,19 @@ scripts <- function(script_selection) {
     # Folder to features' file
     feats_folder <- paste("G:/Mi unidad/WHY/Resultados/lcl/features/",
                           "2013 Feb, 0% NA, scale=FALSE, 70 feats/", sep="")
-    ftp          <- 1:10
+    ftp          <- c(5:9, 21:22)
     centers      <- 4
     # Compute k-means
     km <- whyT2.1::pca_kmeans_analysis(
       feats_folder = feats_folder,
       ftp          = ftp,
-      min_var      = 0.95,
+      min_var      = 0.90,
       centers      = centers
     )
     # Plot k-means
     whyT2.1::plot_kmeans(
-      km            = km$results[[centers]],
-      feats_df      = km$feats,
+      km            = km[["results"]],
+      feats_df      = km[["feats"]],
       plot_clusters = TRUE
     )
     return(km)

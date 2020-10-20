@@ -118,13 +118,16 @@ pca_kmeans_analysis <- function(feats_folder, ftp, otp=NULL, min_var=0.95, cente
   # Selection of the reduced set of PCA components
   reduced_pc_set <- pca$x[,1:pc_number]
   # Compute k-means
-  km <- whyT2.1::kmeans_from_features(
-    feats_folder = feats_folder,
-    ftp          = ftp,
-    otp          = otp,
-    centers      = centers,
-    iter_max     = 500,
-    nstart       = 10000
+  results <- stats::kmeans(
+    x        = reduced_pc_set,
+    centers  = centers,
+    iter.max = 500,
+    nstart   = 10000
+  )
+  # Results
+  km <- list(
+    feats   = reduced_pc_set,
+    results = results
   )
   return(km)
 }
