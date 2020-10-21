@@ -52,14 +52,14 @@ quantiles <- function(x) {
 #' @export
 
 electricity <- function(x) {
-  browser()
   # Get samples per day
-  spd            <- attr(x, "msts")[1]
-  # Pad with NA
-  samples_to_pad <- (spd - (length(x) %% spd)) %% spd
-  padded_x       <- c(as.numeric(x), rep(0, samples_to_pad))
+  spd            <- frequency(x)
+  # Skip omisible samples (those that don't start or finish with the day)
+  omisible_left  <- (spd - start(x)[2] + 1) %% spd
+  omisible_right <- end(x)[2] %% spd
+  clean_x        <- x[(1+omisible_left):(length(x)-omisible_right)]
   # Convert TS to matrix of size = 28 days x "spd"
-  x_matrix       <- t(matrix(padded_x, nrow=spd))
+  x_matrix       <- t(matrix(clean_x, nrow=spd))
   # List of load factors (one per day)
   load_factors   <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
   # Return
