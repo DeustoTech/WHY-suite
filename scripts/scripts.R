@@ -26,7 +26,7 @@
 #' 
 
 ################################################################################
-script_selection <- 4
+script_selection <- 5
 ################################################################################
 
 library(whyT2.1)
@@ -111,7 +111,7 @@ scripts <- function(script_selection) {
   if (script_selection == 5) {
     # User parameters
     lcl_ext_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    lcl_4_digit_id <- "4004"
+    lcl_4_digit_id <- "5005"
     from_time      <- as.POSIXct("2013-02-01", tz="GMT")
     to_time        <- as.POSIXct("2013-03-01", tz="GMT")
     
