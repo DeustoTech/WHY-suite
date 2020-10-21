@@ -52,6 +52,7 @@ quantiles <- function(x) {
 #' @export
 
 electricity <- function(x) {
+  browser()
   # Get samples per day
   spd            <- attr(x, "msts")[1]
   # Pad with NA

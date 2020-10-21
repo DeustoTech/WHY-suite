@@ -94,7 +94,8 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
     cooked_df <- cook_raw_dataframe(raw_df, from_date, to_date, dset_key)
     
     # Accept to extract features
-    if (cooked_df$na_percentage <= allowed_na & !cooked_df$is_0) {
+    na_percentage <- cooked_df$number_of_na/dim(cooked_df$df)[1]
+    if (na_percentage <= allowed_na & !cooked_df$is_0) {
       # GET FEATURES
       ff <- get_features_from_cooked_dataframe(cooked_df, type_of_analysis)
       # Incorporate features to output
@@ -105,7 +106,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
         from_date     = format(from_date, "%Y-%m-%d %H:%M:%S"),
         to_date       = format(to_date, "%Y-%m-%d %H:%M:%S"),
         samples       = dim(cooked_df$df)[1],
-        na_percentage = cooked_df$na_percentage
+        na_percentage = na_percentage
       )
       # Incorporate accepted dataframe to output
       accepted <- dplyr::bind_rows(accepted, aa)
@@ -119,7 +120,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
         filename      = dset_filename,
         from_date     = format(from_date, "%Y-%m-%d %H:%M:%S"),
         to_date       = format(to_date, "%Y-%m-%d %H:%M:%S"),
-        na_percentage = cooked_df$na_percentage,
+        na_percentage = na_percentage,
         is_0          = cooked_df$is_0
       )
       # Incorporate rejected dataframe to output
