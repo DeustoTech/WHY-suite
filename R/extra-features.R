@@ -54,7 +54,7 @@ quantiles <- function(x) {
 electricity <- function(x) {
   # Get samples per day
   spd            <- frequency(x)
-  # Skip omisible samples (those that don't start or finish with the day)
+  # Skip omisible samples (those that start or finish in the middle of the day)
   omisible_left  <- (spd - start(x)[2] + 1) %% spd
   omisible_right <- end(x)[2] %% spd
   clean_x        <- x[(1+omisible_left):(length(x)-omisible_right)]
