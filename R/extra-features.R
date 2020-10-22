@@ -74,10 +74,10 @@ electricity <- function(x) {
   load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
   browser()
   # Results
-  if (length(load_factors) == 1)
+  if (length(load_factors) == 1) {
     load_factor_1       <- load_factors
-  else
+  } else {
     mean_load_factors_1 <- mean(load_factors),
     var_load_factors_1  <- stats::var(load_factors)
-  )
+  }
 }
