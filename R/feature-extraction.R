@@ -29,7 +29,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
   # Compute delay
   initial_date  <- df$df[1,1]
   lowest_season <- df$seasonal_periods[1]
-  hour_factor   <- lowest_season/24
+  hour_factor   <- lowest_season / 24
   start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
     lubridate::minute(initial_date) / 60 * hour_factor + 
     lubridate::second(initial_date) / 3600 * hour_factor
@@ -48,7 +48,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
     scale     = FALSE,
     na.action = forecast::na.interp
   )
-  # Extract features that REQUIRE normalization of the time series
+  # Extract features that DO require normalization of the time series
   norm_feats <- tsfeatures::tsfeatures(
     tslist    = list(vals_msts),
     features  = analysis_fns[[type_of_analysis]],
@@ -56,7 +56,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
     na.action = forecast::na.interp
   )
   # Bind features into a unique dataframe
-  feats <- dplyr::bind_cols(not_norm_feats, norm_feats)
+  feats <- as.data.frame(dplyr::bind_cols(not_norm_feats, norm_feats))
   return(feats)
 }
 

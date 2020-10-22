@@ -27,7 +27,7 @@
 #' 
 
 ################################################################################
-script_selection <- 4
+script_selection <- 9
 ################################################################################
 
 library(whyT2.1)
@@ -229,20 +229,13 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 9 **IN PROGRESS**
+  # SCRIPT 9
   if (script_selection == 9) {
-    # User parameters
-    folder_path      <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    from_date        <- ISOdate(2013, 2, 1, 0, 0, 0)
-    to_date          <- ISOdate(2013, 2, 28, 23, 30, 0)
-    dset_key         <- "lcl"
-    allowed_na       <- 0
-    type_of_analysis <- "extra"
-    
-    # Function call
-    o <- whyT2.1::get_features_of_datasets_in_folder(
-      folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
-    return(o)
+    # Load file
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    # Get features
+    feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
+    return(feats)
   }
   
   # ----------------------------------------------------------------------------

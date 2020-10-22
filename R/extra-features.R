@@ -30,9 +30,8 @@ stat_moments <- function(x) {
 #' @export
 
 quantiles <- function(x) {
+  # Compute quantiles
   q <- stats::quantile(x)
-  
-  browser()
   # Interquartile range
   iqr <- q[[4]] - q[[2]]
   # IQR criterion for outlier detection
@@ -62,22 +61,40 @@ quantiles <- function(x) {
 #' @export
 
 electricity <- function(x) {
+  # Initialize
+  results <- list()
   # Get samples per day
   spd            <- attr(x,"msts")[1]
   # Skip omisible samples (those that start or finish in the middle of the day)
   omisible_left  <- (spd - start(x)[2] + 1) %% spd
   omisible_right <- end(x)[2] %% spd
   clean_x        <- x[(1+omisible_left):(length(x)-omisible_right)]
-  # Convert TS to matrix of size = 28 days x "spd"
-  x_matrix     <- t(matrix(clean_x, nrow=spd))
-  # List of load factors (one per day)
-  load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
-  browser()
-  # Results
-  if (length(load_factors) == 1) {
-    load_factor_1       <- load_factors
-  } else {
-    mean_load_factors_1 <- mean(load_factors)
-    var_load_factors_1  <- stats::var(load_factors)
+  # Loop for each number of samples per seasonal period
+  ii <- 0
+  for (spsp in attr(x, "msts")) {
+    ii <- ii + 1
+    # Delete last samples that don't fit into the matrix
+    ok_samples <- spsp * floor(length(clean_x) / spsp)
+    fit_x      <- clean_x[1:ok_samples]
+    # Convert TS to matrix of size = 28 days x "spd"
+    x_matrix <- t(matrix(fit_x, nrow=spsp))
+    # List of load factors (one per day)
+    load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
+    # Results
+    if (length(load_factors) == 1) {
+      # In case of one only value
+      results[[as.name(paste("load_factor", ii, sep=""))]] <- load_factors
+    } else {
+      # Mean
+      mean_nm <- as.name(paste("load_factor_mean", ii, sep=""))
+      mean_lf <- mean(load_factors)
+      # Variance
+      var_nm  <- as.name(paste("load_factor_var", ii, sep=""))
+      var_lf  <- stats::var(load_factors)
+      # Results
+      results[[mean_nm]] <- mean_lf
+      results[[var_nm]]  <- var_lf
+    }
   }
+  return(results)
 }
