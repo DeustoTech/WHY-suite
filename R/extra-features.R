@@ -54,27 +54,30 @@ quantiles <- function(x) {
 #' Features of electricity
 #'
 #' @description
-#' Compute the load factor across 24-hour periods.
+#' Compute the load factor across seasonal periods. These seasonal periods are related to days, weeks and years. For days, the selected periods coincide with complete days starting at 00:00.
 #'
 #' @param x Time series of class `msts`.
 #'
-#' @return A list with the mean and variance of the load factors across 24-hour periods.
+#' @return A list with the mean and variance of the load factors across seasonal periods. In case there is just one period (and therefore variance cannot be computed), direct load factor for that period is provided.
 #' @export
 
 electricity <- function(x) {
   # Get samples per day
-  spd            <- frequency(x)
+  spd            <- attr(x,"msts")[1]
   # Skip omisible samples (those that start or finish in the middle of the day)
   omisible_left  <- (spd - start(x)[2] + 1) %% spd
   omisible_right <- end(x)[2] %% spd
   clean_x        <- x[(1+omisible_left):(length(x)-omisible_right)]
   # Convert TS to matrix of size = 28 days x "spd"
-  x_matrix       <- t(matrix(clean_x, nrow=spd))
+  x_matrix     <- t(matrix(clean_x, nrow=spd))
   # List of load factors (one per day)
-  load_factors   <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
-  # Return
-  list(
-    mean_load_factors = mean(load_factors),
-    var_load_factors  = stats::var(load_factors)
+  load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
+  browser()
+  # Results
+  if (length(load_factors) == 1)
+    load_factor_1       <- load_factors
+  else
+    mean_load_factors_1 <- mean(load_factors),
+    var_load_factors_1  <- stats::var(load_factors)
   )
 }
