@@ -38,7 +38,7 @@ quantiles <- function(x) {
   # IQR criterion for outlier detection
   is_outlier <- x < q[[2]] - 1.5 * iqr | x > q[[4]] + 1.5 * iqr
   # Percentage of outliers 
-  outlier_percentage <- sum(is_outlier) / length(x)
+  outlier_pc <- sum(is_outlier) / length(x)
   
   list(
     minimum        = q[[1]],
@@ -47,7 +47,7 @@ quantiles <- function(x) {
     upper_quartile = q[[4]],
     maximum        = q[[5]],
     iqr            = iqr,
-    outlier_pct    = outlier_percentage
+    iqr_outlier_pc = outlier_pc
   )
 }
 
