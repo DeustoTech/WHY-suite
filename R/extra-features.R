@@ -31,13 +31,23 @@ stat_moments <- function(x) {
 
 quantiles <- function(x) {
   q <- stats::quantile(x)
+  
+  browser()
+  # Interquartile range
+  iqr <- q[[4]] - q[[2]]
+  # IQR criterion for outlier detection
+  is_outlier <- x < q[[2]] - 1.5 * iqr | x > q[[4]] + 1.5 * iqr
+  # Percentage of outliers 
+  outlier_percentage <- sum(is_outlier) / length(x)
+  
   list(
     minimum        = q[[1]],
     lower_quartile = q[[2]],
     median         = q[[3]],
     upper_quartile = q[[4]],
     maximum        = q[[5]],
-    q3_to_q1_range = q[[4]] - q[[2]]
+    iqr            = iqr,
+    outlier_pct    = outlier_percentage
   )
 }
 
