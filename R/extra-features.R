@@ -77,7 +77,7 @@ electricity <- function(x) {
   if (length(load_factors) == 1) {
     load_factor_1       <- load_factors
   } else {
-    mean_load_factors_1 <- mean(load_factors),
+    mean_load_factors_1 <- mean(load_factors)
     var_load_factors_1  <- stats::var(load_factors)
   }
 }
