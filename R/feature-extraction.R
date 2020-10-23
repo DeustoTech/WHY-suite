@@ -1,7 +1,7 @@
 #' Time series from cooked dataframe
 #' 
 #' @description 
-#' Creates a multi-seasonal time series `msts` from a coocked dataframe (or superior).
+#' Creates a multi-seasonal time series \code{msts} from a coocked dataframe (or superior).
 #' 
 #' @param df Cooked dataframe.
 #' 
@@ -10,10 +10,11 @@
 #' @export
 
 get_timeseries_from_cooked_dataframe <- function(cdf) {
-  # Compute "start" parameter used in "msts"
+  # Compute "start" parameters used in "msts"
   initial_date  <- cdf$df[1,1]
   lowest_season <- cdf$seasonal_periods[1]
   hour_factor   <- lowest_season / 24
+  start_yearday <- lubridate::yday(initial_date)
   start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
     lubridate::minute(initial_date) / 60 * hour_factor + 
     lubridate::second(initial_date) / 3600 * hour_factor
@@ -23,7 +24,7 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
     data             = cdf$df[,2],
     seasonal.periods = cdf$seasonal_periods,
     ts.frequency     = lowest_season,
-    start            = c(1, start_offset)
+    start            = c(start_yearday, start_offset)
   )
   
   return(tseries)
@@ -35,7 +36,7 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
 #' Get features of a cooked dataframe.
 #'
 #' @param df Cooked dataframe.
-#' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.
+#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}. \code{basic} contains 7 functions whereas \code{extra} contains 33 (see code).
 #'
 #' @return List of features.
 #'
@@ -65,6 +66,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     )
   # Get multiseasonal time series
   tseries <- get_timeseries_from_cooked_dataframe(cdf)
+  browser()
   # Extract features that DON'T require normalization of the time series
   not_norm_feats <- tsfeatures::tsfeatures(
     tslist    = list(tseries),
@@ -81,6 +83,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   )
   # Bind features into a unique dataframe
   feats <- cbind(not_norm_feats, norm_feats)
+  
   return(feats)
 }
 
@@ -90,11 +93,11 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
 #' Get features of all datasets contained in a folder.
 #'
 #' @param folder_path String with the absolute path to the dataset folder (ending in `/`).
-#' @param from_date Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR the string `first`.
-#' @param to_date Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR the string `last`.
+#' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{first}.
+#' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{last}.
 #' @param dset_key Key of the dataset.
-#' @param allowed_na A numerical value between 0 and 1. It represents the maximum percentage of admissible `NA` values in the cooked dataframe for which the feature extraction is performed. The `NA` values will be STL-interpolated (using ``forecast::na.interp``) prior to the feature extraction.
-#' @param type_of_analysis A string indicating the type of analysis: either `basic` or `extra`.
+#' @param allowed_na A numerical value between 0 and 1. It represents the maximum percentage of admissible \code{NA} values in the cooked dataframe for which the feature extraction is performed. The \code{NA} values will be STL-interpolated (using \code{forecast::na.interp}) prior to the feature extraction.
+#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
 #' @param output_folder_path String with the absolute path to the output folder (ending in `/`).
 #'
 #' @return List of dataframes of (1) extracted features and (2) accepted and (3) rejected files for feature extraction.
