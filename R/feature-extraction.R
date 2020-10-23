@@ -99,7 +99,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
       # GET FEATURES
       ff <- get_features_from_cooked_dataframe(cooked_df, type_of_analysis)
       # Incorporate features to output
-      features <- dplyr::bind_rows(features, ff)
+      features <- rbind(features, ff)
       # Create dataframe for accepted dataset
       aa <- data.frame(
         filename      = dset_filename,
@@ -109,7 +109,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
         na_percentage = na_percentage
       )
       # Incorporate accepted dataframe to output
-      accepted <- dplyr::bind_rows(accepted, aa)
+      accepted <- rbind(accepted, aa)
       print("Features extracted!")
     }
     
@@ -124,7 +124,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
         is_0          = cooked_df$is_0
       )
       # Incorporate rejected dataframe to output
-      rejected <- dplyr::bind_rows(rejected, rr)
+      rejected <- rbind(rejected, rr)
       print("Features not extracted")
     }
   }
