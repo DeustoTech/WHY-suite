@@ -4,12 +4,12 @@
 \alias{get_features_from_cooked_dataframe}
 \title{Features of a cooked dataframe}
 \usage{
-get_features_from_cooked_dataframe(df, type_of_analysis)
+get_features_from_cooked_dataframe(cdf, type_of_analysis)
 }
 \arguments{
-\item{df}{Cooked dataframe.}
-
 \item{type_of_analysis}{A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.}
+
+\item{df}{Cooked dataframe.}
 }
 \value{
 List of features.

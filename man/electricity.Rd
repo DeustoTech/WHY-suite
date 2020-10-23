@@ -10,8 +10,8 @@ electricity(x)
 \item{x}{Time series of class `msts`.}
 }
 \value{
-A list with the mean and variance of the load factors across 24-hour periods.
+A list with the mean and variance of the load factors across seasonal periods. In case there is just one period (and therefore variance cannot be computed), direct load factor for that period is provided.
 }
 \description{
-Compute the load factor across 24-hour periods.
+Compute the load factor across seasonal periods. These seasonal periods are related to days, weeks and years. For days, the selected periods coincide with complete days starting at 00:00.
 }

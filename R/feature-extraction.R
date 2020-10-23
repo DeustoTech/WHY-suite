@@ -1,3 +1,34 @@
+#' Time series from cooked dataframe
+#' 
+#' @description 
+#' Creates a multi-seasonal time series `msts` from a coocked dataframe (or superior).
+#' 
+#' @param df Cooked dataframe.
+#' 
+#' @return Multi-seasonal time series.
+#'
+#' @export
+
+get_timeseries_from_cooked_dataframe <- function(cdf) {
+  # Compute "start" parameter used in "msts"
+  initial_date  <- cdf$df[1,1]
+  lowest_season <- cdf$seasonal_periods[1]
+  hour_factor   <- lowest_season / 24
+  start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
+    lubridate::minute(initial_date) / 60 * hour_factor + 
+    lubridate::second(initial_date) / 3600 * hour_factor
+  
+  # Convert to time series (using "msts")
+  tseries <- forecast::msts(
+    data             = cdf$df[,2],
+    seasonal.periods = cdf$seasonal_periods,
+    ts.frequency     = lowest_season,
+    start            = c(1, start_offset)
+  )
+  
+  return(tseries)
+}
+
 #' Features of a cooked dataframe
 #'
 #' @description
@@ -10,11 +41,11 @@
 #'
 #' @export
 
-get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
+get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   # Set a seed for random numbers
   set.seed(1981)
   # List of functions that DON'T require normalization
-  # They are included in BOTH "basic" and "extra" lists
+  # They are included in BOTH "basic" and "extra" analyses
   not_norm_fns <- c("stat_moments", "quantiles", "electricity")
   # List of BASIC functions that REQUIRE normalization
   basic_fns <- c("frequency", "stl_features", "entropy", "acf_features")
@@ -28,33 +59,22 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
                  "histogram_mode", "unitroot_pp", "localsimple_taures",
                  "lumpiness", "motiftwo_entro3")
   # List of functions that require NORMALIZATION ("extra" includes "basic")
-  analysis_fns <- list(basic = basic_fns,
-                       extra = c(basic_fns, extra_fns))
-  # Compute "start" parameter used in "msts"
-  initial_date  <- df$df[1,1]
-  lowest_season <- df$seasonal_periods[1]
-  hour_factor   <- lowest_season / 24
-  start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
-    lubridate::minute(initial_date) / 60 * hour_factor + 
-    lubridate::second(initial_date) / 3600 * hour_factor
-  
-  # Convert to time series (using "msts")
-  vals_msts <- forecast::msts(
-    data             = df$df[,2],
-    seasonal.periods = df$seasonal_periods,
-    ts.frequency     = lowest_season,
-    start            = c(1, start_offset)
-  )
+  analysis_fns <- list(
+    basic = basic_fns,
+    extra = c(basic_fns, extra_fns)
+    )
+  # Get multiseasonal time series
+  tseries <- get_timeseries_from_cooked_dataframe(cdf)
   # Extract features that DON'T require normalization of the time series
   not_norm_feats <- tsfeatures::tsfeatures(
-    tslist    = list(vals_msts),
+    tslist    = list(tseries),
     features  = not_norm_fns,
     scale     = FALSE,   # <-- time series are NOT SCALED
     na.action = forecast::na.interp
   )
   # Extract features that DO require normalization of the time series
   norm_feats <- tsfeatures::tsfeatures(
-    tslist    = list(vals_msts),
+    tslist    = list(tseries),
     features  = analysis_fns[[type_of_analysis]],
     scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
     na.action = forecast::na.interp
