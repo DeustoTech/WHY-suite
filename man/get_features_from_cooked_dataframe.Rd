@@ -7,7 +7,7 @@
 get_features_from_cooked_dataframe(cdf, type_of_analysis)
 }
 \arguments{
-\item{type_of_analysis}{A string indicating the type of analysis: either `basic` or `extra`. `basic` contains 7 functions whereas `extra` contains 33.}
+\item{type_of_analysis}{A string indicating the type of analysis: either \code{basic} or \code{extra}. \code{basic} contains 7 functions whereas \code{extra} contains 33 (see code).}
 
 \item{df}{Cooked dataframe.}
 }

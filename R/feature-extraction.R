@@ -47,7 +47,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   set.seed(1981)
   # List of functions that DON'T require normalization
   # They are included in BOTH "basic" and "extra" analyses
-  not_norm_fns <- c("stat_moments", "quantiles", "electricity")
+  not_norm_fns <- c("stat_moments", "quantiles", "load_factors")
   # List of BASIC functions that REQUIRE normalization
   basic_fns <- c("frequency", "stl_features", "entropy", "acf_features")
   # List of EXTRA functions that REQUIRE normalization

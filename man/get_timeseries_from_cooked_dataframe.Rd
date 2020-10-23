@@ -13,5 +13,5 @@ get_timeseries_from_cooked_dataframe(cdf)
 Multi-seasonal time series.
 }
 \description{
-Creates a multi-seasonal time series `msts` from a coocked dataframe (or superior).
+Creates a multi-seasonal time series \code{msts} from a coocked dataframe (or superior).
 }

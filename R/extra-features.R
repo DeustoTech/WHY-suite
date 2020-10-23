@@ -50,7 +50,7 @@ quantiles <- function(x) {
   )
 }
 
-#' Features of electricity
+#' Features of load factors
 #'
 #' @description
 #' Compute the load factor across seasonal periods. These seasonal periods are related to days, weeks and years. For days, the selected periods coincide with complete days starting at 00:00.
@@ -60,7 +60,7 @@ quantiles <- function(x) {
 #' @return A list with the mean and variance of the load factors across seasonal periods. In case there is just one period (and therefore variance cannot be computed), direct load factor for that period is provided.
 #' @export
 
-electricity <- function(x) {
+load_factors <- function(x) {
   # Initialize
   results <- list()
   # Get samples per day

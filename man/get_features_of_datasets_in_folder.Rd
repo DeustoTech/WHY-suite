@@ -17,15 +17,15 @@ get_features_of_datasets_in_folder(
 \arguments{
 \item{folder_path}{String with the absolute path to the dataset folder (ending in `/`).}
 
-\item{from_date}{Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR the string `first`.}
+\item{from_date}{Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{first}.}
 
-\item{to_date}{Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR the string `last`.}
+\item{to_date}{Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{last}.}
 
 \item{dset_key}{Key of the dataset.}
 
-\item{allowed_na}{A numerical value between 0 and 1. It represents the maximum percentage of admissible `NA` values in the cooked dataframe for which the feature extraction is performed. The `NA` values will be STL-interpolated (using ``forecast::na.interp``) prior to the feature extraction.}
+\item{allowed_na}{A numerical value between 0 and 1. It represents the maximum percentage of admissible \code{NA} values in the cooked dataframe for which the feature extraction is performed. The \code{NA} values will be STL-interpolated (using \code{forecast::na.interp}) prior to the feature extraction.}
 
-\item{type_of_analysis}{A string indicating the type of analysis: either `basic` or `extra`.}
+\item{type_of_analysis}{A string indicating the type of analysis: either \code{basic} or \code{extra}.}
 
 \item{output_folder_path}{String with the absolute path to the output folder (ending in `/`).}
 }
