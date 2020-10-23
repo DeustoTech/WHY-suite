@@ -109,8 +109,6 @@ scripts <- function(script_selection) {
     feats <- whyT2.1::get_features_of_datasets_in_folder(
       folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
     
-    browser()
-    
     return(feats)
   }
 

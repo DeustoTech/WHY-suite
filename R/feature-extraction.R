@@ -13,9 +13,12 @@
 get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
   # Set a seed for random numbers
   set.seed(1981)
-  # Analysis list
+  # List of functions that DON'T require normalization
+  # They are included in BOTH "basic" and "extra" lists
   not_norm_fns <- c("stat_moments", "quantiles", "electricity")
+  # List of BASIC functions that REQUIRE normalization
   basic_fns <- c("frequency", "stl_features", "entropy", "acf_features")
+  # List of EXTRA functions that REQUIRE normalization
   extra_fns <- c("max_kl_shift", "outlierinclude_mdrmd", "arch_stat",
                  "max_level_shift", "ac_9", "crossing_points", "max_var_shift",
                  "nonlinearity", "spreadrandomlocal_meantaul", "flat_spots",
@@ -24,9 +27,10 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
                  "walker_propcross", "hurst", "unitroot_kpss",
                  "histogram_mode", "unitroot_pp", "localsimple_taures",
                  "lumpiness", "motiftwo_entro3")
+  # List of functions that require NORMALIZATION ("extra" includes "basic")
   analysis_fns <- list(basic = basic_fns,
                        extra = c(basic_fns, extra_fns))
-  # Compute delay
+  # Compute "start" parameter used in "msts"
   initial_date  <- df$df[1,1]
   lowest_season <- df$seasonal_periods[1]
   hour_factor   <- lowest_season / 24
@@ -34,7 +38,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
     lubridate::minute(initial_date) / 60 * hour_factor + 
     lubridate::second(initial_date) / 3600 * hour_factor
   
-  # Convert to time series
+  # Convert to time series (using "msts")
   vals_msts <- forecast::msts(
     data             = df$df[,2],
     seasonal.periods = df$seasonal_periods,
@@ -45,14 +49,14 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
   not_norm_feats <- tsfeatures::tsfeatures(
     tslist    = list(vals_msts),
     features  = not_norm_fns,
-    scale     = FALSE,
+    scale     = FALSE,   # <-- time series are NOT SCALED
     na.action = forecast::na.interp
   )
   # Extract features that DO require normalization of the time series
   norm_feats <- tsfeatures::tsfeatures(
     tslist    = list(vals_msts),
     features  = analysis_fns[[type_of_analysis]],
-    scale     = TRUE,
+    scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
     na.action = forecast::na.interp
   )
   # Bind features into a unique dataframe
