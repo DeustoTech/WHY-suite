@@ -27,6 +27,8 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
     start            = c(start_yearday, start_offset)
   )
   
+  browser()
+  
   return(tseries)
 }
 

@@ -98,3 +98,15 @@ load_factors <- function(x) {
   }
   return(results)
 }
+
+
+# Acumular por horas
+# > x <- c(1,2,3,3,4,3,2,2,3,1,2,1)
+# > y <- c(1,0,1,1,0,1,0,0,1,1,0,1)
+# > aggregate(x=x, by=list(parity=y), FUN=sum)
+
+# ave -> Group Averages Over Level Combinations Of Factors
+
+# plyr::round_any(a, 1/24, f=floor)
+
+# time(tseries)
