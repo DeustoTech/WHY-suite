@@ -56,7 +56,7 @@ get_features_from_cooked_dataframe <- function(df, type_of_analysis) {
     na.action = forecast::na.interp
   )
   # Bind features into a unique dataframe
-  feats <- as.data.frame(dplyr::bind_cols(not_norm_feats, norm_feats))
+  feats <- cbind(not_norm_feats, norm_feats)
   return(feats)
 }
 

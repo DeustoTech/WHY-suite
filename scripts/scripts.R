@@ -43,6 +43,8 @@ scripts <- function(script_selection) {
     
     # Function call
     whyT2.1::extend_datasets(input_folder,output_folder)
+    
+    return(NULL)
   }
   
   # ----------------------------------------------------------------------------
@@ -65,6 +67,7 @@ scripts <- function(script_selection) {
       target = as.vector(t(as.data.frame(feats[1:24]))),
       parallel = FALSE
     )
+    
     return(gen_ts)
   }
   
@@ -86,6 +89,8 @@ scripts <- function(script_selection) {
       feats_folder = feats_folder,
       feats_to_plot = feats_to_plot
     )
+    
+    return(NULL)
   }
   
   # ----------------------------------------------------------------------------
@@ -101,9 +106,12 @@ scripts <- function(script_selection) {
     type_of_analysis <- "extra"
     
     # Function call
-    o <- whyT2.1::get_features_of_datasets_in_folder(
+    feats <- whyT2.1::get_features_of_datasets_in_folder(
       folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
-    return(o)
+    
+    browser()
+    
+    return(feats)
   }
 
   # ----------------------------------------------------------------------------
@@ -127,6 +135,8 @@ scripts <- function(script_selection) {
       dset_data = ext_dset, 
       title     = paste("File", lcl_4_digit_id)
       )
+    
+    return(NULL)
   }
   
   # ----------------------------------------------------------------------------
@@ -170,6 +180,7 @@ scripts <- function(script_selection) {
       color_by_SE_vars = color_by_SE_vars,
       SE_data_file     = SE_data_file
       )
+    
     return(pca)
   }
   
@@ -199,6 +210,7 @@ scripts <- function(script_selection) {
       feats_df      = km$feats,
       plot_clusters = TRUE
     )
+    
     return(km)
   }
   
@@ -224,6 +236,7 @@ scripts <- function(script_selection) {
       feats_df      = km[["feats"]],
       plot_clusters = TRUE
     )
+    
     return(km)
   }
   
@@ -235,6 +248,7 @@ scripts <- function(script_selection) {
     load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
     # Get features
     feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
+    
     return(feats)
   }
   
@@ -250,4 +264,4 @@ scripts <- function(script_selection) {
 
 # Execute selected script
 
-scripts(script_selection)
+result <- scripts(script_selection)
