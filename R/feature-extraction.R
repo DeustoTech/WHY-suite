@@ -14,7 +14,10 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
   initial_date  <- cdf$df[1,1]
   lowest_season <- cdf$seasonal_periods[1]
   hour_factor   <- lowest_season / 24
-  start_yearday <- lubridate::yday(initial_date)
+  # Number of days since 1970-01-01
+  ref_day       <- as.Date("1970-01-01")
+  start_yearday <- lubridate::day(lubridate::days(
+    as.Date(initial_date) - ref_day))
   start_offset  <- 1 + lubridate::hour(initial_date) * hour_factor +
     lubridate::minute(initial_date) / 60 * hour_factor + 
     lubridate::second(initial_date) / 3600 * hour_factor
@@ -26,8 +29,6 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
     ts.frequency     = lowest_season,
     start            = c(start_yearday, start_offset)
   )
-  
-  browser()
   
   return(tseries)
 }
@@ -68,7 +69,6 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     )
   # Get multiseasonal time series
   tseries <- get_timeseries_from_cooked_dataframe(cdf)
-  browser()
   # Extract features that DON'T require normalization of the time series
   not_norm_feats <- tsfeatures::tsfeatures(
     tslist    = list(tseries),

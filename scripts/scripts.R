@@ -1,8 +1,7 @@
 #' This is a compilation of simple scripts to execute functions of the `whyT2.1` library. 
 #' 
 #' KEY OF ABBREVIATIONS:
-#' DSET = dataset | EXT = extended | FEAT = feature
-#' PCA = principal component analysis | RAW = raw | TS = time series | W/ = with
+#' DSET = dataset | EXT = extended | FEAT = feature | LCL = Low Carbon London | PCA = principal component analysis | RAW = raw | TS = time series | W/ = with
 #' 
 #' LIST OF SCRIPTS:
 #' 
@@ -24,10 +23,9 @@
 #' 
 #' ** TIME SERIES GENERATION **
 #' `2` Create TS from FEATs using GRATIS
-#' 
 
 ################################################################################
-script_selection <- 9
+script_selection <- 10
 ################################################################################
 
 library(whyT2.1)
@@ -242,10 +240,10 @@ scripts <- function(script_selection) {
   
   # SCRIPT 9
   if (script_selection == 9) {
-    # Load file
+    # Load extended dataframe (edf) from file
     load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
     # Get features
-    feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
+    feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "extra")
     
     return(feats)
   }
@@ -254,6 +252,20 @@ scripts <- function(script_selection) {
   
   # SCRIPT 10
   if (script_selection == 10) {
+    # Load extended dataframe (edf) from file
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    # Get ts from edf
+    tseries  <- get_timeseries_from_cooked_dataframe(edf)
+    browser()
+    time_edf <- time(tseries)
+    dec_time <- time_edf %% 1
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 11
+  if (script_selection == 11) {
     
   }
   
