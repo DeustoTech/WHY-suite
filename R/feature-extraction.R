@@ -26,11 +26,49 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
   tseries <- forecast::msts(
     data             = cdf$df[,2],
     seasonal.periods = cdf$seasonal_periods,
-    ts.frequency     = lowest_season,
+    ts.frequency     = lowest_season, 
     start            = c(start_yearday, start_offset)
   )
   
   return(tseries)
+}
+
+#' Initial and final dates from time series
+#' 
+#' @description 
+#' Get initial and final dates from a time series.
+#' 
+#' @param tseries Time series of class \code{msts}.
+#' 
+#' @return List with initial and final dates.
+#' 
+#' @export
+
+get_extrema_dates_from_timeseries <- function(tseries) {
+  # First seasonal period
+  sp <- attr(tseries, "msts")[1]
+  # Initial date
+  initial_date <- as.Date("1970-01-01") + start(tseries)[1]
+  # Initial time
+  td <- lubridate::seconds_to_period((start(tseries)[2] - 1) / sp * 86400)
+  initial_time <- sprintf("%02d:%02d:%02d", 
+                          lubridate::hour(td),
+                          lubridate::minute(td),
+                          lubridate::second(td))
+  # Initial time-date
+  initial_td <- as.POSIXct(paste(initial_date, initial_time), tz="GMT")
+  # Final date
+  final_date <- as.Date("1970-01-01") + end(tseries)[1]
+  # Final time
+  td <- lubridate::seconds_to_period((end(tseries)[2] - 1) / sp * 86400)
+  final_time <- sprintf("%02d:%02d:%02d", 
+                        lubridate::hour(td),
+                        lubridate::minute(td),
+                        lubridate::second(td))
+  # Final time-date
+  final_td <- as.POSIXct(paste(final_date, final_date), tz="GMT")
+  
+  return(list(initial_date = initial_td, final_date = final_td))
 }
 
 #' Features of a cooked dataframe
@@ -118,7 +156,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
     # Load raw dataframe from dataset
     print(dset_filename)
     file_path <- paste(folder_path, dset_filename, sep="")
-    raw_df <- get_raw_dataframe_from_dataset(file_path)
+    raw_df    <- get_raw_dataframe_from_dataset(file_path)
     # Get cooked dataframe from raw dataframe
     cooked_df <- cook_raw_dataframe(raw_df, from_date, to_date, dset_key)
     
