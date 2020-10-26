@@ -253,7 +253,7 @@ scripts <- function(script_selection) {
   # SCRIPT 10
   if (script_selection == 10) {
     # Load extended dataframe (edf) from file
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC004004")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC005005")
     # Get ts from edf
     tseries  <- get_timeseries_from_cooked_dataframe(edf)
     # Initial date
@@ -265,8 +265,86 @@ scripts <- function(script_selection) {
                     length.out = length(tseries),
                     by         = date_by)
     
-    ### Group by periods of 1 hour
-    cut_seq <- cut(date_seq, breaks = "1 hour")
+    # ### Group by periods of 1 hour
+    # cut_seq <- cut(date_seq, breaks = "1 hour")
+    # # Aggregate data (sum) according to the groups
+    # aggr_ts <- stats::aggregate(
+    #   x   = as.numeric(tseries),
+    #   by  = list(date_time = cut_seq),
+    #   FUN = sum )
+    # ## Estimate incomplete groups (possibly initial and final bins)
+    # # Number of elements per group
+    # elems_per_group <- samples_per_day / 24
+    # # Number of elements in the first group
+    # elems_first_group <- sum(as.numeric(cut_seq) == 1)
+    # # Perform estimation in the first group
+    # if (elems_per_group != elems_first_group) {
+    #   aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+    # }
+    # # ID of the last group
+    # id_last_group <- length(levels(cut_seq))
+    # # Number of elements in the last group
+    # elems_last_group <- sum(as.numeric(cut_seq) == id_last_group)
+    # # Perform estimation in the last group
+    # if (elems_per_group != elems_last_group) {
+    #   aggr_ts[id_last_group, 2] <-
+    #     aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+    # }
+    # ## Assign meaningful group values
+    # nice_groups <- (lubridate::hour(ini_date) + 0:(id_last_group - 1) ) %% 24
+    # # Aggregate data (mean) according to the nice groups
+    # hourly_mean <- stats::aggregate(
+    #   x   = aggr_ts$x,
+    #   by  = list(hour = nice_groups),
+    #   FUN = mean )
+    # # Aggregate data (variance) according to the nice groups
+    # hourly_var <- stats::aggregate(
+    #   x   = aggr_ts$x,
+    #   by  = list(hour = nice_groups),
+    #   FUN = stats::var )
+    
+    # ### Group by periods of 1 weekday
+    # cut_seq <- cut(date_seq, breaks = "1 day")
+    # # Aggregate data (sum) according to the groups
+    # aggr_ts <- stats::aggregate(
+    #   x   = as.numeric(tseries),
+    #   by  = list(date_time = cut_seq),
+    #   FUN = sum )
+    # ## Estimate incomplete groups (possibly initial and final bins)
+    # # Number of elements per group
+    # elems_per_group <- samples_per_day
+    # # Number of elements in the first group
+    # elems_first_group <- sum(as.numeric(cut_seq) == 1)
+    # # Perform estimation in the first group
+    # if (elems_per_group != elems_first_group) {
+    #   aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+    # }
+    # # ID of the last group
+    # id_last_group <- length(levels(cut_seq))
+    # # Number of elements in the last group
+    # elems_last_group <- sum(as.numeric(cut_seq) == id_last_group)
+    # # Perform estimation in the last group
+    # if (elems_per_group != elems_last_group) {
+    #   aggr_ts[id_last_group, 2] <-
+    #     aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+    # }
+    # ## Assign meaningful group values
+    # nice_groups <- 
+    #   (lubridate::wday(ini_date) - 1 + 0:(id_last_group - 1) ) %% 7 + 1
+    # # Aggregate data (mean) according to the nice groups
+    # daily_mean <- stats::aggregate(
+    #   x   = aggr_ts$x,
+    #   by  = list(wday = nice_groups),
+    #   FUN = mean )
+    # # Aggregate data (variance) according to the nice groups
+    # daily_var <- stats::aggregate(
+    #   x   = aggr_ts$x,
+    #   by  = list(week_day = nice_groups),
+    #   FUN = stats::var )
+    
+    ### Group by periods of 1 month
+    cut_seq <- cut(date_seq, breaks = "1 month")
+    browser()
     # Aggregate data (sum) according to the groups
     aggr_ts <- stats::aggregate(
       x   = as.numeric(tseries),
@@ -274,7 +352,7 @@ scripts <- function(script_selection) {
       FUN = sum )
     ## Estimate incomplete groups (possibly initial and final bins)
     # Number of elements per group
-    elems_per_group <- samples_per_day / 24
+    elems_per_group <- round(samples_per_day * 30.4375)
     # Number of elements in the first group
     elems_first_group <- sum(as.numeric(cut_seq) == 1)
     # Perform estimation in the first group
@@ -291,18 +369,21 @@ scripts <- function(script_selection) {
         aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
     }
     ## Assign meaningful group values
-    nice_groups <- (lubridate::hour(ini_date) + 0:(id_last_group - 1) ) %% 24
+    nice_groups <- 
+      (lubridate::wday(ini_date) - 1 + 0:(id_last_group - 1) ) %% 7 + 1
     # Aggregate data (mean) according to the nice groups
-    mean_aggr_ts <- stats::aggregate(
+    daily_mean <- stats::aggregate(
       x   = aggr_ts$x,
-      by  = list(hour = nice_groups),
+      by  = list(wday = nice_groups),
       FUN = mean )
     # Aggregate data (variance) according to the nice groups
-    var_aggr_ts <- stats::aggregate(
+    daily_var <- stats::aggregate(
       x   = aggr_ts$x,
-      by  = list(hour = nice_groups),
+      by  = list(week_day = nice_groups),
       FUN = stats::var )
-    browser()
+
+    print(daily_mean)
+    plot(daily_mean)
   }
   
   # ----------------------------------------------------------------------------

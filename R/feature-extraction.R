@@ -83,9 +83,9 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 #' Features of a cooked dataframe
 #'
 #' @description
-#' Get features of a cooked dataframe.
+#' Get features of a cooked (or extended) dataframe.
 #'
-#' @param df Cooked dataframe.
+#' @param df Cooked (or extended) dataframe.
 #' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}. \code{basic} contains 7 functions whereas \code{extra} contains 33 (see code).
 #'
 #' @return List of features.
