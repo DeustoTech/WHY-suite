@@ -255,10 +255,14 @@ scripts <- function(script_selection) {
     # Load extended dataframe (edf) from file
     load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
     # Get ts from edf
-    tseries <- get_timeseries_from_cooked_dataframe(edf)
-    # List of dates
-    dates <- get_extrema_dates_from_timeseries(tseries)
-
+    tseries  <- get_timeseries_from_cooked_dataframe(edf)
+    # Initial date
+    ini_date <- get_extrema_dates_from_timeseries(tseries)
+    # Date sequence
+    date_by  <- as.difftime(24 / attr(tseries, "msts")[1], units = "hours")
+    date_seq <- seq(from       = ini_date,
+                    length.out = length(tseries),
+                    by         = date_by)
     browser()
   }
   

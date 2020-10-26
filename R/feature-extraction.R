@@ -36,15 +36,16 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
 #' Initial and final dates from time series
 #' 
 #' @description 
-#' Get initial and final dates from a time series.
+#' Get initial and final dates from a time series. If parameter \code{only_initial} is set to \code{TRUE}, return only initial date.
 #' 
 #' @param tseries Time series of class \code{msts}.
+#' @param only_initial If \code{TRUE}, returns only initial date.
 #' 
-#' @return List with initial and final dates.
+#' @return List with initial and final dates or initial date if \code{only_initial} is set to \code{TRUE}.
 #' 
 #' @export
 
-get_extrema_dates_from_timeseries <- function(tseries) {
+get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
   # First seasonal period
   sp <- attr(tseries, "msts")[1]
   # Initial date
@@ -57,18 +58,26 @@ get_extrema_dates_from_timeseries <- function(tseries) {
                           lubridate::second(td))
   # Initial time-date
   initial_td <- as.POSIXct(paste(initial_date, initial_time), tz="GMT")
-  # Final date
-  final_date <- as.Date("1970-01-01") + end(tseries)[1]
-  # Final time
-  td <- lubridate::seconds_to_period((end(tseries)[2] - 1) / sp * 86400)
-  final_time <- sprintf("%02d:%02d:%02d", 
-                        lubridate::hour(td),
-                        lubridate::minute(td),
-                        lubridate::second(td))
-  # Final time-date
-  final_td <- as.POSIXct(paste(final_date, final_date), tz="GMT")
   
-  return(list(initial_date = initial_td, final_date = final_td))
+  # In case "only_initial" is TRUE
+  if (only_initial) {
+    
+    return(initial_td)
+    
+  } else {
+    # Final date
+    final_date <- as.Date("1970-01-01") + end(tseries)[1]
+    # Final time
+    td <- lubridate::seconds_to_period((end(tseries)[2] - 1) / sp * 86400)
+    final_time <- sprintf("%02d:%02d:%02d", 
+                          lubridate::hour(td),
+                          lubridate::minute(td),
+                          lubridate::second(td))
+    # Final time-date
+    final_td <- as.POSIXct(paste(final_date, final_date), tz="GMT")
+    
+    return(list(initial_date = initial_td, final_date = final_td))
+  }
 }
 
 #' Features of a cooked dataframe
