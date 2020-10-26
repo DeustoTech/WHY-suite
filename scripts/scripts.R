@@ -253,16 +253,55 @@ scripts <- function(script_selection) {
   # SCRIPT 10
   if (script_selection == 10) {
     # Load extended dataframe (edf) from file
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC004004")
     # Get ts from edf
     tseries  <- get_timeseries_from_cooked_dataframe(edf)
     # Initial date
     ini_date <- get_extrema_dates_from_timeseries(tseries)
     # Date sequence
-    date_by  <- as.difftime(24 / attr(tseries, "msts")[1], units = "hours")
+    samples_per_day <- attr(tseries, "msts")[1]
+    date_by  <- as.difftime(24 / samples_per_day, units = "hours")
     date_seq <- seq(from       = ini_date,
                     length.out = length(tseries),
                     by         = date_by)
+    
+    ### Group by periods of 1 hour
+    cut_seq <- cut(date_seq, breaks = "1 hour")
+    # Aggregate data (sum) according to the groups
+    aggr_ts <- stats::aggregate(
+      x   = as.numeric(tseries),
+      by  = list(date_time = cut_seq),
+      FUN = sum )
+    ## Estimate incomplete groups (possibly initial and final bins)
+    # Number of elements per group
+    elems_per_group <- samples_per_day / 24
+    # Number of elements in the first group
+    elems_first_group <- sum(as.numeric(cut_seq) == 1)
+    # Perform estimation in the first group
+    if (elems_per_group != elems_first_group) {
+      aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+    }
+    # ID of the last group
+    id_last_group <- length(levels(cut_seq))
+    # Number of elements in the last group
+    elems_last_group <- sum(as.numeric(cut_seq) == id_last_group)
+    # Perform estimation in the last group
+    if (elems_per_group != elems_last_group) {
+      aggr_ts[id_last_group, 2] <-
+        aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+    }
+    ## Assign meaningful group values
+    nice_groups <- (lubridate::hour(ini_date) + 0:(id_last_group - 1) ) %% 24
+    # Aggregate data (mean) according to the nice groups
+    mean_aggr_ts <- stats::aggregate(
+      x   = aggr_ts$x,
+      by  = list(hour = nice_groups),
+      FUN = mean )
+    # Aggregate data (variance) according to the nice groups
+    var_aggr_ts <- stats::aggregate(
+      x   = aggr_ts$x,
+      by  = list(hour = nice_groups),
+      FUN = stats::var )
     browser()
   }
   
