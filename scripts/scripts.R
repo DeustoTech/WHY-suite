@@ -253,7 +253,7 @@ scripts <- function(script_selection) {
   # SCRIPT 10
   if (script_selection == 10) {
     # Load extended dataframe (edf) from file
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC005005")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC002530")
     # Get ts from edf
     tseries  <- get_timeseries_from_cooked_dataframe(edf)
     # Initial date
@@ -344,7 +344,6 @@ scripts <- function(script_selection) {
     
     ### Group by periods of 1 month
     cut_seq <- cut(date_seq, breaks = "1 month")
-    browser()
     # Aggregate data (sum) according to the groups
     aggr_ts <- stats::aggregate(
       x   = as.numeric(tseries),
@@ -355,35 +354,59 @@ scripts <- function(script_selection) {
     elems_per_group <- round(samples_per_day * 30.4375)
     # Number of elements in the first group
     elems_first_group <- sum(as.numeric(cut_seq) == 1)
-    # Perform estimation in the first group
-    if (elems_per_group != elems_first_group) {
-      aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+    # Check for some estimation in the first group
+    skip_first <- FALSE
+    if (elems_first_group < elems_per_group) {
+      # Enough samples to perform estimation?
+      if (elems_first_group / elems_per_group > 0.5) {
+        aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+      } else {
+        skip_first <- TRUE
+      }
     }
-    # ID of the last group
-    id_last_group <- length(levels(cut_seq))
+    # Index of the last group in aggr_ts
+    id_last_group <- dim(aggr_ts)[1]
     # Number of elements in the last group
     elems_last_group <- sum(as.numeric(cut_seq) == id_last_group)
-    # Perform estimation in the last group
-    if (elems_per_group != elems_last_group) {
-      aggr_ts[id_last_group, 2] <-
-        aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+    # Check for some estimation in the last group
+    skip_last <- FALSE
+    if (elems_last_group < elems_per_group) {
+      # Enough samples to perform estimation?
+      if (elems_last_group / elems_per_group > 0.5) {
+        aggr_ts[id_last_group, 2] <-
+          aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+      } else {
+        skip_last = TRUE
+      }
     }
+    # Skip unestimated groups
+    if (skip_first) {
+      aggr_ts <- aggr_ts[2:dim(aggr_ts)[1],]
+    }
+    if (skip_last) {
+      aggr_ts <- aggr_ts[1:(dim(aggr_ts)[1]-1),]
+    }
+    id_last_group <- dim(aggr_ts)[1]
     ## Assign meaningful group values
-    nice_groups <- 
-      (lubridate::wday(ini_date) - 1 + 0:(id_last_group - 1) ) %% 7 + 1
+    nice_groups <- (lubridate::month(as.POSIXct(aggr_ts[1,1])) - 1 + 
+                      0:(id_last_group - 1)) %% 12 + 1
     # Aggregate data (mean) according to the nice groups
-    daily_mean <- stats::aggregate(
+    monthly_mean <- stats::aggregate(
       x   = aggr_ts$x,
       by  = list(wday = nice_groups),
       FUN = mean )
     # Aggregate data (variance) according to the nice groups
-    daily_var <- stats::aggregate(
+    monthly_var <- stats::aggregate(
       x   = aggr_ts$x,
       by  = list(week_day = nice_groups),
       FUN = stats::var )
 
-    print(daily_mean)
-    plot(daily_mean)
+    # print(monthly_mean)
+    # plot(monthly_mean)
+    # print(list(summer=mean(monthly_mean[6:8,2]), 
+    #         autumn=mean(monthly_mean[9:11,2]), 
+    #         winter=mean(monthly_mean[c(1,2,12),2]),
+    #         spring=mean(monthly_mean[3:5,2])) )
   }
   
   # ----------------------------------------------------------------------------
