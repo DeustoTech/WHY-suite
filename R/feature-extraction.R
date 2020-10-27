@@ -56,6 +56,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
   
   # Loop initializations
   cut_breaks_list <- c("1 hour", "1 day", "1 month")
+  name_list <- c(as.name("hourly"), as.name("daily"), as.name("monthly"))
   elems_per_bin_list <- c(
     samples_per_day / 24,
     samples_per_day,
@@ -125,13 +126,13 @@ get_seasonal_features_from_timeseries <- function(tseries) {
                       0:(id_last_bin - 1)) %% 12 + 1
     }
     # Aggregate data (mean) according to the nice bins
-    result_mean[[ii]] <- stats::aggregate(
+    result_mean[[name_list[[ii]]]] <- stats::aggregate(
       x   = aggr_ts$x,
       by  = list(bin = nice_bins),
       FUN = mean
     )
     # Aggregate data (variance) according to the nice bins
-    result_var[[ii]]  <- stats::aggregate(
+    result_var[[name_list[[ii]]]]  <- stats::aggregate(
       x   = aggr_ts$x,
       by  = list(bin = nice_bins),
       FUN = stats::var
