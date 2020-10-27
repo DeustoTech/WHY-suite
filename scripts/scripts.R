@@ -25,7 +25,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 10
+script_selection <- 11
 ################################################################################
 
 library(whyT2.1)
@@ -266,6 +266,63 @@ scripts <- function(script_selection) {
   
   # SCRIPT 11
   if (script_selection == 11) {
+    # Load extended dataframe (edf) from file
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC002002")
+    # Get ts from edf
+    tseries  <- get_timeseries_from_cooked_dataframe(edf)
+    # Initial date
+    ini_date <- get_extrema_dates_from_timeseries(tseries)
+    # Date sequence
+    samples_per_day <- attr(tseries, "msts")[1]
+    date_by  <- as.difftime(24 / samples_per_day, units = "hours")
+    date_seq <- seq(from       = ini_date,
+                    length.out = length(tseries),
+                    by         = date_by)
+    
+    # Loop initializations
+    cut_breaks_list <- c("1 day", "1 week", "1 month")
+    load_factor <- list()
+    name_list <- c(as.name("daily"), as.name("weekly"), as.name("monthly"))
+    # Seasonality loop
+    for (ii in 1:3) {
+      ### Bin by periods of 1 month
+      cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
+      # Aggregate data (mean) according to the bins
+      mean_aggr_ts <- stats::aggregate(
+        x   = as.numeric(tseries),
+        by  = list(date_time = cut_seq),
+        FUN = mean)
+      # Aggregate data (max) according to the bins
+      max_aggr_ts  <- stats::aggregate(
+        x   = as.numeric(tseries),
+        by  = list(date_time = cut_seq),
+        FUN = max)
+      # Compute seasonal mean load factor excluding first and last bins
+      last_1 <- dim(max_aggr_ts)[1] - 1
+      load_factor[[name_list[[ii]]]] <- 
+        mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
+    }
+    return(load_factor)
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 12
+  if (script_selection == 12) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 13
+  if (script_selection == 13) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 14
+  if (script_selection == 14) {
     
   }
   
