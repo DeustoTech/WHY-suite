@@ -8,6 +8,10 @@
 #' ** DATASET MANAGEMENT **
 #' `1` Create EXT DSETs from folder of RAW DSETs
 #' 
+#' ** FEATURE CHECK **
+#' `10` Extraction of seasonal bins of TS
+#' `11` Extraction of load factors of TS
+#' 
 #' ** FEATURE EXTRACTION **
 #' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
 #' `9` Get FEATs of LCL EXT DSET
@@ -253,7 +257,7 @@ scripts <- function(script_selection) {
   # SCRIPT 10
   if (script_selection == 10) {
     # Load extended dataframe (edf) from file
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC002002")
     # Get ts from edf
     tseries <- get_timeseries_from_cooked_dataframe(edf)
     # Compute raw seasonal features

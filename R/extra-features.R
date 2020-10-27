@@ -53,11 +53,11 @@ quantiles <- function(x) {
 #' Features of load factors
 #'
 #' @description
-#' Compute the load factor across seasonal periods. These seasonal periods are related to days, weeks and years. For days, the selected periods coincide with complete days starting at 00:00.
+#' Compute the load factor across seasonal periods (days, weeks and years).
 #'
 #' @param x Time series of class `msts`.
 #'
-#' @return A list with the mean and variance of the load factors across seasonal periods. In case there is just one period (and therefore variance cannot be computed), direct load factor for that period is provided.
+#' @return A list with the mean and variance of the load factors across seasonal periods.
 #' @export
 
 load_factors <- function(x) {
@@ -69,13 +69,21 @@ load_factors <- function(x) {
   date_seq <- seq(from       = ini_date,
                   length.out = length(x),
                   by         = date_by)
-  
   # Loop initializations
   cut_breaks_list <- c("1 day", "1 week", "1 month")
   load_factor <- list()
-  name_list <- c(as.name("daily"), as.name("weekly"), as.name("monthly"))
+  mean_name_list <- c(
+    as.name("load_factor_mean1"),
+    as.name("load_factor_mean2"),
+    as.name("load_factor_mean3")
+    )
+  var_name_list <- c(
+    as.name("load_factor_var1"),
+    as.name("load_factor_var2"),
+    as.name("load_factor_var3")
+  )
   # Seasonality loop
-  for (ii in 1:3) {
+  for (ii in 1:length(attr(x, "msts"))) {
     ### Bin by periods of 1 month
     cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
     # Aggregate data (mean) according to the bins
@@ -90,8 +98,10 @@ load_factors <- function(x) {
       FUN = max)
     # Compute seasonal mean load factor excluding first and last bins
     last_1 <- dim(max_aggr_ts)[1] - 1
-    load_factor[[name_list[[ii]]]] <- 
+    load_factor[[mean_name_list[[ii]]]] <- 
       mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
+    load_factor[[var_name_list[[ii]]]]  <- 
+      var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
   }
   return(load_factor)
 }
