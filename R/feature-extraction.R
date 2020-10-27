@@ -56,7 +56,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
   
   # Loop initializations
   cut_breaks_list <- c("1 hour", "1 day", "1 month")
-  elems_per_group_list <- c(
+  elems_per_bin_list <- c(
     samples_per_day / 24,
     samples_per_day,
     round(samples_per_day * 30.4375)
@@ -66,74 +66,74 @@ get_seasonal_features_from_timeseries <- function(tseries) {
   
   # Seasonality loop
   for (ii in 1:3) {
-    ### Group by periods of 1 month
+    ### Bin by periods of 1 month
     cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
-    # Aggregate data (sum) according to the groups
+    # Aggregate data (sum) according to the bins
     aggr_ts <- stats::aggregate(
       x   = as.numeric(tseries),
       by  = list(date_time = cut_seq),
       FUN = sum )
-    ## Estimate incomplete groups (possibly initial and final bins)
-    # Number of elements per group
-    elems_per_group <- elems_per_group_list[ii]
-    # Number of elements in the first group
-    elems_first_group <- sum(as.numeric(cut_seq) == 1)
-    # Check for some estimation in the first group
+    ## Estimate incomplete bins (initial and final bins)
+    # Number of elements per bin
+    elems_per_bin <- elems_per_bin_list[ii]
+    # Number of elements in the first bin
+    elems_first_bin <- sum(as.numeric(cut_seq) == 1)
+    # Check for some estimation in the first bin
     skip_first <- FALSE
-    if (elems_first_group < elems_per_group) {
+    if (elems_first_bin < elems_per_bin) {
       # Enough samples to perform estimation?
-      if (elems_first_group / elems_per_group > 0.5) {
-        aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_group / elems_first_group)
+      if (elems_first_bin / elems_per_bin > 0.5) {
+        aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_bin / elems_first_bin)
       } else {
         skip_first <- TRUE
       }
     }
-    # Index of the last group in aggr_ts
-    id_last_group <- dim(aggr_ts)[1]
-    # Number of elements in the last group
-    elems_last_group <- sum(as.numeric(cut_seq) == id_last_group)
-    # Check for some estimation in the last group
+    # Index of the last bin in aggr_ts
+    id_last_bin <- dim(aggr_ts)[1]
+    # Number of elements in the last bin
+    elems_last_bin <- sum(as.numeric(cut_seq) == id_last_bin)
+    # Check for some estimation in the last bin
     skip_last <- FALSE
-    if (elems_last_group < elems_per_group) {
+    if (elems_last_bin < elems_per_bin) {
       # Enough samples to perform estimation?
-      if (elems_last_group / elems_per_group > 0.5) {
-        aggr_ts[id_last_group, 2] <-
-          aggr_ts[id_last_group, 2] * (elems_per_group / elems_last_group)
+      if (elems_last_bin / elems_per_bin > 0.5) {
+        aggr_ts[id_last_bin, 2] <-
+          aggr_ts[id_last_bin, 2] * (elems_per_bin / elems_last_bin)
       } else {
         skip_last = TRUE
       }
     }
-    # Skip unestimated groups
+    # Skip unestimated bins
     if (skip_first) {
       aggr_ts <- aggr_ts[2:dim(aggr_ts)[1],]
     }
     if (skip_last) {
       aggr_ts <- aggr_ts[1:(dim(aggr_ts)[1]-1),]
     }
-    id_last_group <- dim(aggr_ts)[1]
-    ## Assign meaningful group values
+    id_last_bin <- dim(aggr_ts)[1]
+    ## Assign meaningful bin tags
     if (ii == 1) {
-      nice_groups <- (lubridate::hour(as.POSIXct(aggr_ts[1,1])) + 
-                        0:(id_last_group - 1)) %% 24
+      nice_bins <- (lubridate::hour(as.POSIXct(aggr_ts[1,1])) + 
+                      0:(id_last_bin - 1)) %% 24
     }
     if (ii == 2) {
-      nice_groups <- (lubridate::wday(as.POSIXct(aggr_ts[1,1])) - 1 + 
-                        0:(id_last_group - 1)) %% 7 + 1
+      nice_bins <- (lubridate::wday(as.POSIXct(aggr_ts[1,1])) - 1 + 
+                      0:(id_last_bin - 1)) %% 7 + 1
     }
     if (ii == 3) {
-      nice_groups <- (lubridate::month(as.POSIXct(aggr_ts[1,1])) - 1 + 
-                        0:(id_last_group - 1)) %% 12 + 1
+      nice_bins <- (lubridate::month(as.POSIXct(aggr_ts[1,1])) - 1 + 
+                      0:(id_last_bin - 1)) %% 12 + 1
     }
-    # Aggregate data (mean) according to the nice groups
+    # Aggregate data (mean) according to the nice bins
     result_mean[[ii]] <- stats::aggregate(
       x   = aggr_ts$x,
-      by  = list(group = nice_groups),
+      by  = list(bin = nice_bins),
       FUN = mean
     )
-    # Aggregate data (variance) according to the nice groups
+    # Aggregate data (variance) according to the nice bins
     result_var[[ii]]  <- stats::aggregate(
       x   = aggr_ts$x,
-      by  = list(group = nice_groups),
+      by  = list(bin = nice_bins),
       FUN = stats::var
     )
   }
