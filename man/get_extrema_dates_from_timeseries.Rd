@@ -4,14 +4,16 @@
 \alias{get_extrema_dates_from_timeseries}
 \title{Initial and final dates from time series}
 \usage{
-get_extrema_dates_from_timeseries(tseries)
+get_extrema_dates_from_timeseries(tseries, only_initial = TRUE)
 }
 \arguments{
 \item{tseries}{Time series of class \code{msts}.}
+
+\item{only_initial}{If \code{TRUE}, returns only initial date.}
 }
 \value{
-List with initial and final dates.
+List with initial and final dates or initial date if \code{only_initial} is set to \code{TRUE}.
 }
 \description{
-Get initial and final dates from a time series.
+Get initial and final dates from a time series. If parameter \code{only_initial} is set to \code{TRUE}, return only initial date.
 }
