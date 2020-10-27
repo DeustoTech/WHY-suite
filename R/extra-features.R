@@ -61,52 +61,37 @@ quantiles <- function(x) {
 #' @export
 
 load_factors <- function(x) {
-  # Initialize
-  results <- list()
-  # Get samples per day
-  spd            <- attr(x,"msts")[1]
-  # Skip omisible samples (those that start or finish in the middle of the day)
-  omisible_left  <- (spd - start(x)[2] + 1) %% spd
-  omisible_right <- end(x)[2] %% spd
-  clean_x        <- x[(1+omisible_left):(length(x)-omisible_right)]
-  # Loop for each number of samples per seasonal period
-  ii <- 0
-  for (spsp in attr(x, "msts")) {
-    ii <- ii + 1
-    # Delete last samples that don't fit into the matrix
-    ok_samples <- spsp * floor(length(clean_x) / spsp)
-    fit_x      <- clean_x[1:ok_samples]
-    # Convert TS to matrix of size = 28 days x "spd"
-    x_matrix <- t(matrix(fit_x, nrow=spsp))
-    # List of load factors (one per day)
-    load_factors <- rowMeans(x_matrix)/Rfast::rowMaxs(x_matrix, value=TRUE)
-    # Results
-    if (length(load_factors) == 1) {
-      # In case of one only value
-      results[[as.name(paste("load_factor", ii, sep=""))]] <- load_factors
-    } else {
-      # Mean
-      mean_nm <- as.name(paste("load_factor_mean", ii, sep=""))
-      mean_lf <- mean(load_factors)
-      # Variance
-      var_nm  <- as.name(paste("load_factor_var", ii, sep=""))
-      var_lf  <- stats::var(load_factors)
-      # Results
-      results[[mean_nm]] <- mean_lf
-      results[[var_nm]]  <- var_lf
-    }
+  # Initial date
+  ini_date <- get_extrema_dates_from_timeseries(x)
+  # Date sequence
+  samples_per_day <- attr(x, "msts")[1]
+  date_by  <- as.difftime(24 / samples_per_day, units = "hours")
+  date_seq <- seq(from       = ini_date,
+                  length.out = length(x),
+                  by         = date_by)
+  
+  # Loop initializations
+  cut_breaks_list <- c("1 day", "1 week", "1 month")
+  load_factor <- list()
+  name_list <- c(as.name("daily"), as.name("weekly"), as.name("monthly"))
+  # Seasonality loop
+  for (ii in 1:3) {
+    ### Bin by periods of 1 month
+    cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
+    # Aggregate data (mean) according to the bins
+    mean_aggr_ts <- stats::aggregate(
+      x   = as.numeric(x),
+      by  = list(date_time = cut_seq),
+      FUN = mean)
+    # Aggregate data (max) according to the bins
+    max_aggr_ts  <- stats::aggregate(
+      x   = as.numeric(x),
+      by  = list(date_time = cut_seq),
+      FUN = max)
+    # Compute seasonal mean load factor excluding first and last bins
+    last_1 <- dim(max_aggr_ts)[1] - 1
+    load_factor[[name_list[[ii]]]] <- 
+      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
   }
-  return(results)
+  return(load_factor)
 }
-
-
-# Acumular por horas
-# > x <- c(1,2,3,3,4,3,2,2,3,1,2,1)
-# > y <- c(1,0,1,1,0,1,0,0,1,1,0,1)
-# > aggregate(x=x, by=list(parity=y), FUN=sum)
-
-# ave -> Group Averages Over Level Combinations Of Factors
-
-# plyr::round_any(a, 1/24, f=floor)
-
-# time(tseries)
