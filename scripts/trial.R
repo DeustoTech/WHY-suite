@@ -28,11 +28,15 @@ extend_datasets <- function(input_folder, output_folder) {
         short_gap = cdf$seasonal_periods[1] / 3
       )
       # Expand if needed
-      edf <- extend_imputed_dataframe(idf=idf, wanted_days=800)
-      # Save dataframe in output folder
-      path <- paste(output_folder, substr(dset_filename,1,9), sep="")
-      save(edf, file=path)
-      print("SAVED!")
+      edf <- extend_imputed_dataframe(idf=idf, wanted_days=1000)
+      if (is.null(edf)) {
+        print("DISCARDED")
+      } else {
+        # Save dataframe in output folder
+        path <- paste(output_folder, substr(dset_filename,1,9), sep="")
+        save(edf, file=path)
+        print("SAVED!")
+      }
     }
     else print("DISCARDED")
   }
@@ -44,32 +48,47 @@ extend_imputed_dataframe <- function(idf, wanted_days) {
   idf_final_date <- tail(idf$df, n=1)[[1]]
   idf_final_wday <- lubridate::wday(idf_final_date)
   idf_days       <- as.numeric(idf_final_date - idf_init_date)
-
+  
+  # Count of loops of extension
+  idf$extensions <- 1
   # Length of the extension in days
   extens_in_days <- ceiling(wanted_days - idf_days)
-  
-  ### OJO - SUPONIENDO QUE ESTA EXTENSION ES MENOR QUE 365 DIAS
-  
+  # Loop
+  extens_in_days_loop <- extens_in_days
   # If idf is longer than required, do nothing!
-  if (extens_in_days > 0) {
+  while (extens_in_days_loop > 0) {
+    browser()
     ## Look for the exact point of extraction than matches the weekday
     # Subtract one year
     extr_init_date <- idf_final_date - lubridate::days(365)
     # Check weekdays: if original ends on Monday, copy must start on Monday
     extr_init_date_wday <- lubridate::wday(extr_init_date)
-    # Get the shortest path of two 
+    # Get the shortest path of two
     diff_wdays <- c(
       (idf_final_wday - extr_init_date_wday) %% 7,
       - ((extr_init_date_wday - idf_final_wday) %% 7)
-      )
+    )
     # Get the absolute minimum
     diff_wdays <- diff_wdays[which.min(abs(diff_wdays))][1]
-    # Extraction interval
+    # Initial date of extraction
     extr_init_date <- extr_init_date + lubridate::days(diff_wdays)
-    extr_final_date <- extr_init_date + lubridate::days(extens_in_days)
+    # Check if the initial date of extraction exists in the dataframe
+    if (idf_init_date > extr_init_date) {
+      return(NULL)
+    }
+    # Amount of extractable days
+    available_days <- 365 - diff_wdays
+    # Check if the extension is larger than the amount of extractable days
+    if (extens_in_days_loop > available_days) {
+      extr_final_date <- idf_final_date
+      extens_in_days_loop <- extens_in_days_loop - available_days
+      idf$extensions <- idf$extensions + 1
+    } else {
+      extr_final_date <- extr_init_date + lubridate::days(extens_in_days_loop)
+      extens_in_days_loop <- 0
+    }
     # Extraction indices
     extr_idx <- idf$df[,1] > extr_init_date & idf$df[,1] < extr_final_date
-    browser()
     # Extracted times and values
     extr_times  <- idf$df[extr_idx, 1]
     extr_values <- idf$df[extr_idx, 2]
@@ -87,12 +106,17 @@ extend_imputed_dataframe <- function(idf, wanted_days) {
       original_times = extr_times
     )
     # Bind rows
-    idf$df            <- rbind(idf$df, extend_df)
-    idf$number_of_ext <- length(extr_times)
-    if (extens_in_days > 730) {
-      low_seas <- idf$seasonal_periods[1]
-      idf$seasonal_periods <- c(low_seas, low_seas*7, low_seas*365)
+    idf$df <- dplyr::bind_rows(idf$df, extend_df)
+    # New final dates if needed
+    if (extens_in_days_loop > 0) {
+      idf_final_date <- tail(idf$df, n=1)[[1]]
+      idf_final_wday <- lubridate::wday(idf_final_date)
     }
+  }
+  # Add new seasonal periods if needed
+  if (idf_days + extens_in_days > 730) {
+    low_seas <- idf$seasonal_periods[1]
+    idf$seasonal_periods <- c(low_seas, low_seas*7, low_seas*365)
   }
   return(idf)
 }
