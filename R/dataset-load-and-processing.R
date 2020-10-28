@@ -214,7 +214,7 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
   final_date    <- tail(idf$df, n=1)[[1]]
   wday_fd       <- lubridate::wday(final_date)
   idf_in_days   <- as.numeric(final_date - initial_date)
-  idf_in_months <- idf_in_days/31
+  idf_in_months <- idf_in_days / 31
   # If idf is shorter than expected, extend
   if (idf_in_months > 12) {
     # Length of the extension in months
@@ -299,11 +299,11 @@ extend_datasets <- function(input_folder, output_folder) {
                               filename   = dset_filename, 
                               acorn_path = acorn_folder)
     # Get length
-    initial_date <- cdf$df[1,1]
-    final_date <- tail(cdf$df, n=1)[[1]]
+    initial_date   <- cdf$df[1,1]
+    final_date     <- tail(cdf$df, n=1)[[1]]
     length_in_days <- as.numeric(final_date - initial_date)
-    # If TS is longer than 372 days, impute; ELSE discard
-    if (length_in_days > 372) {
+    # If TS is longer than 365 days, impute; ELSE discard
+    if (length_in_days > 365) {
       idf <- impute_cooked_dataframe(
         cdf       = cdf, 
         season    = cdf$seasonal_periods[1] * 7, 

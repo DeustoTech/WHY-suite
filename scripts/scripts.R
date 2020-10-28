@@ -44,7 +44,7 @@ scripts <- function(script_selection) {
     output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
     
     # Function call
-    whyT2.1::extend_datasets(input_folder,output_folder)
+    whyT2.1::extend_datasets(input_folder, output_folder)
     
     return(NULL)
   }
