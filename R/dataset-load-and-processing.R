@@ -1,3 +1,7 @@
+################################################################################
+# get_raw_dataframe_from_dataset
+################################################################################
+
 #' Raw dataframe from dataset
 #'
 #' @description
@@ -41,6 +45,10 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
     }
   }
 }
+
+################################################################################
+# cook_raw_dataframe
+################################################################################
 
 #' @rdname get_raw_dataframe_from_dataset
 #' @export
@@ -149,6 +157,10 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key,
   return(output)
 }
 
+################################################################################
+# impute_cooked_dataframe
+################################################################################
+
 #' Imputed dataframe from cooked dataframe
 #'
 #' @description
@@ -179,6 +191,10 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
                        imputed = as.integer(is.na(not_imp_ts)))
   return(cdf)
 }
+
+################################################################################
+# extend_imputed_dataframe
+################################################################################
 
 #' Extended dataframe from imputed dataframe
 #'
@@ -245,6 +261,10 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
     stop("372-days-long time series are required.")
   }
 }
+
+################################################################################
+# extend_datasets
+################################################################################
 
 #' Extended datasets from folder of raw datasets
 #'

@@ -1,3 +1,7 @@
+################################################################################
+# get_timeseries_from_cooked_dataframe
+################################################################################
+
 #' Time series from cooked dataframe
 #' 
 #' @description 
@@ -32,6 +36,10 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
   
   return(tseries)
 }
+
+################################################################################
+# get_seasonal_features_from_timeseries
+################################################################################
 
 #' Seasonal features from time series
 #' 
@@ -142,6 +150,10 @@ get_seasonal_features_from_timeseries <- function(tseries) {
   return(list(mean = result_mean, var = result_var))
 }
 
+################################################################################
+# get_extrema_dates_from_timeseries
+################################################################################
+
 #' Initial and final dates from time series
 #' 
 #' @description 
@@ -188,6 +200,10 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
     return(list(initial_date = initial_td, final_date = final_td))
   }
 }
+
+################################################################################
+# get_features_from_cooked_dataframe
+################################################################################
 
 #' Features of a cooked dataframe
 #'
@@ -244,6 +260,10 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   
   return(feats)
 }
+
+################################################################################
+# get_features_of_datasets_in_folder
+################################################################################
 
 #' Features of raw datasets in a folder
 #'
