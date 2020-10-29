@@ -117,6 +117,19 @@ stat_data_binning <- function(x) {
   for (ii in 1:24) {
     o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] / sum_of_means
   }
+  # Derived features
+  g1 <- f$mean$hourly[2:5,2] / sum_of_means
+  g2 <- f$mean$hourly[6:9,2] / sum_of_means
+  g3 <- f$mean$hourly[10:13,2] / sum_of_means
+  g4 <- f$mean$hourly[14:17,2] / sum_of_means
+  g5 <- f$mean$hourly[18:21,2] / sum_of_means
+  g6 <- f$mean$hourly[c(1,22:24),2] / sum_of_means
+  o_f[["unit_mean_01h_04h"]] <- sum(g1)
+  o_f[["unit_mean_05h_08h"]] <- sum(g2)
+  o_f[["unit_mean_09h_12h"]] <- sum(g3)
+  o_f[["unit_mean_13h_16h"]] <- sum(g4)
+  o_f[["unit_mean_17h_20h"]] <- sum(g5)
+  o_f[["unit_mean_21h_00h"]] <- sum(g6)
   
   # Vectors of names for days
   nmd <- c(
@@ -145,6 +158,11 @@ stat_data_binning <- function(x) {
   for (ii in 1:7) {
     o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
   }
+  # Derived features
+  g1 <- f$mean$daily[c(1,7),2] / sum_of_means
+  g2 <- f$mean$daily[2:6,2] / sum_of_means
+  o_f[["unit_mean_weekend"]] <- sum(g1)
+  o_f[["unit_mean_workdays"]] <- sum(g2)
   
   # Vectors of names for months
   nmm <- c(
@@ -175,6 +193,15 @@ stat_data_binning <- function(x) {
   for (ii in 1:12) {
     o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] / sum_of_means
   }
+  # Derived features
+  g1 <- f$mean$monthly[6:8,2] / sum_of_means
+  g2 <- f$mean$monthly[9:11,2] / sum_of_means
+  g3 <- f$mean$monthly[c(12,1,2),2] / sum_of_means
+  g4 <- f$mean$monthly[3:5,2] / sum_of_means
+  o_f[["unit_mean_summer"]] <- sum(g1)
+  o_f[["unit_mean_autumn"]] <- sum(g2)
+  o_f[["unit_mean_winter"]] <- sum(g3)
+  o_f[["unit_mean_spring"]] <- sum(g4)
   
   return(o_f)
 }
