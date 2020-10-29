@@ -1,4 +1,8 @@
-#' Features of statistical moments
+################################################################################
+# stat_moments
+################################################################################
+
+#' Features related to statistical moments
 #'
 #' @description
 #' Compute the mean, variance, skewness and kurtosis of a time series.
@@ -18,7 +22,11 @@ stat_moments <- function(x) {
   )
 }
 
-#' Features of quantiles
+################################################################################
+# quantiles
+################################################################################
+
+#' Features related to quantiles
 #'
 #' @description
 #' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series. Also the Q3 to Q1 range.
@@ -50,7 +58,132 @@ quantiles <- function(x) {
   )
 }
 
-#' Features of load factors
+################################################################################
+# stat_data_binning
+################################################################################
+
+#' Features related to statistical data binning
+#' 
+#' @description 
+#' Compute means and variances of the binned signal, where bins are related to days, weeks and months
+#' 
+#' @param x Time series of class `msts`.
+#'
+#' @return A list with statistical values of the different bins.
+#' @export
+
+stat_data_binning <- function(x) {
+  # Get the seasonal features
+  f <- whyT2.1::get_seasonal_features_from_timeseries(x)
+  # Output feature list
+  o_f <- list()
+  
+  # Vectors of names for hours
+  nmh <- c(
+    "mean_00h", "mean_01h", "mean_02h", "mean_03h", "mean_04h", "mean_05h",
+    "mean_06h", "mean_07h", "mean_08h", "mean_09h", "mean_10h", "mean_11h",
+    "mean_12h", "mean_13h", "mean_14h", "mean_15h", "mean_16h", "mean_17h",
+    "mean_18h", "mean_19h", "mean_20h", "mean_21h", "mean_22h", "mean_23h")
+  nvh <- c(
+    "var_00h", "var_01h", "var_02h", "var_03h", "var_04h", "var_05h",
+    "var_06h", "var_07h", "var_08h", "var_09h", "var_10h", "var_11h",
+    "var_12h", "var_13h", "var_14h", "var_15h", "var_16h", "var_17h",
+    "var_18h", "var_19h", "var_20h", "var_21h", "var_22h", "var_23h")
+  numh <- c(
+    "unit_mean_00h", "unit_mean_01h", "unit_mean_02h", "unit_mean_03h",
+    "unit_mean_04h", "unit_mean_05h", "unit_mean_06h", "unit_mean_07h", 
+    "unit_mean_08h", "unit_mean_09h", "unit_mean_10h", "unit_mean_11h", 
+    "unit_mean_12h", "unit_mean_13h", "unit_mean_14h", "unit_mean_15h", 
+    "unit_mean_16h", "unit_mean_17h", "unit_mean_18h", "unit_mean_19h", 
+    "unit_mean_20h", "unit_mean_21h", "unit_mean_22h", "unit_mean_23h")
+  nuvh <- c(
+    "unit_var_00h", "unit_var_01h", "unit_var_02h", "unit_var_03h",
+    "unit_var_04h", "unit_var_05h", "unit_var_06h", "unit_var_07h", 
+    "unit_var_08h", "unit_var_09h", "unit_var_10h", "unit_var_11h", 
+    "unit_var_12h", "unit_var_13h", "unit_var_14h", "unit_var_15h", 
+    "unit_var_16h", "unit_var_17h", "unit_var_18h", "unit_var_19h", 
+    "unit_var_20h", "unit_var_21h", "unit_var_22h", "unit_var_23h")
+  # Incorporation to output list
+  sum_of_means <- sum(f$mean$hourly[,2])
+  for (ii in 1:24) {
+    o_f[[as.name(nmh[ii])]]  = f$mean$hourly[ii,2]
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(nvh[ii])]]  = f$var$hourly[ii,2]
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(numh[ii])]] = f$mean$hourly[ii,2] / sum_of_means
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] / sum_of_means
+  }
+  
+  # Vectors of names for days
+  nmd <- c(
+    "mean_sun", "mean_mon", "mean_tue", "mean_wed", "mean_thu", "mean_fri",
+    "mean_sat")
+  nvd <- c(
+    "var_sun", "var_mon", "var_tue", "var_wed", "var_thu", "var_fri",
+    "var_sat")
+  numd <- c(
+    "unit_mean_sun", "unit_mean_mon", "unit_mean_tue", "unit_mean_wed",
+    "unit_mean_thu", "unit_mean_fri", "unit_mean_sat")
+  nuvd <- c(
+    "unit_var_sun", "unit_var_mon", "unit_var_tue", "unit_var_wed",
+    "unit_var_thu", "unit_var_fri", "unit_var_sat")
+  # Incorporation to output list
+  sum_of_means <- sum(f$mean$daily[,2])
+  for (ii in 1:7) {
+    o_f[[as.name(nmd[ii])]]  = f$mean$daily[ii,2]
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(nvd[ii])]]  = f$var$daily[ii,2]
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(numd[ii])]] = f$mean$daily[ii,2] / sum_of_means
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
+  }
+  
+  # Vectors of names for months
+  nmm <- c(
+    "mean_jan", "mean_feb", "mean_mar", "mean_apr", "mean_may", "mean_jun",
+    "mean_jul", "mean_ago", "mean_sep", "mean_oct", "mean_nov", "mean_dec")
+  nvm <- c(
+    "var_jan", "var_feb", "var_mar", "var_apr", "var_may", "var_jun",
+    "var_jul", "var_ago", "var_sep", "var_oct", "var_nov", "var_dec")
+  numm <- c(
+    "unit_mean_jan", "unit_mean_feb", "unit_mean_mar", "unit_mean_apr", 
+    "unit_mean_may", "unit_mean_jun", "unit_mean_jul", "unit_mean_ago",
+    "unit_mean_sep", "unit_mean_oct", "unit_mean_nov", "unit_mean_dec")
+  nuvm <- c(
+    "unit_var_jan", "unit_var_feb", "unit_var_mar", "unit_var_apr", 
+    "unit_var_may", "unit_var_jun", "unit_var_jul", "unit_var_ago",
+    "unit_var_sep", "unit_var_oct", "unit_var_nov", "unit_var_dec")
+  # Incorporation to output list
+  sum_of_means <- sum(f$mean$monthly[,2])
+  for (ii in 1:12) {
+    o_f[[as.name(nmm[ii])]]  = f$mean$monthly[ii,2]
+  }
+  for (ii in 1:12) {
+    o_f[[as.name(nvm[ii])]]  = f$var$monthly[ii,2]
+  }
+  for (ii in 1:12) {
+    o_f[[as.name(numm[ii])]] = f$mean$monthly[ii,2] / sum_of_means
+  }
+  for (ii in 1:12) {
+    o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] / sum_of_means
+  }
+  
+  return(o_f)
+}
+
+################################################################################
+# load_factors
+################################################################################
+
+#' Features related to load factors
 #'
 #' @description
 #' Compute the load factor across seasonal periods (days, weeks and years).
