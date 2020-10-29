@@ -246,7 +246,6 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1) {
     if (extens_in_days > available_days) {
       extr_final_date <- idf_final_date
       extens_in_days  <- extens_in_days - available_days
-      idf$extensions  <- idf$extensions + 1
     } else {
       extr_final_date <- extr_init_date + lubridate::days(extens_in_days)
       extens_in_days  <- 0
@@ -271,6 +270,7 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1) {
     )
     # Bind rows
     idf$df <- dplyr::bind_rows(idf$df, extend_df)
+    idf$extensions <- idf$extensions + 1
     # New final dates if needed
     if (extens_in_days > 0) {
       idf_final_date <- tail(idf$df, n=1)[[1]]
@@ -298,12 +298,13 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1) {
 #'
 #' @param input_folder Input folder of datasets.
 #' @param output_folder Desired output folder of extended datasets.
+#' @param wanted_days Minimum number of complete days of the final extended datasets.
 #'
 #' @return As many extended dataframes as files in the raw dataset folder.
 #'
 #' @export
 
-extend_datasets <- function(input_folder, output_folder) {
+extend_datasets <- function(input_folder, output_folder, wanted_days) {
   # Path to ACORN folder
   acorn_folder <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/", 
                         "informations_households.csv", sep="")
@@ -315,12 +316,14 @@ extend_datasets <- function(input_folder, output_folder) {
     print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
     rdf <- get_raw_dataframe_from_dataset(file_path)
-    cdf <- cook_raw_dataframe(raw_df     = rdf, 
-                              from_date  = "first", 
-                              to_date    = "last", 
-                              dset_key   = "lcl", 
-                              filename   = dset_filename, 
-                              acorn_path = acorn_folder)
+    cdf <- cook_raw_dataframe(
+      raw_df     = rdf, 
+      from_date  = "first", 
+      to_date    = "last", 
+      dset_key   = "lcl", 
+      filename   = dset_filename, 
+      acorn_path = acorn_folder
+      )
     # Get length
     initial_date   <- cdf$df[1,1]
     final_date     <- tail(cdf$df, n=1)[[1]]
@@ -333,7 +336,7 @@ extend_datasets <- function(input_folder, output_folder) {
         short_gap = cdf$seasonal_periods[1] / 3
       )
       # Expand if needed
-      edf <- extend_imputed_dataframe(idf=idf, wanted_days=800)
+      edf <- extend_imputed_dataframe(idf=idf, wanted_days=wanted_days)
       if (is.null(edf)) {
         print("DISCARDED")
       } else {

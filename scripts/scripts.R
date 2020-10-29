@@ -29,7 +29,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 11
+script_selection <- 1
 ################################################################################
 
 library(whyT2.1)
@@ -41,10 +41,10 @@ scripts <- function(script_selection) {
   if (script_selection == 1) {
     # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
-    output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
+    output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext2/"
     
     # Function call
-    whyT2.1::extend_datasets(input_folder, output_folder)
+    whyT2.1::extend_datasets(input_folder, output_folder, wanted_days=800)
     
     return(NULL)
   }
