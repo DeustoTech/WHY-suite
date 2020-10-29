@@ -2,7 +2,7 @@
 % Please edit documentation in R/extra-features.R
 \name{load_factors}
 \alias{load_factors}
-\title{Features of load factors}
+\title{Features related to load factors}
 \usage{
 load_factors(x)
 }

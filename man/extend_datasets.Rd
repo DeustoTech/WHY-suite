@@ -4,15 +4,17 @@
 \alias{extend_datasets}
 \title{Extended datasets from folder of raw datasets}
 \usage{
-extend_datasets(input_folder, output_folder)
+extend_datasets(input_folder, output_folder, wanted_days)
 }
 \arguments{
 \item{input_folder}{Input folder of datasets.}
 
 \item{output_folder}{Desired output folder of extended datasets.}
+
+\item{wanted_days}{Minimum number of complete days of the final extended datasets.}
 }
 \value{
-As many extended dataframes as files in the raw dataset forlder.
+As many extended dataframes as files in the raw dataset folder.
 }
 \description{
 Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.

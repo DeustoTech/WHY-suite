@@ -211,7 +211,7 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 #' Get features of a cooked (or extended) dataframe.
 #'
 #' @param df Cooked (or extended) dataframe.
-#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}. \code{basic} contains 7 functions whereas \code{extra} contains 33 (see code).
+#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
 #'
 #' @return List of features.
 #'
@@ -220,20 +220,22 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   # Set a seed for random numbers
   set.seed(1981)
-  # List of functions that DON'T require normalization
-  # They are included in BOTH "basic" and "extra" analyses
-  not_norm_fns <- c("stat_moments", "quantiles", "load_factors")
+  # List of functions that DON'T require normalization -> they are included in 
+  # BOTH "basic" and "extra" analyses
+  not_norm_fns <- c(
+    "stat_moments", "quantiles", "stat_data_binning", "load_factors")
   # List of BASIC functions that REQUIRE normalization
-  basic_fns <- c("frequency", "stl_features", "entropy", "acf_features")
+  basic_fns <- c(
+    "frequency", "stl_features", "entropy", "acf_features")
   # List of EXTRA functions that REQUIRE normalization
-  extra_fns <- c("max_kl_shift", "outlierinclude_mdrmd", "arch_stat",
-                 "max_level_shift", "ac_9", "crossing_points", "max_var_shift",
-                 "nonlinearity", "spreadrandomlocal_meantaul", "flat_spots",
-                 "pacf_features", "firstmin_ac", "std1st_der", "heterogeneity",
-                 "stability", "firstzero_ac", "trev_num", "holt_parameters",
-                 "walker_propcross", "hurst", "unitroot_kpss",
-                 "histogram_mode", "unitroot_pp", "localsimple_taures",
-                 "lumpiness", "motiftwo_entro3")
+  extra_fns <- c(
+    "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", "max_level_shift",
+    "ac_9", "crossing_points", "max_var_shift", "nonlinearity",
+    "spreadrandomlocal_meantaul", "flat_spots", "pacf_features", "firstmin_ac",
+    "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
+    "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss", 
+    "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
+    "motiftwo_entro3")
   # List of functions that require NORMALIZATION ("extra" includes "basic")
   analysis_fns <- list(
     basic = basic_fns,
@@ -288,7 +290,7 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
   accepted <- NULL
   rejected <- NULL
   # Get list of filenames in dataset folder
-  dset_filenames <- list.files(folder_path)[1:10]
+  dset_filenames <- list.files(folder_path)
   # Analysis loop
   for (dset_filename in dset_filenames) {
     # Load raw dataframe from dataset

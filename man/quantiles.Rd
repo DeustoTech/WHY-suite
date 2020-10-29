@@ -2,7 +2,7 @@
 % Please edit documentation in R/extra-features.R
 \name{quantiles}
 \alias{quantiles}
-\title{Features of quantiles}
+\title{Features related to quantiles}
 \usage{
 quantiles(x)
 }

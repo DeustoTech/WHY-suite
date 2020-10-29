@@ -29,7 +29,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 1
+script_selection <- 12
 ################################################################################
 
 library(whyT2.1)
@@ -284,7 +284,40 @@ scripts <- function(script_selection) {
   
   # SCRIPT 12
   if (script_selection == 12) {
+    # User parameters
+    input_folder     <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
+    output_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/"
+    type_of_analysis <- "extra"
     
+    # Initialization of outputs
+    features <- NULL
+
+    # Get list of filenames in dataset folder
+    dset_filenames <- list.files(input_folder)
+    # Analysis loop
+    for (dset_filename in dset_filenames[1:3]) {
+      # Print file being analyzed
+      print(dset_filename)
+      # Load extended dataframe
+      load(paste(input_folder, dset_filename, sep=""))
+      # GET FEATURES
+      ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+      # Incorporate features to output
+      features <- rbind(features, ff)
+    }
+    
+    # Save dataframes as CSV
+    utils::write.table(
+      features,
+      file      = paste(output_folder, "features.csv", sep=""),
+      row.names = FALSE,
+      sep       = ",",
+      na        = "",
+      quote     = FALSE
+    )
+    
+    # Also return the dataframes
+    return(features)
   }
   
   # ----------------------------------------------------------------------------

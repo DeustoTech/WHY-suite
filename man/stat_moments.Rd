@@ -2,7 +2,7 @@
 % Please edit documentation in R/extra-features.R
 \name{stat_moments}
 \alias{stat_moments}
-\title{Features of statistical moments}
+\title{Features related to statistical moments}
 \usage{
 stat_moments(x)
 }
