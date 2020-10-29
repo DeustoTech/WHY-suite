@@ -4,16 +4,18 @@
 \alias{extend_imputed_dataframe}
 \title{Extended dataframe from imputed dataframe}
 \usage{
-extend_imputed_dataframe(idf, length_in_months)
+extend_imputed_dataframe(idf, wanted_days, back_years = 1)
 }
 \arguments{
 \item{idf}{Imputed dataframe.}
 
-\item{length_in_months}{Minimum number of months of the extended output.}
+\item{wanted_days}{Number of complete days of the extended output.}
+
+\item{back_years}{Number of previous years for which the time series is copied.}
 }
 \value{
 Extended dataframe, i.e. an imputed dataframe with a 3rd column indicating if each sample has been extended or not and a 4th column indicating the original date of the replicated sample.
 }
 \description{
-Replicate the existing values of a periodic time series to obtain a time series with the desired length in months. Only imputed dataframes larger than 372 days can be extended.
+Create an extended dataframe from an imputed dataframe by replicating previous sequences of the time series, of at least one year, as many times as necessary, until completing a certain number of days.
 }

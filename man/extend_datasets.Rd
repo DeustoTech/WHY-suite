@@ -12,10 +12,10 @@ extend_datasets(input_folder, output_folder)
 \item{output_folder}{Desired output folder of extended datasets.}
 }
 \value{
-Extended dataframes.
+As many extended dataframes as files in the raw dataset forlder.
 }
 \description{
-Compute the extended dataframes from an input folder of datasets and store them in an output folder.
+Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.
 }
 \details{
 Automatizes the following sequence for a whole folder: raw dataset -> raw dataframe -> cooked dataframe -> imputed dataframe -> extended dataframe -> extended dataset.

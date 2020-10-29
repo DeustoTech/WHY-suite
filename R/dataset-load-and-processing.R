@@ -199,67 +199,90 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 #' Extended dataframe from imputed dataframe
 #'
 #' @description
-#' Replicate the existing values of a periodic time series to obtain a time series with the desired length in months. Only imputed dataframes larger than 372 days can be extended.
+#' Create an extended dataframe from an imputed dataframe by replicating previous sequences of the time series, of at least one year, as many times as necessary, until completing a certain number of days. 
 #'
 #' @param idf Imputed dataframe.
-#' @param length_in_months Minimum number of months of the extended output.
+#' @param wanted_days Number of complete days of the extended output.
+#' @param back_years Number of previous years for which the time series is copied.
 #'
 #' @return Extended dataframe, i.e. an imputed dataframe with a 3rd column indicating if each sample has been extended or not and a 4th column indicating the original date of the replicated sample.
 #'
 #' @export
 
-extend_imputed_dataframe <- function(idf, length_in_months) {
+extend_imputed_dataframe <- function(idf, wanted_days, back_years=1) {
   # Get current length in months of idf
-  initial_date  <- idf$df[1,1]
-  final_date    <- tail(idf$df, n=1)[[1]]
-  wday_fd       <- lubridate::wday(final_date)
-  idf_in_days   <- as.numeric(final_date - initial_date)
-  idf_in_months <- idf_in_days / 31
-  # If idf is shorter than expected, extend
-  if (idf_in_months > 12) {
-    # Length of the extension in months
-    extension_in_months <- ceiling(length_in_months - idf_in_months)
-    if (extension_in_months > 0) {
-      # Subtract one year
-      initial_extract_date <- final_date - lubridate::days(365)
-      # Check weekdays: if original ends on Monday, copy must start on Monday
-      wday_ied  <- lubridate::wday(initial_extract_date)
-      days_diff <- (wday_fd - wday_ied) %% 7
-      # Extraction interval
-      initial_extract_date <- initial_extract_date + 
-                              lubridate::days(days_diff)
-      final_extract_date   <- initial_extract_date + 
-                              lubridate::days(31*extension_in_months)
-      extract_idx          <- idf$df[,1] > initial_extract_date &
-                              idf$df[,1] <= final_extract_date
-      # Extracted times and values
-      extracted_times  <- idf$df[extract_idx, 1]
-      extracted_values <- idf$df[extract_idx, 2]
-      # Extended times
-      extended_times <- seq(
-        from       = final_date,
-        by         = as.difftime(86400/idf$seasonal_periods[1], units = "secs"),
-        length.out = length(extracted_times) + 1
-      )
-      # Create the extended dataframe
-      extended_df <- data.frame(
-        times          = extended_times[2:length(extended_times)],
-        values         = extracted_values,
-        imputed        = 2,
-        original_times = extracted_times
-      )
-      # Bind rows
-      idf$df            <- dplyr::bind_rows(idf$df, extended_df)
-      idf$number_of_ext <- length(extracted_times)
-      if (length_in_months >= 24) {
-        low_seas <- idf$seasonal_periods[1]
-        idf$seasonal_periods <- c(low_seas, low_seas*7, low_seas*365)
-      }
+  idf_init_date  <- idf$df[1,1]
+  idf_final_date <- tail(idf$df, n=1)[[1]]
+  idf_final_wday <- lubridate::wday(idf_final_date)
+  idf_days       <- as.numeric(idf_final_date - idf_init_date)
+  
+  # Count of loops of extension
+  idf$extensions <- 1
+  # Length of the extension in days
+  extens_in_days <- ceiling(wanted_days - idf_days)
+  # If idf is longer than required, do nothing!
+  while (extens_in_days > 0) {
+    ## Look for the exact point of extraction than matches the weekday
+    # Subtract one year
+    extr_init_date <- idf_final_date - lubridate::days(back_years*365)
+    # Check weekdays: if original ends on Monday, copy must start on Monday
+    extr_init_date_wday <- lubridate::wday(extr_init_date)
+    # Get the shortest path of two
+    diff_wdays <- c(
+      (idf_final_wday - extr_init_date_wday) %% 7,
+      - ((extr_init_date_wday - idf_final_wday) %% 7)
+    )
+    # Get the absolute minimum
+    diff_wdays <- diff_wdays[which.min(abs(diff_wdays))][1]
+    # Initial date of extraction
+    extr_init_date <- extr_init_date + lubridate::days(diff_wdays)
+    # Check if the initial date of extraction exists in the dataframe
+    if (idf_init_date > extr_init_date) {
+      return(NULL)
     }
-    return(idf)
-  } else {
-    stop("372-days-long time series are required.")
+    # Amount of extractable days
+    available_days <- back_years*365 - diff_wdays
+    # Check if the extension is larger than the amount of extractable days
+    if (extens_in_days > available_days) {
+      extr_final_date <- idf_final_date
+      extens_in_days  <- extens_in_days - available_days
+      idf$extensions  <- idf$extensions + 1
+    } else {
+      extr_final_date <- extr_init_date + lubridate::days(extens_in_days)
+      extens_in_days  <- 0
+    }
+    # Extraction indices
+    extr_idx <- idf$df[,1] > extr_init_date & idf$df[,1] <= extr_final_date
+    # Extracted times and values
+    extr_times  <- idf$df[extr_idx, 1]
+    extr_values <- idf$df[extr_idx, 2]
+    # Extended times
+    extend_times <- seq(
+      from       = idf_final_date,
+      by         = as.difftime(86400/idf$seasonal_periods[1], units="secs"),
+      length.out = length(extr_times) + 1
+    )
+    # Create the extended dataframe
+    extend_df <- data.frame(
+      times          = extend_times[2:length(extend_times)],
+      values         = extr_values,
+      imputed        = 2,
+      original_times = extr_times
+    )
+    # Bind rows
+    idf$df <- dplyr::bind_rows(idf$df, extend_df)
+    # New final dates if needed
+    if (extens_in_days > 0) {
+      idf_final_date <- tail(idf$df, n=1)[[1]]
+      idf_final_wday <- lubridate::wday(idf_final_date)
+    }
   }
+  # Add new seasonal periods if needed
+  if (wanted_days > 730) {
+    low_seas <- idf$seasonal_periods[1]
+    idf$seasonal_periods <- c(low_seas, low_seas*7, low_seas*365)
+  }
+  return(idf)
 }
 
 ################################################################################
@@ -269,14 +292,14 @@ extend_imputed_dataframe <- function(idf, length_in_months) {
 #' Extended datasets from folder of raw datasets
 #'
 #' @description
-#' Compute the extended dataframes from an input folder of datasets and store them in an output folder.
+#' Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.
 #' 
 #' @details Automatizes the following sequence for a whole folder: raw dataset -> raw dataframe -> cooked dataframe -> imputed dataframe -> extended dataframe -> extended dataset.
 #'
 #' @param input_folder Input folder of datasets.
 #' @param output_folder Desired output folder of extended datasets.
 #'
-#' @return Extended dataframes.
+#' @return As many extended dataframes as files in the raw dataset folder.
 #'
 #' @export
 
@@ -310,11 +333,15 @@ extend_datasets <- function(input_folder, output_folder) {
         short_gap = cdf$seasonal_periods[1] / 3
       )
       # Expand if needed
-      edf <- extend_imputed_dataframe(idf=idf, length_in_months=25)
-      # Save dataframe in output folder
-      path <- paste(output_folder, substr(dset_filename,1,9), sep="")
-      save(edf, file=path)
-      print("SAVED!")
+      edf <- extend_imputed_dataframe(idf=idf, wanted_days=800)
+      if (is.null(edf)) {
+        print("DISCARDED")
+      } else {
+        # Save dataframe in output folder
+        path <- paste(output_folder, substr(dset_filename,1,9), sep="")
+        save(edf, file=path)
+        print("SAVED!")
+      }
     }
     else print("DISCARDED")
   }
