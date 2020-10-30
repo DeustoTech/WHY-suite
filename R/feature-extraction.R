@@ -391,7 +391,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   # Analysis loop
-  for (dset_filename in dset_filenames[1:3]) {
+  for (dset_filename in dset_filenames) {
     # Print file being analyzed
     print(dset_filename)
     # Load extended dataframe
