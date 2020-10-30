@@ -108,7 +108,7 @@ scripts <- function(script_selection) {
     type_of_analysis <- "extra"
     
     # Function call
-    feats <- whyT2.1::get_features_of_datasets_in_folder(
+    feats <- whyT2.1::get_features_from_datasets_in_folder(
       folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
     
     return(feats)
@@ -288,36 +288,11 @@ scripts <- function(script_selection) {
     input_folder     <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
     output_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/"
     type_of_analysis <- "extra"
+    # Compute features
+    feats <- whyT2.1::get_features_from_ext_datasets_in_folder(
+      input_folder, output_folder, type_of_analysis)
     
-    # Initialization of outputs
-    features <- NULL
-
-    # Get list of filenames in dataset folder
-    dset_filenames <- list.files(input_folder)
-    # Analysis loop
-    for (dset_filename in dset_filenames[1:3]) {
-      # Print file being analyzed
-      print(dset_filename)
-      # Load extended dataframe
-      load(paste(input_folder, dset_filename, sep=""))
-      # GET FEATURES
-      ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
-      # Incorporate features to output
-      features <- rbind(features, ff)
-    }
-    
-    # Save dataframes as CSV
-    utils::write.table(
-      features,
-      file      = paste(output_folder, "features.csv", sep=""),
-      row.names = FALSE,
-      sep       = ",",
-      na        = "",
-      quote     = FALSE
-    )
-    
-    # Also return the dataframes
-    return(features)
+    return(feats)
   }
   
   # ----------------------------------------------------------------------------

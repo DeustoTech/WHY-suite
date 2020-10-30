@@ -264,7 +264,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
 }
 
 ################################################################################
-# get_features_of_datasets_in_folder
+# get_features_from_datasets_in_folder
 ################################################################################
 
 #' Features of raw datasets in a folder
@@ -284,7 +284,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
 #'
 #' @export
 
-get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis, output_folder_path=NULL) {
+get_features_from_datasets_in_folder <- function(folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis, output_folder_path=NULL) {
   # Initialization of outputs
   features <- NULL
   accepted <- NULL
@@ -364,4 +364,54 @@ get_features_of_datasets_in_folder <- function(folder_path, from_date, to_date, 
   
   # Also return the dataframes
   return(list(features=features, accepted=accepted, rejected=rejected))
+}
+
+################################################################################
+# get_features_from_ext_datasets_in_folder
+################################################################################
+
+#' Features of extended datasets in a folder
+#'
+#' @description
+#' Get features of all extended datasets contained in a folder.
+#'
+#' @param input_folder Absolute path to the dataset folder.
+#' @param output_folder Absolute path where the results are wanted.
+#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
+#'
+#' @return File containing the features
+#'
+#' @export
+
+get_features_from_ext_datasets_in_folder <- function(input_folder, output_folder, type_of_analysis) {
+  
+  # Initialization of outputs
+  features <- NULL
+  
+  # Get list of filenames in dataset folder
+  dset_filenames <- list.files(input_folder)
+  # Analysis loop
+  for (dset_filename in dset_filenames[1:3]) {
+    # Print file being analyzed
+    print(dset_filename)
+    # Load extended dataframe
+    load(paste(input_folder, dset_filename, sep=""))
+    # GET FEATURES
+    ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+    # Incorporate features to output
+    features <- rbind(features, ff)
+  }
+  
+  # Save dataframes as CSV
+  utils::write.table(
+    features,
+    file      = paste(output_folder, "features.csv", sep=""),
+    row.names = FALSE,
+    sep       = ",",
+    na        = "",
+    quote     = FALSE
+  )
+  
+  # Also return the dataframes
+  return(features)
 }
