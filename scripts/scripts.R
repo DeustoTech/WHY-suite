@@ -108,7 +108,7 @@ scripts <- function(script_selection) {
     type_of_analysis <- "extra"
     
     # Function call
-    feats <- whyT2.1::get_features_from_datasets_in_folder(
+    feats <- whyT2.1::get_features_from_raw_datasets(
       folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis)
     
     return(feats)
@@ -289,7 +289,7 @@ scripts <- function(script_selection) {
     output_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/"
     type_of_analysis <- "extra"
     # Compute features
-    feats <- whyT2.1::get_features_from_ext_datasets_in_folder(
+    feats <- whyT2.1::get_features_from_ext_datasets(
       input_folder, output_folder, type_of_analysis)
     
     return(feats)

@@ -264,7 +264,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
 }
 
 ################################################################################
-# get_features_from_datasets_in_folder
+# get_features_from_raw_datasets
 ################################################################################
 
 #' Features of raw datasets in a folder
@@ -284,7 +284,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
 #'
 #' @export
 
-get_features_from_datasets_in_folder <- function(folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis, output_folder_path=NULL) {
+get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset_key, allowed_na, type_of_analysis, output_folder_path=NULL) {
   # Initialization of outputs
   features <- NULL
   accepted <- NULL
@@ -367,7 +367,7 @@ get_features_from_datasets_in_folder <- function(folder_path, from_date, to_date
 }
 
 ################################################################################
-# get_features_from_ext_datasets_in_folder
+# get_features_from_ext_datasets
 ################################################################################
 
 #' Features of extended datasets in a folder
@@ -383,7 +383,7 @@ get_features_from_datasets_in_folder <- function(folder_path, from_date, to_date
 #'
 #' @export
 
-get_features_from_ext_datasets_in_folder <- function(input_folder, output_folder, type_of_analysis) {
+get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
   
   # Initialization of outputs
   features <- NULL
