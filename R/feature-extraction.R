@@ -408,7 +408,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         sep       = ",",
         na        = "",
         quote     = FALSE,
-        append    = TRUE
+        append    = TRUE,
+        col.names = dset_filename == dset_filenames[1]
       )
       # Incorporate features to output
       features <- rbind(features, ff)
