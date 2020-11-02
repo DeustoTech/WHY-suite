@@ -393,24 +393,29 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   # Analysis loop
   for (dset_filename in dset_filenames) {
     # Print file being analyzed
-    print(dset_filename)
+    print(paste(date(), dset_filename, sep=" --- "))
     # Load extended dataframe
     load(paste(input_folder, dset_filename, sep=""))
-    # GET FEATURES
-    ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
-    # Incorporate features to output
-    features <- rbind(features, ff)
+    # Set exceptions
+    if (!edf$is_0) {
+      # GET FEATURES
+      ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+      # Append line of new results to the CSV file
+      utils::write.table(
+        features,
+        file      = paste(output_folder, "features.csv", sep=""),
+        row.names = FALSE,
+        sep       = ",",
+        na        = "",
+        quote     = FALSE,
+        append    = TRUE
+      )
+      # Incorporate features to output
+      features <- rbind(features, ff)
+    } else {
+      print("SKIPPED!")
+    }
   }
-  
-  # Save dataframes as CSV
-  utils::write.table(
-    features,
-    file      = paste(output_folder, "features.csv", sep=""),
-    row.names = FALSE,
-    sep       = ",",
-    na        = "",
-    quote     = FALSE
-  )
   
   # Also return the dataframes
   return(features)
