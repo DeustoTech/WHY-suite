@@ -404,7 +404,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       utils::write.table(
         ff,
         file      = paste(output_folder, "features.csv", sep=""),
-        row.names = dset_filenames,
+        row.names = dset_filename,
         sep       = ",",
         na        = "",
         quote     = FALSE,
