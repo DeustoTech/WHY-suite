@@ -378,20 +378,30 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #' @param input_folder Absolute path to the dataset folder.
 #' @param output_folder Absolute path where the results are wanted.
 #' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
+#' @param resume_from_file A string indicating the name of the file to start the analysis.
 #'
 #' @return File containing the features
 #'
 #' @export
 
-get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
+get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, resume_from_file=NULL) {
   
   # Initialization of outputs
   features <- NULL
-  
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
+  
+  # Resume options
+  if (is.null(resume_from_file)) {
+    from_file <- 1
+  } else {
+    from_file <- which(dset_filenames == resume_from_file)
+  }
+  # Last file
+  to_file <- length(dset_filenames)
+  
   # Analysis loop
-  for (dset_filename in dset_filenames) {
+  for (dset_filename in dset_filenames[from_file:to_file]) {
     # Print file being analyzed
     print(paste(date(), dset_filename, sep=" --- "))
     # Load extended dataframe
