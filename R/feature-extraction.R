@@ -402,7 +402,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
       # Append line of new results to the CSV file
       utils::write.table(
-        features,
+        ff,
         file      = paste(output_folder, "features.csv", sep=""),
         row.names = FALSE,
         sep       = ",",
