@@ -385,7 +385,6 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #' @export
 
 get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, resume_from_file=NULL) {
-  
   # Initialization of outputs
   features <- NULL
   # Get list of filenames in dataset folder
@@ -414,7 +413,6 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       utils::write.table(
         ff,
         file      = paste(output_folder, "features.csv", sep=""),
-        row.names = dset_filename,
         sep       = ",",
         na        = "",
         quote     = FALSE,
