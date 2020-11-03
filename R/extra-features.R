@@ -259,9 +259,11 @@ load_factors <- function(x) {
     # Compute seasonal mean load factor excluding first and last bins
     last_1 <- dim(max_aggr_ts)[1] - 1
     load_factor[[mean_name_list[[ii]]]] <- 
-      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
+      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+           na.rm = TRUE)
     load_factor[[var_name_list[[ii]]]]  <- 
-      var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2])
+      stats::var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+                 na.rm = TRUE)
   }
   return(load_factor)
 }

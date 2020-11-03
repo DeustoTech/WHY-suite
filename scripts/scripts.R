@@ -29,7 +29,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 12
+script_selection <- 15
 ################################################################################
 
 library(whyT2.1)
@@ -297,15 +297,130 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 13
+  # SCRIPT 13 --> GOIENER FILES
   if (script_selection == 13) {
+    # Goiener data folder
+    g_folder <- "C:/GOIENER/"
+    # Goiener info dataframe
+    g_info_file <- paste(
+      "G:/.shortcut-targets-by-id/1g1D2rJfAektwZCB-O_F0EHxDYHxJmhmc/", 
+      "20WHY datasets/GOIENER/Contratos_Goiener_20201013-anonymized.csv",
+      sep = "")
+    # Get list of filenames in dataset folder
+    dset_filenames <- list.files(g_folder)
+    # Load data from CSV file
+    g_df <- data.table::fread(
+      file = g_info_file,
+      header = TRUE,
+      sep = ",",
+      na.strings = ""
+    )
     
+    browser()
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 14
+  # SCRIPT 14 --> ANALYSIS OF FEATURES FROM EXTENDED TIME SERIES
   if (script_selection == 14) {
+    # Folder to features' file
+    feats_folder <-
+      "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/features.csv"
+    ftp          <- c(5:9, 21:22)
+    centers      <- 4
+    
+    feats <- utils::read.table(
+      file   = feats_folder,
+      header = TRUE,
+      sep    = ","
+    )
+    browser()
+    # Compute k-means
+    km <- whyT2.1::pca_kmeans_analysis(
+      feats_folder = feats_folder,
+      ftp          = ftp,
+      min_var      = 0.90,
+      centers      = centers
+    )
+    # Plot k-means
+    whyT2.1::plot_kmeans(
+      km            = km[["results"]],
+      feats_df      = km[["feats"]],
+      plot_clusters = TRUE
+    )
+    
+    return(km)
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 15 --> CHECK SOME FEATURES 
+  if (script_selection == 15) {
+    
+    
+    load_factors <- function(x) {
+      browser()
+      # Initial date
+      ini_date <- get_extrema_dates_from_timeseries(x)
+      # Date sequence
+      samples_per_day <- attr(x, "msts")[1]
+      date_by  <- as.difftime(24 / samples_per_day, units = "hours")
+      date_seq <- seq(from       = ini_date,
+                      length.out = length(x),
+                      by         = date_by)
+      # Loop initializations
+      cut_breaks_list <- c("1 day", "1 week", "1 month")
+      load_factor <- list()
+      mean_name_list <- c(
+        as.name("load_factor_mean1"),
+        as.name("load_factor_mean2"),
+        as.name("load_factor_mean3")
+      )
+      var_name_list <- c(
+        as.name("load_factor_var1"),
+        as.name("load_factor_var2"),
+        as.name("load_factor_var3")
+      )
+      # Seasonality loop
+      for (ii in 1:length(attr(x, "msts"))) {
+        ### Bin by periods of 1 month
+        cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
+        # Aggregate data (mean) according to the bins
+        mean_aggr_ts <- stats::aggregate(
+          x   = as.numeric(x),
+          by  = list(date_time = cut_seq),
+          FUN = mean)
+        # Aggregate data (max) according to the bins
+        max_aggr_ts  <- stats::aggregate(
+          x   = as.numeric(x),
+          by  = list(date_time = cut_seq),
+          FUN = max)
+        # Compute seasonal mean load factor excluding first and last bins
+        last_1 <- dim(max_aggr_ts)[1] - 1
+        load_factor[[mean_name_list[[ii]]]] <- 
+          mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+               na.rm = TRUE)
+        load_factor[[var_name_list[[ii]]]]  <- 
+          stats::var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+                     na.rm = TRUE)
+      }
+      return(load_factor)
+    }
+    
+    
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC002388")
+    whyT2.1::plot_dataframe(edf$df)
+    ts01 <- whyT2.1::get_timeseries_from_cooked_dataframe(edf)
+    res  <- load_factors(ts01)
+    print(res)
+    
+    
+    return(NULL)
+  }
+  
+  # ----------------------------------------------------------------------------  
+  # SCRIPT 16
+  if (script_selection == 16) {
     
   }
   
