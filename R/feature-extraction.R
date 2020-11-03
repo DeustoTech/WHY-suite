@@ -417,7 +417,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         na        = "",
         quote     = FALSE,
         append    = TRUE,
-        col.names = dset_filename == dset_filenames[1]
+        col.names = dset_filename == dset_filenames[1],
+        row.names = FALSE
       )
       # Append line of new results to the CSV file
       utils::write.table(
@@ -425,7 +426,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         file      = paste(output_folder, "analyzed.csv", sep=""),
         quote     = FALSE,
         append    = TRUE,
-        col.names = dset_filename == dset_filenames[1]
+        row.names = FALSE,
+        col.names = FALSE
       )
       # Incorporate features to output
       features <- rbind(features, ff)
