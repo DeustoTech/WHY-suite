@@ -1,3 +1,7 @@
+################################################################################
+# plot_dataframe
+################################################################################
+
 #' Plotting of a dataframe
 #'
 #' @description
@@ -40,6 +44,10 @@ plot_dataframe <- function(dset_data, title=NULL) {
 
   print(p)
 }
+
+################################################################################
+# plot_pca
+################################################################################
 
 #' Plotting of PCA scores
 #'
@@ -112,6 +120,10 @@ plot_pca <- function(pca_sc, feats_folder, axis_x, axis_y, color_by_SE_vars=FALS
   print(p)
 }
 
+################################################################################
+# plot_kmeans
+################################################################################
+
 #' Plotting of k-means results or elbow curve
 #'
 #' @description
@@ -163,6 +175,10 @@ plot_kmeans <- function(km, feats_df=NULL, plot_clusters=FALSE, plot_elbow=FALSE
     )
   }
 }
+
+################################################################################
+# plot_features_library
+################################################################################
 
 #' Creation of a PDF library of features
 #'

@@ -131,10 +131,11 @@ pca_kmeans_analysis <- function(feats_folder, ftp, otp=NULL, min_var=0.95, cente
   reduced_pc_set <- pca$x[,1:pc_number]
   # Compute k-means
   results <- stats::kmeans(
-    x        = reduced_pc_set,
-    centers  = centers,
-    iter.max = 500,
-    nstart   = 10000
+    x         = reduced_pc_set,
+    centers   = centers,
+    algorithm = "MacQueen",
+    iter.max  = 500,
+    nstart    = 10000
   )
   # Results
   km <- list(

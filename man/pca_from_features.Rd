@@ -2,7 +2,7 @@
 % Please edit documentation in R/machine-learning-analysis.R
 \name{pca_from_features}
 \alias{pca_from_features}
-\title{PCA of features}
+\title{PCA from features}
 \usage{
 pca_from_features(feats_folder, ftp, otp = NULL)
 }
@@ -11,10 +11,10 @@ pca_from_features(feats_folder, ftp, otp = NULL)
 
 \item{ftp}{Vector of features to plot.}
 
-\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
+\item{otp}{Vector of observations to plot. \code{NULL} indicates all observations.}
 }
 \value{
-A list with class `princomp`.
+A list with class \code{princomp}.
 }
 \description{
 Compute PCA from a dataframe of features.

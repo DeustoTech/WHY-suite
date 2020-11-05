@@ -2,7 +2,7 @@
 % Please edit documentation in R/machine-learning-analysis.R
 \name{kmeans_from_features}
 \alias{kmeans_from_features}
-\title{k-means of features}
+\title{k-means from features}
 \usage{
 kmeans_from_features(
   feats_folder,
@@ -18,7 +18,7 @@ kmeans_from_features(
 
 \item{ftp}{Vector of features to plot.}
 
-\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
+\item{otp}{Vector of observations to plot. \code{NULL} indicates all observations.}
 
 \item{centers}{Number of clusters.}
 
@@ -27,7 +27,7 @@ kmeans_from_features(
 \item{nstart}{Number of random sets.}
 }
 \value{
-Object of class `kmeans`.
+Object of class \code{kmeans}.
 }
 \description{
 Compute k-means from a dataframe of features.

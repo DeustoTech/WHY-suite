@@ -324,17 +324,10 @@ scripts <- function(script_selection) {
   # SCRIPT 14 --> ANALYSIS OF FEATURES FROM EXTENDED TIME SERIES
   if (script_selection == 14) {
     # Folder to features' file
-    feats_folder <-
-      "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/features.csv"
-    ftp          <- c(5:9, 21:22)
-    centers      <- 4
+    feats_folder <- "C:/Users/carlos.quesada/Documents/temptative-results/"
+    ftp          <- c(5:9, 60:83, 128:134, 168:179)
+    centers      <- 8
     
-    feats <- utils::read.table(
-      file   = feats_folder,
-      header = TRUE,
-      sep    = ","
-    )
-    browser()
     # Compute k-means
     km <- whyT2.1::pca_kmeans_analysis(
       feats_folder = feats_folder,
@@ -348,6 +341,53 @@ scripts <- function(script_selection) {
       feats_df      = km[["feats"]],
       plot_clusters = TRUE
     )
+    
+    # Load features
+    feats <- utils::read.table(
+      file   = paste(feats_folder, "feats.csv", sep = ""),
+      header = TRUE,
+      sep    = ","
+    )
+    
+    # Plotting constants
+    cols1_block <- c(5, 60, 128, 168)
+    cols2_block <- c(9, 83, 134, 179)
+    x1_block <- c(1, 0, 1, 1)
+    x2_block <- c(5, 23, 7, 12)
+    
+    # Analysis
+    for (cc in 1:centers) {
+      cluster_idx <- which(km$results$cluster == cc)
+      feat_means  <- colMeans(feats[cluster_idx,])
+      feat_vars   <- Rfast::colVars(as.matrix(feats[cluster_idx,]))
+      feat_df     <- data.frame(feat_means, feat_vars)
+      
+      title <- paste(
+        "Cluster #", cc, " - Elements: ",
+        length(cluster_idx),
+        sep = "")
+      for (ii in 1:4) {
+        p <- 
+          # Data to be plotted
+          ggplot2::ggplot(
+            data    = feat_df[cols1_block[ii]:cols2_block[ii],],
+            mapping = ggplot2::aes(x=x1_block[ii]:x2_block[ii], y=feat_means)
+          ) +
+          # Type of graph (line in this case)
+          ggplot2::geom_line() +
+          # Title
+          ggplot2::ggtitle(title) +
+          # Labels
+          ggplot2::labs(x = "Features", y = "Value") + 
+          # Axis limits
+          ggplot2::scale_y_continuous() + 
+          # Error bars
+          ggplot2::geom_errorbar(
+            ggplot2::aes(ymin = feat_means - sqrt(feat_vars),
+                         ymax = feat_means + sqrt(feat_vars)))
+        print(p)
+      }
+    }
     
     return(km)
   }

@@ -11,14 +11,14 @@ pca_kmeans_analysis(feats_folder, ftp, otp = NULL, min_var = 0.95, centers)
 
 \item{ftp}{Vector of features to plot.}
 
-\item{otp}{Vector of observations to plot. `NULL` indicates all observations.}
+\item{otp}{Vector of observations to plot. \code{NULL} indicates all observations.}
 
 \item{min_var}{Minimum variance that the reduced set of principal components must fulfil (value between 0 and 1).}
 
 \item{centers}{Number of clusters.}
 }
 \value{
-Object of class `kmeans`.
+Object of class \code{kmeans}.
 }
 \description{
 Compute PCA from a dataframe of features, select a reduced set of dimensions for the PCA scores (depending on the acummulated explained variance provided), then computes k-means.

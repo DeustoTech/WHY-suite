@@ -4,7 +4,12 @@
 \alias{get_features_from_ext_datasets}
 \title{Features of extended datasets in a folder}
 \usage{
-get_features_from_ext_datasets(input_folder, output_folder, type_of_analysis)
+get_features_from_ext_datasets(
+  input_folder,
+  output_folder,
+  type_of_analysis,
+  resume_from_file = NULL
+)
 }
 \arguments{
 \item{input_folder}{Absolute path to the dataset folder.}
@@ -12,6 +17,8 @@ get_features_from_ext_datasets(input_folder, output_folder, type_of_analysis)
 \item{output_folder}{Absolute path where the results are wanted.}
 
 \item{type_of_analysis}{A string indicating the type of analysis: either \code{basic} or \code{extra}.}
+
+\item{resume_from_file}{A string indicating the name of the file to start the analysis.}
 }
 \value{
 File containing the features
