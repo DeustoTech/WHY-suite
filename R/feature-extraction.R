@@ -148,7 +148,6 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       FUN = stats::var
     )
     ### Extra aggregations
-    browser()
     aggr_ts_x <- aggr_ts$x
     # Hours
     if (ii == 1) {
