@@ -164,6 +164,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       if (runs$lengths[1] != 4) {
         aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
         extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+        last_bin <- length(extra_bins)
       }
       # Remove incomplete bins (end)
       if (runs$lengths[last_run] != 4) {
@@ -195,10 +196,12 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       if (runs$lengths[1] != 5 & runs$values[1] == 0) {
         aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
         extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+        last_bin <- length(extra_bins)
       }
       if (runs$lengths[1] != 2 & runs$values[1] == 1) {
         aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
         extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+        last_bin <- length(extra_bins)
       }
       # Remove incomplete bins (end)
       if (runs$lengths[last_run] != 5 & runs$values[last_run] == 0) {
@@ -236,6 +239,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       if (runs$lengths[1] != 3) {
         aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
         extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+        last_bin <- length(extra_bins)
       }
       # Remove incomplete bins (end)
       if (runs$lengths[last_run] != 3) {
