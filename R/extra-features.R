@@ -7,7 +7,7 @@
 #' @description
 #' Compute the mean, variance, skewness and kurtosis of a time series.
 #'
-#' @param x Time series of class `msts`.
+#' @param x Time series of class \code{msts}.
 #'
 #' @return A list with the mean, variance, skewness and kurtosis of the time series.
 #'
@@ -31,7 +31,7 @@ stat_moments <- function(x) {
 #' @description
 #' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series. Also the Q3 to Q1 range.
 #'
-#' @param x Time series of class `msts`.
+#' @param x Time series of class \code{msts}.
 #'
 #' @return A list with the minimum, lower quartile, median, upper quartile, maximum and Q3-Q1 range of the time series.
 #'
@@ -67,7 +67,7 @@ quantiles <- function(x) {
 #' @description 
 #' Compute means and variances of the binned signal, where bins are related to days, weeks and months
 #' 
-#' @param x Time series of class `msts`.
+#' @param x Time series of class \code{msts}.
 #'
 #' @return A list with statistical values of the different bins.
 #' @export
@@ -215,7 +215,7 @@ stat_data_binning <- function(x) {
 #' @description
 #' Compute the load factor across seasonal periods (days, weeks and years).
 #'
-#' @param x Time series of class `msts`.
+#' @param x Time series of class \code{msts}.
 #'
 #' @return A list with the mean and variance of the load factors across seasonal periods.
 #' @export

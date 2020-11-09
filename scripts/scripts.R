@@ -29,7 +29,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 14
+script_selection <- 12
 ################################################################################
 
 library(whyT2.1)
@@ -290,7 +290,7 @@ scripts <- function(script_selection) {
     type_of_analysis <- "extra"
     # Compute features
     feats <- whyT2.1::get_features_from_ext_datasets(
-      input_folder, output_folder, type_of_analysis)
+      input_folder, output_folder, type_of_analysis, "MAC000059")
     
     return(feats)
   }

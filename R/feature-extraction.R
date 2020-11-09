@@ -53,6 +53,8 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
 #' @export
 
 get_seasonal_features_from_timeseries <- function(tseries) {
+  # Estimation threshold
+  estimation_threshold <- 0.85
   # Initial date
   ini_date <- get_extrema_dates_from_timeseries(tseries)
   # Date sequence
@@ -91,7 +93,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
     skip_first <- FALSE
     if (elems_first_bin < elems_per_bin) {
       # Enough samples to perform estimation?
-      if (elems_first_bin / elems_per_bin > 0.5) {
+      if (elems_first_bin / elems_per_bin > estimation_threshold) {
         aggr_ts[1,2] <- aggr_ts[1,2] * (elems_per_bin / elems_first_bin)
       } else {
         skip_first <- TRUE
@@ -145,6 +147,114 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       by  = list(bin = nice_bins),
       FUN = stats::var
     )
+    ### Extra aggregations
+    browser()
+    aggr_ts_x <- aggr_ts$x
+    # Hours
+    if (ii == 1) {
+      # Bins for 4-hour groups:
+      # 0: 01h-04h  # 1: 05h-08h  # 2: 09h-12h
+      # 3: 13h-16h  # 4: 17h-20h  # 5: 21h-00h
+      extra_bins <- floor(((nice_bins -1) %% 24) / 4)
+      # Check incomplete bins
+      runs <- rle(extra_bins)
+      last_run <- length(runs$lengths)
+      last_bin <- length(extra_bins)
+      # Remove incomplete bins (beginning)
+      if (runs$lengths[1] != 4) {
+        aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
+        extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+      }
+      # Remove incomplete bins (end)
+      if (runs$lengths[last_run] != 4) {
+        aggr_ts_x <- aggr_ts_x[1:(last_bin-runs$lengths[last_run])]
+        extra_bins <- extra_bins[1:(last_bin-runs$lengths[last_run])]
+      }
+      # Aggregate data (mean) according to the extra bins
+      result_mean[["4-hourly"]] <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = mean
+      )
+      # Aggregate data (variance) according to the extra bins
+      result_var[["4-hourly"]]  <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = stats::var
+      )
+    }
+    # Days
+    if (ii == 2) {
+      # Bins for workdays (#0) weekend groups (#1)
+      extra_bins <- as.numeric(nice_bins %% 7 <= 1)
+      # Check incomplete bins
+      runs <- rle(extra_bins)
+      last_run <- length(runs$lengths)
+      last_bin <- length(extra_bins)
+      # Remove incomplete bins (beginning)
+      if (runs$lengths[1] != 5 & runs$values[1] == 0) {
+        aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
+        extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+      }
+      if (runs$lengths[1] != 2 & runs$values[1] == 1) {
+        aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
+        extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+      }
+      # Remove incomplete bins (end)
+      if (runs$lengths[last_run] != 5 & runs$values[last_run] == 0) {
+        aggr_ts_x <- aggr_ts_x[1:(last_bin-runs$lengths[last_run])]
+        extra_bins <- extra_bins[1:(last_bin-runs$lengths[last_run])]
+      }
+      if (runs$lengths[last_run] != 2 & runs$values[last_run] == 1) {
+        aggr_ts_x <- aggr_ts_x[1:(last_bin-runs$lengths[last_run])]
+        extra_bins <- extra_bins[1:(last_bin-runs$lengths[last_run])]
+      }
+      # Aggregate data (mean) according to the extra bins
+      result_mean[["weekends"]] <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = mean
+      )
+      # Aggregate data (variance) according to the extra bins
+      result_var[["weekends"]]  <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = stats::var
+      )
+    }
+    # Months
+    if (ii == 3) {
+      # Bins for seasons:
+      # 0: winter (Dec, Jan, Feb)  # 1: spring (Mar, Apr, May)
+      # 2: summer (Jun, Jul, Aug)  # 3: autumn (Sep, Oct, Nov)
+      extra_bins <- floor((nice_bins - 12) %% 12 / 3)
+      # Check incomplete bins
+      runs <- rle(extra_bins)
+      last_run <- length(runs$lengths)
+      last_bin <- length(extra_bins)
+      # Remove incomplete bins (beginning)
+      if (runs$lengths[1] != 3) {
+        aggr_ts_x <- aggr_ts_x[(1+runs$lengths[1]):last_bin]
+        extra_bins <- extra_bins[(1+runs$lengths[1]):last_bin]
+      }
+      # Remove incomplete bins (end)
+      if (runs$lengths[last_run] != 3) {
+        aggr_ts_x <- aggr_ts_x[1:(last_bin-runs$lengths[last_run])]
+        extra_bins <- extra_bins[1:(last_bin-runs$lengths[last_run])]
+      }
+      # Aggregate data (mean) according to the extra bins
+      result_mean[["seasons"]] <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = mean
+      )
+      # Aggregate data (variance) according to the extra bins
+      result_var[["seasons"]]  <- stats::aggregate(
+        x   = aggr_ts_x,
+        by  = list(bin = extra_bins),
+        FUN = stats::var
+      )
+    }
   }
   
   return(list(mean = result_mean, var = result_var))
