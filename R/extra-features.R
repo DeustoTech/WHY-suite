@@ -59,24 +59,28 @@ quantiles <- function(x) {
 }
 
 ################################################################################
-# stat_data_binning
+# stat_data_aggregates
 ################################################################################
 
-#' Features related to statistical data binning
+#' Features related to statistical data aggregates
 #' 
 #' @description 
-#' Compute means and variances of the binned signal, where bins are related to days, weeks and months
+#' Compute means and variances of time series aggregates, where bins are days, weeks and months.
+#' 
+#' @details \code{mean_XXh} and \code{var_XXh}: the mean and variance of the time series at \code{XX} hours, where \code{XX} goes from 00 to 23. \code{unit_mean_XXh} and \code{unit_var_XXh}: the same as before but values are normalized so that the sum is 1. \code{mean_xxx} and \code{var_xxx}: the mean and variance of the time series on \code{xxx}, where \code{xxx} goes from sun (Sunday) to sat (Saturday). \code{unit_mean_xxx} and \code{unit_var_xxx}: the same as before but values are normalized so that the sum is 1. \code{mean_yyy} and \code{var_yyy}: the mean and variance of the time series in \code{yyy}, where \code{yyy} goes from jan (January) to dec (December). \code{unit_mean_yyy} and \code{unit_var_yyy}: the same as before but values are normalized so that the sum is 1.
 #' 
 #' @param x Time series of class \code{msts}.
 #'
 #' @return A list with statistical values of the different bins.
 #' @export
 
-stat_data_binning <- function(x) {
+stat_data_aggregates <- function(x) {
   # Get the seasonal features
   f <- whyT2.1::get_seasonal_features_from_timeseries(x)
   # Output feature list
   o_f <- list()
+  
+  browser()
   
   # Vectors of names for hours
   nmh <- c(
@@ -89,6 +93,12 @@ stat_data_binning <- function(x) {
     "var_06h", "var_07h", "var_08h", "var_09h", "var_10h", "var_11h",
     "var_12h", "var_13h", "var_14h", "var_15h", "var_16h", "var_17h",
     "var_18h", "var_19h", "var_20h", "var_21h", "var_22h", "var_23h")
+  nm4h <- c(
+    "mean_01h_04h", "mean_05h_08h", "mean_09h_12h",
+    "mean_13h_16h", "mean_17h_20h", "mean_21h_00h")
+  nv4h <- c(
+    "var_01h_04h", "var_05h_08h", "var_09h_12h",
+    "var_13h_16h", "var_17h_20h", "var_21h_00h")
   numh <- c(
     "unit_mean_00h", "unit_mean_01h", "unit_mean_02h", "unit_mean_03h",
     "unit_mean_04h", "unit_mean_05h", "unit_mean_06h", "unit_mean_07h", 
@@ -103,8 +113,16 @@ stat_data_binning <- function(x) {
     "unit_var_12h", "unit_var_13h", "unit_var_14h", "unit_var_15h", 
     "unit_var_16h", "unit_var_17h", "unit_var_18h", "unit_var_19h", 
     "unit_var_20h", "unit_var_21h", "unit_var_22h", "unit_var_23h")
+  num4h <- c(
+    "unit_mean_01h_04h", "unit_mean_05h_08h", "unit_mean_09h_12h",
+    "unit_mean_13h_16h", "unit_mean_17h_20h", "unit_mean_21h_00h")
+  nuv4h <- c(
+    "unit_var_01h_04h", "unit_var_05h_08h", "unit_var_09h_12h",
+    "unit_var_13h_16h", "unit_var_17h_20h", "unit_var_21h_00h")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$hourly[,2])
+  sum_of_extra_means <- sum(f$mean$`4-hourly`[,2])
+  
   for (ii in 1:24) {
     o_f[[as.name(nmh[ii])]]  = f$mean$hourly[ii,2]
   }
@@ -117,35 +135,39 @@ stat_data_binning <- function(x) {
   for (ii in 1:24) {
     o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] / sum_of_means
   }
-  # Derived features
-  g1 <- f$mean$hourly[2:5,2] / sum_of_means
-  g2 <- f$mean$hourly[6:9,2] / sum_of_means
-  g3 <- f$mean$hourly[10:13,2] / sum_of_means
-  g4 <- f$mean$hourly[14:17,2] / sum_of_means
-  g5 <- f$mean$hourly[18:21,2] / sum_of_means
-  g6 <- f$mean$hourly[c(1,22:24),2] / sum_of_means
-  o_f[["unit_mean_01h_04h"]] <- sum(g1)
-  o_f[["unit_mean_05h_08h"]] <- sum(g2)
-  o_f[["unit_mean_09h_12h"]] <- sum(g3)
-  o_f[["unit_mean_13h_16h"]] <- sum(g4)
-  o_f[["unit_mean_17h_20h"]] <- sum(g5)
-  o_f[["unit_mean_21h_00h"]] <- sum(g6)
-  
+
+  for (ii in 1:24) {
+    o_f[[as.name(nmh[ii])]]  = f$mean$`4-hourly`[ii,2]
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(nvh[ii])]]  = f$var$`4-hourly`[ii,2]
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(numh[ii])]] = f$mean$`4-hourly`[ii,2] / sum_of_extra_means
+  }
+  for (ii in 1:24) {
+    o_f[[as.name(nuvh[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
+  }
   # Vectors of names for days
   nmd <- c(
-    "mean_sun", "mean_mon", "mean_tue", "mean_wed", "mean_thu", "mean_fri",
-    "mean_sat")
+    "mean_sun", "mean_mon", "mean_tue", "mean_wed", 
+    "mean_thu", "mean_fri", "mean_sat")
   nvd <- c(
-    "var_sun", "var_mon", "var_tue", "var_wed", "var_thu", "var_fri",
-    "var_sat")
+    "var_sun", "var_mon", "var_tue", "var_wed", "var_thu", "var_fri", "var_sat")
+  nmwe <- c("mean_weekday", "mean_weekend")
+  nvwe <- c("var_weekday", "var_weekend")
   numd <- c(
     "unit_mean_sun", "unit_mean_mon", "unit_mean_tue", "unit_mean_wed",
     "unit_mean_thu", "unit_mean_fri", "unit_mean_sat")
   nuvd <- c(
     "unit_var_sun", "unit_var_mon", "unit_var_tue", "unit_var_wed",
     "unit_var_thu", "unit_var_fri", "unit_var_sat")
+  numwe <- c("unit_mean_weekday", "unit_mean_weekend")
+  nuvwe <- c("unit_var_weekday", "unit_var_weekend")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$daily[,2])
+  sum_of_extra_means <- sum(f$mean$weekends[,2])
+  
   for (ii in 1:7) {
     o_f[[as.name(nmd[ii])]]  = f$mean$daily[ii,2]
   }
@@ -158,27 +180,42 @@ stat_data_binning <- function(x) {
   for (ii in 1:7) {
     o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
   }
-  # Derived features
-  g1 <- f$mean$daily[c(1,7),2] / sum_of_means
-  g2 <- f$mean$daily[2:6,2] / sum_of_means
-  o_f[["unit_mean_weekend"]] <- sum(g1)
-  o_f[["unit_mean_workdays"]] <- sum(g2)
+
+  for (ii in 1:7) {
+    o_f[[as.name(nmd[ii])]]  = f$mean$daily[ii,2]
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(nvd[ii])]]  = f$var$daily[ii,2]
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(numd[ii])]] = f$mean$daily[ii,2] / sum_of_means
+  }
+  for (ii in 1:7) {
+    o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
+  }
   
   # Vectors of names for months
   nmm <- c(
     "mean_jan", "mean_feb", "mean_mar", "mean_apr", "mean_may", "mean_jun",
-    "mean_jul", "mean_ago", "mean_sep", "mean_oct", "mean_nov", "mean_dec")
+    "mean_jul", "mean_aug", "mean_sep", "mean_oct", "mean_nov", "mean_dec")
   nvm <- c(
     "var_jan", "var_feb", "var_mar", "var_apr", "var_may", "var_jun",
-    "var_jul", "var_ago", "var_sep", "var_oct", "var_nov", "var_dec")
+    "var_jul", "var_aug", "var_sep", "var_oct", "var_nov", "var_dec")
+  nmss <- c("mean_winter", "mean_spring", "mean_summer", "mean_autumn")
+  nvss <- c("var_winter", "var_spring", "var_summer", "var_autumn")
   numm <- c(
     "unit_mean_jan", "unit_mean_feb", "unit_mean_mar", "unit_mean_apr", 
-    "unit_mean_may", "unit_mean_jun", "unit_mean_jul", "unit_mean_ago",
+    "unit_mean_may", "unit_mean_jun", "unit_mean_jul", "unit_mean_aug",
     "unit_mean_sep", "unit_mean_oct", "unit_mean_nov", "unit_mean_dec")
   nuvm <- c(
     "unit_var_jan", "unit_var_feb", "unit_var_mar", "unit_var_apr", 
-    "unit_var_may", "unit_var_jun", "unit_var_jul", "unit_var_ago",
+    "unit_var_may", "unit_var_jun", "unit_var_jul", "unit_var_aug",
     "unit_var_sep", "unit_var_oct", "unit_var_nov", "unit_var_dec")
+  numss <- c(
+    "unit_mean_winter", "unit_mean_spring",
+    "unit_mean_summer", "unit_mean_autumn")
+  nuvss <- c(
+    "unit_var_winter", "unit_var_spring", "unit_var_summer", "unit_var_autumn")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$monthly[,2])
   for (ii in 1:12) {

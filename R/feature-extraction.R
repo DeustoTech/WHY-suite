@@ -147,7 +147,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       by  = list(bin = nice_bins),
       FUN = stats::var
     )
-    ### Extra aggregations
+    ### Extra aggregations of COMPLETE periods
     aggr_ts_x <- aggr_ts$x
     # Hours
     if (ii == 1) {
@@ -336,7 +336,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   # List of functions that DON'T require normalization -> they are included in 
   # BOTH "basic" and "extra" analyses
   not_norm_fns <- c(
-    "stat_moments", "quantiles", "stat_data_binning", "load_factors")
+    "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
   # List of BASIC functions that REQUIRE normalization
   basic_fns <- c(
     "frequency", "stl_features", "entropy", "acf_features")

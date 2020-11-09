@@ -7,7 +7,7 @@
 load_factors(x)
 }
 \arguments{
-\item{x}{Time series of class `msts`.}
+\item{x}{Time series of class \code{msts}.}
 }
 \value{
 A list with the mean and variance of the load factors across seasonal periods.

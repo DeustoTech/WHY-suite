@@ -7,7 +7,7 @@
 stat_moments(x)
 }
 \arguments{
-\item{x}{Time series of class `msts`.}
+\item{x}{Time series of class \code{msts}.}
 }
 \value{
 A list with the mean, variance, skewness and kurtosis of the time series.

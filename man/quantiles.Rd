@@ -7,7 +7,7 @@
 quantiles(x)
 }
 \arguments{
-\item{x}{Time series of class `msts`.}
+\item{x}{Time series of class \code{msts}.}
 }
 \value{
 A list with the minimum, lower quartile, median, upper quartile, maximum and Q3-Q1 range of the time series.
