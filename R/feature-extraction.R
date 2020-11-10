@@ -335,9 +335,8 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   set.seed(1981)
   # List of functions that DON'T require normalization -> they are included in 
   # BOTH "basic" and "extra" analyses
-  not_norm_fns <- c("stat_data_aggregates")
-  # not_norm_fns <- c(
-  #   "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
+  not_norm_fns <- c(
+    "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
   # List of BASIC functions that REQUIRE normalization
   basic_fns <- c(
     "frequency", "stl_features", "entropy", "acf_features")
@@ -364,16 +363,15 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     scale     = FALSE,   # <-- time series are NOT SCALED
     na.action = forecast::na.interp
   )
-  # # Extract features that REQUIRE normalization of the time series
-  # norm_feats <- tsfeatures::tsfeatures(
-  #   tslist    = list(tseries),
-  #   features  = analysis_fns[[type_of_analysis]],
-  #   scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
-  #   na.action = forecast::na.interp
-  # )
+  # Extract features that REQUIRE normalization of the time series
+  norm_feats <- tsfeatures::tsfeatures(
+    tslist    = list(tseries),
+    features  = analysis_fns[[type_of_analysis]],
+    scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
+    na.action = forecast::na.interp
+  )
   # Bind features into a unique dataframe
-  # feats <- cbind(not_norm_feats, norm_feats)
-  feats <- not_norm_feats
+  feats <- cbind(not_norm_feats, norm_feats)
   
   return(feats)
 }
@@ -524,25 +522,18 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     if (!edf$is_0) {
       # GET FEATURES
       ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+      # Incorporate filename as a column
+      ff[["file"]] <- dset_filename
       # Append line of new results to the CSV file
       utils::write.table(
         ff,
-        file      = paste(output_folder, "features.csv", sep=""),
+        file      = paste(output_folder, "feats.csv", sep=""),
         sep       = ",",
         na        = "",
         quote     = FALSE,
         append    = TRUE,
         col.names = dset_filename == dset_filenames[1],
         row.names = FALSE
-      )
-      # Append line of new results to the CSV file
-      utils::write.table(
-        dset_filename,
-        file      = paste(output_folder, "analyzed.csv", sep=""),
-        quote     = FALSE,
-        append    = TRUE,
-        row.names = FALSE,
-        col.names = FALSE
       )
       # Incorporate features to output
       features <- rbind(features, ff)

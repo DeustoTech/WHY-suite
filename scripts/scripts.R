@@ -29,7 +29,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 12
+script_selection <- 15
 ################################################################################
 
 library(whyT2.1)
@@ -394,14 +394,56 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 15 --> CHECK SOME FEATURES 
+  # SCRIPT 15 --> REPLACE FEATURE COLUMNS
   if (script_selection == 15) {
-
+    # Features file (OLD)
+    o_file <- "C:/Users/carlos.quesada/Documents/temptative-results/feats_old.csv"
+    # Features file (NEW)
+    n_file <- "C:/Users/carlos.quesada/Documents/temptative-results/feats_new.csv"
+    
+    # Load data from CSV file
+    o_df <- data.table::fread(
+      file = o_file,
+      header = TRUE,
+      sep = ",",
+      na.strings = ""
+    )
+    # Load data from CSV file
+    n_df <- data.table::fread(
+      file = n_file,
+      header = TRUE,
+      sep = ",",
+      na.strings = ""
+    )
+    
+    browser()
+    
+    # Columns to be deleted in OLD
+    del_cols <- 1:5
+    # Columns to be extracted from NEW
+    repl_cols <- 8:9
+    # Position of BASICS (after deletion) to paste columns extracted from NEW
+    repl_pos <- 2
+    
   }
   
   # ----------------------------------------------------------------------------  
   # SCRIPT 16
   if (script_selection == 16) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 17
+  if (script_selection == 17) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 18
+  if (script_selection == 18) {
     
   }
   
