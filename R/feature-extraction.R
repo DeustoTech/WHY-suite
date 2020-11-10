@@ -335,8 +335,9 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
   set.seed(1981)
   # List of functions that DON'T require normalization -> they are included in 
   # BOTH "basic" and "extra" analyses
-  not_norm_fns <- c(
-    "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
+  not_norm_fns <- c("stat_data_aggregates")
+  # not_norm_fns <- c(
+  #   "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
   # List of BASIC functions that REQUIRE normalization
   basic_fns <- c(
     "frequency", "stl_features", "entropy", "acf_features")
@@ -349,7 +350,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss", 
     "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
     "motiftwo_entro3")
-  # List of functions that require NORMALIZATION ("extra" includes "basic")
+  # List of functions that REQUIRE normalization ("extra" includes "basic")
   analysis_fns <- list(
     basic = basic_fns,
     extra = c(basic_fns, extra_fns)
@@ -363,15 +364,16 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     scale     = FALSE,   # <-- time series are NOT SCALED
     na.action = forecast::na.interp
   )
-  # Extract features that DO require normalization of the time series
-  norm_feats <- tsfeatures::tsfeatures(
-    tslist    = list(tseries),
-    features  = analysis_fns[[type_of_analysis]],
-    scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
-    na.action = forecast::na.interp
-  )
+  # # Extract features that REQUIRE normalization of the time series
+  # norm_feats <- tsfeatures::tsfeatures(
+  #   tslist    = list(tseries),
+  #   features  = analysis_fns[[type_of_analysis]],
+  #   scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
+  #   na.action = forecast::na.interp
+  # )
   # Bind features into a unique dataframe
-  feats <- cbind(not_norm_feats, norm_feats)
+  # feats <- cbind(not_norm_feats, norm_feats)
+  feats <- not_norm_feats
   
   return(feats)
 }
