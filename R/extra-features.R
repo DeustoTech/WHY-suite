@@ -80,8 +80,6 @@ stat_data_aggregates <- function(x) {
   # Output feature list
   o_f <- list()
   
-  browser()
-  
   # Vectors of names for hours
   nmh <- c(
     "mean_00h", "mean_01h", "mean_02h", "mean_03h", "mean_04h", "mean_05h",
@@ -136,17 +134,17 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] / sum_of_means
   }
 
-  for (ii in 1:24) {
-    o_f[[as.name(nmh[ii])]]  = f$mean$`4-hourly`[ii,2]
+  for (ii in 1:6) {
+    o_f[[as.name(nm4h[ii])]]  = f$mean$`4-hourly`[ii,2]
   }
-  for (ii in 1:24) {
-    o_f[[as.name(nvh[ii])]]  = f$var$`4-hourly`[ii,2]
+  for (ii in 1:6) {
+    o_f[[as.name(nv4h[ii])]]  = f$var$`4-hourly`[ii,2]
   }
-  for (ii in 1:24) {
-    o_f[[as.name(numh[ii])]] = f$mean$`4-hourly`[ii,2] / sum_of_extra_means
+  for (ii in 1:6) {
+    o_f[[as.name(num4h[ii])]] = f$mean$`4-hourly`[ii,2] / sum_of_extra_means
   }
-  for (ii in 1:24) {
-    o_f[[as.name(nuvh[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
+  for (ii in 1:6) {
+    o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
   }
   # Vectors of names for days
   nmd <- c(
@@ -181,17 +179,17 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
   }
 
-  for (ii in 1:7) {
-    o_f[[as.name(nmd[ii])]]  = f$mean$daily[ii,2]
+  for (ii in 1:2) {
+    o_f[[as.name(nmwe[ii])]]  = f$mean$weekends[ii,2]
   }
-  for (ii in 1:7) {
-    o_f[[as.name(nvd[ii])]]  = f$var$daily[ii,2]
+  for (ii in 1:2) {
+    o_f[[as.name(nvwe[ii])]]  = f$var$weekends[ii,2]
   }
-  for (ii in 1:7) {
-    o_f[[as.name(numd[ii])]] = f$mean$daily[ii,2] / sum_of_means
+  for (ii in 1:2) {
+    o_f[[as.name(numwe[ii])]] = f$mean$weekends[ii,2] / sum_of_extra_means
   }
-  for (ii in 1:7) {
-    o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
+  for (ii in 1:2) {
+    o_f[[as.name(nuvwe[ii])]] = f$var$weekends[ii,2] / sum_of_extra_means
   }
   
   # Vectors of names for months
@@ -218,6 +216,8 @@ stat_data_aggregates <- function(x) {
     "unit_var_winter", "unit_var_spring", "unit_var_summer", "unit_var_autumn")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$monthly[,2])
+  sum_of_extra_means <- sum(f$mean$seasons[,2])
+  
   for (ii in 1:12) {
     o_f[[as.name(nmm[ii])]]  = f$mean$monthly[ii,2]
   }
@@ -230,15 +230,19 @@ stat_data_aggregates <- function(x) {
   for (ii in 1:12) {
     o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] / sum_of_means
   }
-  # Derived features
-  g1 <- f$mean$monthly[6:8,2] / sum_of_means
-  g2 <- f$mean$monthly[9:11,2] / sum_of_means
-  g3 <- f$mean$monthly[c(12,1,2),2] / sum_of_means
-  g4 <- f$mean$monthly[3:5,2] / sum_of_means
-  o_f[["unit_mean_summer"]] <- sum(g1)
-  o_f[["unit_mean_autumn"]] <- sum(g2)
-  o_f[["unit_mean_winter"]] <- sum(g3)
-  o_f[["unit_mean_spring"]] <- sum(g4)
+  
+  for (ii in 1:4) {
+    o_f[[as.name(nmss[ii])]]  = f$mean$seasons[ii,2]
+  }
+  for (ii in 1:4) {
+    o_f[[as.name(nvss[ii])]]  = f$var$seasons[ii,2]
+  }
+  for (ii in 1:4) {
+    o_f[[as.name(numss[ii])]] = f$mean$seasons[ii,2] / sum_of_extra_means
+  }
+  for (ii in 1:4) {
+    o_f[[as.name(nuvss[ii])]] = f$var$seasons[ii,2] / sum_of_extra_means
+  }
   
   return(o_f)
 }
