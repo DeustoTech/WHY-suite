@@ -17,9 +17,11 @@
 #' `9` Get FEATs of LCL EXT DSET
 #' 
 #' ** MACHINE LEARNING TOOLS **
-#' `6` Compute PCA from CSV file of FEATs (W/ plots)
-#' `7` Compute k-means from CSV file of FEATs (W/ plots)
-#' `8` Compute k-means of PCA from CSV file of FEATs (W/ plots)
+#' `6`  Compute PCA from CSV file of FEATs (W/ plots)
+#' `7`  Compute k-means from CSV file of FEATs (W/ plots)
+#' `8`  Compute k-means of PCA from CSV file of FEATs (W/ plots)
+#' `14` Compute k-means of PCA from CSV file of FEATs & EXT DSETs (W/ plots)
+#' `15` Compute DBSCAN
 #'  
 #' ** PLOTTING DATA **
 #' `5` Plot an LCL EXT DSET
@@ -29,7 +31,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 15
+script_selection <- 16
 ################################################################################
 
 library(whyT2.1)
@@ -299,24 +301,73 @@ scripts <- function(script_selection) {
   
   # SCRIPT 13 --> GOIENER FILES
   if (script_selection == 13) {
-    # Goiener data folder
-    g_folder <- "C:/GOIENER/"
-    # Goiener info dataframe
+    ### USER DEFINED VARIABLES
+    # Goiener data input folder
+    g_input <- "C:/GOIENER/"
+    # Goiener data output folder
+    g_output <- "C:/GOIENER_OUTPUT/"
+    # Goiener info file
     g_info_file <- paste(
       "G:/.shortcut-targets-by-id/1g1D2rJfAektwZCB-O_F0EHxDYHxJmhmc/", 
       "20WHY datasets/GOIENER/Contratos_Goiener_20201013-anonymized.csv",
       sep = "")
+
+    ### INITIALIZATIONS
+    # List of users and filenames
+    user_list <- list()
+    # Counter 
+    counter <- 0
+    
     # Get list of filenames in dataset folder
-    dset_filenames <- list.files(g_folder)
-    # Load data from CSV file
-    g_df <- data.table::fread(
+    filenames <- list.files(g_input)
+    total_fnames <- length(filenames)
+    # Load Goiener info dataframe
+    g_info_df <- data.table::fread(
       file = g_info_file,
       header = TRUE,
       sep = ",",
       na.strings = ""
     )
     
-    browser()
+    # File by file
+    for (filename in filenames[1:2]) {
+      # Counter
+      counter <- counter + 1
+      # Print file being analyzed
+      print(paste(date(),
+                  filename,
+                  round(100*counter/total_fnames, 4), 
+                  sep=" | "))
+      # Load Goiener file
+      g_df <- data.table::fread(
+        file = paste(g_input, filename, sep=""),
+        header = FALSE,
+        sep = ";",
+        na.strings = ""
+      )
+      # Unique users in file
+      unique_users <- unique(g_df$V1)
+      for (uu in unique_users) {
+        # Save filename in list of users
+        user_list[[uu]] <- c(user_list[[uu]], filename)
+        # Select all uu entries in df
+        uu_entries <- g_df$V1 == uu
+        # Create new dataframe
+        uu_df <- g_df[uu_entries, ]
+        # Save
+        data.table::fwrite(
+          x = uu_df,
+          file = paste(g_output, uu, sep=""),
+          append = TRUE,
+          quote = FALSE,
+          sep = ",",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+      }
+    }
+    # Save list of users
+    save(user_list, file=paste(g_output, "user_list.RData", sep=""))
   }
   
   # ----------------------------------------------------------------------------
@@ -394,43 +445,111 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 15 --> REPLACE FEATURE COLUMNS
+  # SCRIPT 15 --> DBSCAN
   if (script_selection == 15) {
-    # Features file (OLD)
-    o_file <- "C:/Users/carlos.quesada/Documents/temptative-results/feats_old.csv"
-    # Features file (NEW)
-    n_file <- "C:/Users/carlos.quesada/Documents/temptative-results/feats_new.csv"
-    
-    # Load data from CSV file
-    o_df <- data.table::fread(
-      file = o_file,
+    # Folder to features file
+    feats_folder <- "C:/Users/carlos.quesada/Documents/temptative-results/"
+    ftp          <- c(5:9, 60:83, 128:134, 168:179)
+    # Load features
+    feats <- utils::read.table(
+      file   = paste(feats_folder, "feats.csv", sep = ""),
       header = TRUE,
-      sep = ",",
-      na.strings = ""
-    )
-    # Load data from CSV file
-    n_df <- data.table::fread(
-      file = n_file,
-      header = TRUE,
-      sep = ",",
-      na.strings = ""
+      sep    = ","
     )
     
-    browser()
+    min_var=0.9
     
-    # Columns to be deleted in OLD
-    del_cols <- 1:5
-    # Columns to be extracted from NEW
-    repl_cols <- 8:9
-    # Position of BASICS (after deletion) to paste columns extracted from NEW
-    repl_pos <- 2
+    # PCA
+    pca <- stats::prcomp(feats[, ftp], scale. = TRUE)
+    # Get variance
+    variance <- summary(pca)[["importance"]]
+    # Number of principal components to select
+    pc_number <- sum(variance[3,] < min_var) + 1
+    print(paste("Selected", pc_number, "PCs, variance", variance[3,pc_number]))
+    # Selection of the reduced set of PCA components
+    reduced_pc_set <- pca$x[,1:pc_number]
     
+    # DBSCAN
+    res <- dbscan::optics(reduced_pc_set) #, eps=5, minPts = 5)
+    print(res)
+    return(res)
   }
   
   # ----------------------------------------------------------------------------  
-  # SCRIPT 16
+  # SCRIPT 16 --- GOIENER v2
   if (script_selection == 16) {
+    ### USER DEFINED VARIABLES
+    # Goiener data input folder
+    g_input <- "C:/GOIENER/"
+    # Goiener data output folder
+    g_output <- "C:/GOIENER_OUTPUT/"
     
+    ### INITIALIZATIONS
+    # Counter 
+    counter <- 0
+    # File formats
+    file_formats <- c("P5D", "RF5D", "P4D", "P2D", "P1D", "F5D", "F1", "C2",
+                      "C1", "B5D", "A5D")
+    
+    # Get list of filenames in dataset folder
+    filenames <- list.files(g_input)
+    total_fnames <- length(filenames)
+    
+    # File by file
+    for (filename in filenames) {
+      # Counter
+      counter <- counter + 1
+      # Get file format
+      file_format <- file_formats[
+        match(substr(filename,1,2), substr(file_formats,1,2))]
+      
+      # Print file being analyzed
+      print(paste(date(),
+                  filename,
+                  round(100*counter/total_fnames, 4), 
+                  sep=" | "))
+      # Load Goiener file
+      g_df <- data.table::fread(
+        file = paste(g_input, filename, sep=""),
+        header = FALSE,
+        sep = ";",
+        na.strings = ""
+      )
+      # Unique users in file
+      unique_users <- unique(g_df$V1)
+      for (uu in unique_users) {
+        # Select all uu entries in df
+        uu_entries <- g_df$V1 == uu
+        # Create new dataframe
+        uu_df <- g_df[uu_entries, ]
+        # DATE = #2 | FLAG = #3 | INPUT = #4 | OUTPUT = #5
+        if (any(file_format == c("P5D", "RF5D", "F5D", "B5D", "A5D"))) {
+          new_uu_df <- data.frame(
+            file_format, filename, uu_df$V2, uu_df$V3, uu_df$V4, uu_df$V5)
+        }
+        # DATE = #3 | FLAG = #4 | INPUT = #5 | OUTPUT = #7
+        if (any(file_format == c("P2D", "P1D"))) {
+          new_uu_df <- data.frame(
+            file_format, filename, uu_df$V3, uu_df$V4, uu_df$V5, uu_df$V7)
+        }
+        # DATE = #3 | FLAG = #4 | INPUT = #5 | OUTPUT = #6
+        if (any(file_format == c("F1"))) {
+          new_uu_df <- data.frame(
+            file_format, filename, uu_df$V3, uu_df$V4, uu_df$V5, uu_df$V6)
+        }
+        # Save
+        data.table::fwrite(
+          x = new_uu_df,
+          file = paste(g_output, uu, sep=""),
+          append = TRUE,
+          quote = FALSE,
+          sep = ",",
+          row.names = FALSE,
+          col.names = FALSE,
+          na = ""
+        )
+      }
+    }
   }
   
   # ----------------------------------------------------------------------------
