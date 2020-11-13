@@ -31,7 +31,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 16
+script_selection <- 18
 ################################################################################
 
 library(whyT2.1)
@@ -487,22 +487,15 @@ scripts <- function(script_selection) {
     ### INITIALIZATIONS
     # Counter 
     counter <- 0
-    # File formats
-    file_formats <- c("P5D", "RF5D", "P4D", "P2D", "P1D", "F5D", "F1", "C2",
-                      "C1", "B5D", "A5D")
     
     # Get list of filenames in dataset folder
     filenames <- list.files(g_input)
     total_fnames <- length(filenames)
     
     # File by file
-    for (filename in filenames) {
+    for (filename in filenames[1:2]) {
       # Counter
       counter <- counter + 1
-      # Get file format
-      file_format <- file_formats[
-        match(substr(filename,1,2), substr(file_formats,1,2))]
-      
       # Print file being analyzed
       print(paste(date(),
                   filename,
@@ -521,25 +514,10 @@ scripts <- function(script_selection) {
         # Select all uu entries in df
         uu_entries <- g_df$V1 == uu
         # Create new dataframe
-        uu_df <- g_df[uu_entries, ]
-        # DATE = #2 | FLAG = #3 | INPUT = #4 | OUTPUT = #5
-        if (any(file_format == c("P5D", "RF5D", "F5D", "B5D", "A5D"))) {
-          new_uu_df <- data.frame(
-            file_format, filename, uu_df$V2, uu_df$V3, uu_df$V4, uu_df$V5)
-        }
-        # DATE = #3 | FLAG = #4 | INPUT = #5 | OUTPUT = #7
-        if (any(file_format == c("P2D", "P1D"))) {
-          new_uu_df <- data.frame(
-            file_format, filename, uu_df$V3, uu_df$V4, uu_df$V5, uu_df$V7)
-        }
-        # DATE = #3 | FLAG = #4 | INPUT = #5 | OUTPUT = #6
-        if (any(file_format == c("F1"))) {
-          new_uu_df <- data.frame(
-            file_format, filename, uu_df$V3, uu_df$V4, uu_df$V5, uu_df$V6)
-        }
+        uu_df <- data.frame(filename, g_df[uu_entries, ])
         # Save
         data.table::fwrite(
-          x = new_uu_df,
+          x = uu_df,
           file = paste(g_output, uu, sep=""),
           append = TRUE,
           quote = FALSE,
@@ -554,15 +532,109 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 17
+  # SCRIPT 17 --- GOIENER 3-1
   if (script_selection == 17) {
+    # Goiener user data input folder
+    g_input <- "C:/goiener_users/"
+    
+    # Get list of filenames in dataset folder
+    filenames <- list.files(g_input)
+    total_fnames <- length(filenames)
+    # File formats
+    file_formats <- c("P5D", "RF5D", "P4D", "P2D", "P1D", "F5D", "F1", "C2",
+      "C1", "B5D", "A5D")
+    # Repeated elements
+    rep_df <- data.frame()
+    # Counter
+    counter <- 0
+    
+    # File by file
+    for (filename in filenames) {
+      # Print
+      print(100 * round(counter/total_fnames, 6))
+      # Load Goiener file
+      g_df <- data.table::fread(
+        file = paste(g_input, filename, sep=""),
+        header = FALSE,
+        sep = ",",
+        na.strings = ""
+      )
+      # Get file sources
+      file_sources <- unique(g_df$V1)
+      # Date list
+      date_list <- as.POSIXct(c(), tz="UTC")
+      # File sources loop
+      for (file_source in file_sources) {
+        # Get file format
+        file_format <- file_formats[
+          match(substr(file_source, 1, 2), substr(file_formats, 1, 2))
+        ]
+        # Index of this file source
+        idx <- g_df$V1 == file_source
+        
+        # Date in #3, flag in #4
+        if (any(file_format == c("P5D", "RF5D", "F5D", "B5D", "A5D"))) {
+          dates <- as.POSIXct(g_df[idx,]$V3, tz="UTC") -
+            lubridate::hours(g_df[idx,]$V4)
+          date_list <- c(date_list, dates)
+        }
+        # Date in #4, flag in #5
+        if (any(file_format == c("P2D", "P1D", "F1"))) {
+          dates <- as.POSIXct(g_df[idx,]$V4, tz="UTC") - 
+            lubridate::hours(g_df[idx,]$V5)
+          date_list <- c(date_list, dates)
+        }
+      }
+      # Check repeated 
+      rep_elems <- which(duplicated(date_list))
+      # Add repeated to dataframe
+      if (length(rep_elems) != 0) {
+        rep_df <- rbind(
+          rep_df, 
+          data.frame(
+            file = filename,
+            rep_lines = paste(rep_elems, collapse = ","))
+        )
+      }
+    }
+    # Save
+    data.table::fwrite(
+      x         = rep_lines,
+      file      = paste(g_input, "repetition_id.Rdata", sep=""),
+      append    = FALSE,
+      quote     = FALSE,
+      sep       = ";",
+      row.names = FALSE,
+      col.names = FALSE,
+      na        = ""
+    )
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 18 --- 
+  if (script_selection == 18) {
     
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 18
-  if (script_selection == 18) {
+  # SCRIPT 19
+  if (script_selection == 19) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 20
+  if (script_selection == 20) {
+    
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 21
+  if (script_selection == 21) {
     
   }
   
