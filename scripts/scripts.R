@@ -31,7 +31,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 18
+script_selection <- 19
 ################################################################################
 
 library(whyT2.1)
@@ -377,7 +377,7 @@ scripts <- function(script_selection) {
     # Folder to features' file
     feats_folder <- "C:/Users/carlos.quesada/Documents/temptative-results/"
     ftp          <- c(5:9, 60:83, 128:134, 168:179)
-    centers      <- 8
+    centers      <- 3
     
     # Compute k-means
     km <- whyT2.1::pca_kmeans_analysis(
@@ -386,6 +386,7 @@ scripts <- function(script_selection) {
       min_var      = 0.90,
       centers      = centers
     )
+    
     # Plot k-means
     whyT2.1::plot_kmeans(
       km            = km[["results"]],
@@ -612,16 +613,101 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 18 --- 
+  # SCRIPT 18 --- SEMS
   if (script_selection == 18) {
-    
+    # SEMS data folder
+    sems_input <- "G:/Mi unidad/WHY/Datos (raw)/SEMS"
+    # Get list of dir names in dataset folder
+    dir_names <- list.dirs(sems_input)
+    browser()
+    # Dir loop
+    for (dir_name in dir_names) {
+      # Get list of filenames in dataset folder
+      file_names <- list.dirs(paste(sems_input, dir_name, sep="/"))
+      # File loop
+      for (file_name in file_names) {
+        # Load file
+        g_df <- data.table::fread(
+          file = paste(sems_input, dir_name, file_name, sep="/"),
+          header = TRUE,
+          sep = ";",
+          na.strings = ""
+        )
+        
+      }
+    }
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 19
+  # SCRIPT 19 -- GOIENER ANALYSIS POST 3-1
   if (script_selection == 19) {
+    # Repetitions file path
+    goiener_users_folder <- "C:/Users/carlos.quesada/Documents/"
     
+    # Time origin
+    time_origin <- as.POSIXct("1970-01-01", tz="UTC")
+    # File formats
+    file_formats <- c("P5D", "RF5D", "P4D", "P2D", "P1D", "F5D", "F1", "C2",
+                      "C1", "B5D", "A5D")
+    # FUNCTION that extracts the date from a dataframe's row
+    extract_date <- function(x) {
+      # Extract
+      file_format <- file_formats[
+        match(substr(x[[1]], 1, 2), substr(file_formats, 1, 2))
+      ]
+      # Select format of data extraction
+      if (any(file_format == c("P2D", "P1D", "F1"))) {
+        dates <- as.POSIXct(x[[4]], tz="UTC", origin=time_origin) - 
+          lubridate::hours(x[[5]])
+      }
+      if (any(file_format == c("P5D", "RF5D", "F5D", "B5D", "A5D"))) {
+        dates <- as.POSIXct(x[[3]], tz="UTC", origin=time_origin) - 
+          lubridate::hours(x[[4]])
+      }
+      return(c(file_format,dates))
+    }
+    
+    # FUNCTION that, given a file name, returns the types of the duplicates
+    get_duplicate_types <- function(x) {
+      # Read file
+      g_df <- data.table::fread(
+        file = paste(goiener_users_folder, x, sep=""),
+        header = FALSE,
+        sep = ",",
+        na.strings = ""
+      )
+      # Dates in file
+      types_and_dates <- apply(g_df, 1, extract_date)
+      types <- types_and_dates[1,]
+      dates <- as.POSIXct(as.numeric(types_and_dates[2,]),
+                          tz = "UTC",
+                          origin = time_origin)
+      rm(types_and_dates)
+      # Get indices of duplicates
+      dupes_idx_1 <- which(duplicated(dates))
+      dupes_idx_2 <- which(duplicated(dates, fromLast = TRUE))
+      # Get types of duplicates
+      dupes_types_1 <- unique(types[dupes_idx_1])
+      dupes_types_2 <- unique(types[dupes_idx_2])
+      # Return
+      return(list(type_1=dupes_types_1, type_2=dupes_types_2))
+    }
+    
+    # Load list of files with repetitions
+    rep_id <- data.table::fread(
+      file = paste(goiener_users_folder, "repetition_id.Rdata", sep=""),
+      header = FALSE,
+      sep = ";",
+      na.strings = "",
+      drop = c(2)
+    )
+    rep_id <- as.vector(rep_id)$V1
+    
+    # Analyze file by file
+    dupes <- lapply(rep_id, get_duplicate_types)
+    browser()
+
   }
   
   # ----------------------------------------------------------------------------
