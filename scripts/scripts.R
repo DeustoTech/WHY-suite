@@ -486,7 +486,7 @@ scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------
   
   # SCRIPT 17
-  if (script_selection == 17) 
+  if (script_selection == 17) {
     
   }
   
