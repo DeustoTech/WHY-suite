@@ -523,7 +523,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       # GET FEATURES
       ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
       # Incorporate filename as a column
-      ff[["file"]] <- dset_filename
+      ff <- append(list(file = dset_filename), ff)
       # Append line of new results to the CSV file
       utils::write.table(
         ff,

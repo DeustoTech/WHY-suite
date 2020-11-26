@@ -14,7 +14,8 @@
 #' 
 #' ** FEATURE EXTRACTION **
 #' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
-#' `9` Get FEATs of LCL EXT DSET
+#' `9` Get FEATs of 1 LCL EXT DSET file
+#' `12` Get FEATs of LCL EXT DSET from folder
 #' 
 #' ** MACHINE LEARNING TOOLS **
 #' `6`  Compute PCA from CSV file of FEATs (W/ plots)
@@ -292,7 +293,7 @@ scripts <- function(script_selection) {
     type_of_analysis <- "extra"
     # Compute features
     feats <- whyT2.1::get_features_from_ext_datasets(
-      input_folder, output_folder, type_of_analysis, "MAC000059")
+      input_folder, output_folder, type_of_analysis)
     
     return(feats)
   }
