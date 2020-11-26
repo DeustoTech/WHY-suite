@@ -512,8 +512,14 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   # Last file
   to_file <- length(dset_filenames)
   
+  # Setup parallel backend to use many processors
+  cl <- parallel::makeCluster(parallel::detectCores() - 1)
+  doParallel::registerDoParallel(cl)
+  
   # Analysis loop
-  for (dset_filename in dset_filenames[from_file:to_file]) {
+  all_features <- foreach (x = from_file:to_file, .combine=rbind) %dopar% {
+    # Select file name
+    dset_filename <- dset_filenames[x]
     # Print file being analyzed
     print(paste(date(), dset_filename, sep=" --- "))
     # Load extended dataframe
@@ -542,6 +548,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     }
   }
   
+  parallel::stopCluster(cl)
+  
   # Also return the dataframes
-  return(features)
+  return(all_features)
 }
