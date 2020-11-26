@@ -32,7 +32,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 22
+script_selection <- 12
 ################################################################################
 
 library(whyT2.1)
@@ -290,7 +290,7 @@ scripts <- function(script_selection) {
     # User parameters
     input_folder     <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
     output_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/"
-    type_of_analysis <- "extra"
+    type_of_analysis <- "basic"
     # Compute features
     feats <- whyT2.1::get_features_from_ext_datasets(
       input_folder, output_folder, type_of_analysis)

@@ -379,7 +379,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
     skip_last <- FALSE
     if (elems_last_bin < elems_per_bin) {
       # Enough samples to perform estimation?
-      if (elems_last_bin / elems_per_bin > 0.5) {
+      if (elems_last_bin / elems_per_bin > estimation_threshold) {
         aggr_ts[id_last_bin, 2] <-
           aggr_ts[id_last_bin, 2] * (elems_per_bin / elems_last_bin)
       } else {
@@ -424,9 +424,10 @@ get_seasonal_features_from_timeseries <- function(tseries) {
     # Hours
     if (ii == 1) {
       # Bins for 4-hour groups:
-      # 0: 01h-04h  # 1: 05h-08h  # 2: 09h-12h
-      # 3: 13h-16h  # 4: 17h-20h  # 5: 21h-00h
-      extra_bins <- floor(((nice_bins -1) %% 24) / 4)
+      # 0: 00h-03h  # 1: 04h-07h  # 2: 08h-11h
+      # 3: 12h-15h  # 4: 16h-19h  # 5: 20h-23h
+      browser()
+      extra_bins <- floor(((nice_bins) %% 24) / 4)
       # Check incomplete bins
       runs <- rle(extra_bins)
       last_run <- length(runs$lengths)
