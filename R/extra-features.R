@@ -59,6 +59,68 @@ quantiles <- function(x) {
 }
 
 ################################################################################
+# load_factors
+################################################################################
+
+#' Features related to load factors
+#'
+#' @description
+#' Compute the load factor across seasonal periods (days, weeks and years).
+#'
+#' @param x Time series of class \code{msts}.
+#'
+#' @return A list with the mean and variance of the load factors across seasonal periods.
+#' @export
+
+load_factors <- function(x) {
+  # Initial date
+  ini_date <- get_extrema_dates_from_timeseries(x)
+  # Date sequence
+  samples_per_day <- attr(x, "msts")[1]
+  date_by  <- as.difftime(24 / samples_per_day, units = "hours")
+  date_seq <- seq(from       = ini_date,
+                  length.out = length(x),
+                  by         = date_by)
+  # Loop initializations
+  cut_breaks_list <- c("1 day", "1 week", "1 month")
+  load_factor <- list()
+  mean_name_list <- c(
+    as.name("load_factor_mean1"),
+    as.name("load_factor_mean2"),
+    as.name("load_factor_mean3")
+  )
+  var_name_list <- c(
+    as.name("load_factor_var1"),
+    as.name("load_factor_var2"),
+    as.name("load_factor_var3")
+  )
+  # Seasonality loop
+  for (ii in 1:length(attr(x, "msts"))) {
+    ### Bin by periods of 1 month
+    cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
+    # Aggregate data (mean) according to the bins
+    mean_aggr_ts <- stats::aggregate(
+      x   = as.numeric(x),
+      by  = list(date_time = cut_seq),
+      FUN = mean)
+    # Aggregate data (max) according to the bins
+    max_aggr_ts  <- stats::aggregate(
+      x   = as.numeric(x),
+      by  = list(date_time = cut_seq),
+      FUN = max)
+    # Compute seasonal mean load factor excluding first and last bins
+    last_1 <- dim(max_aggr_ts)[1] - 1
+    load_factor[[mean_name_list[[ii]]]] <- 
+      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+           na.rm = TRUE)
+    load_factor[[var_name_list[[ii]]]]  <- 
+      stats::var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+                 na.rm = TRUE)
+  }
+  return(load_factor)
+}
+
+################################################################################
 # stat_data_aggregates
 ################################################################################
 
@@ -92,11 +154,11 @@ stat_data_aggregates <- function(x) {
     "var_12h", "var_13h", "var_14h", "var_15h", "var_16h", "var_17h",
     "var_18h", "var_19h", "var_20h", "var_21h", "var_22h", "var_23h")
   nm4h <- c(
-    "mean_01h_04h", "mean_05h_08h", "mean_09h_12h",
-    "mean_13h_16h", "mean_17h_20h", "mean_21h_00h")
+    "mean_00h_04h", "mean_04h_08h", "mean_08h_12h",
+    "mean_12h_16h", "mean_16h_20h", "mean_20h_00h")
   nv4h <- c(
-    "var_01h_04h", "var_05h_08h", "var_09h_12h",
-    "var_13h_16h", "var_17h_20h", "var_21h_00h")
+    "var_00h_04h", "var_04h_08h", "var_08h_12h",
+    "var_12h_16h", "var_16h_20h", "var_20h_00h")
   numh <- c(
     "unit_mean_00h", "unit_mean_01h", "unit_mean_02h", "unit_mean_03h",
     "unit_mean_04h", "unit_mean_05h", "unit_mean_06h", "unit_mean_07h", 
@@ -112,11 +174,12 @@ stat_data_aggregates <- function(x) {
     "unit_var_16h", "unit_var_17h", "unit_var_18h", "unit_var_19h", 
     "unit_var_20h", "unit_var_21h", "unit_var_22h", "unit_var_23h")
   num4h <- c(
-    "unit_mean_01h_04h", "unit_mean_05h_08h", "unit_mean_09h_12h",
-    "unit_mean_13h_16h", "unit_mean_17h_20h", "unit_mean_21h_00h")
+    "unit_mean_00h_04h", "unit_mean_04h_08h", "unit_mean_08h_12h",
+    "unit_mean_12h_16h", "unit_mean_16h_20h", "unit_mean_20h_00h")
   nuv4h <- c(
-    "unit_var_01h_04h", "unit_var_05h_08h", "unit_var_09h_12h",
-    "unit_var_13h_16h", "unit_var_17h_20h", "unit_var_21h_00h")
+    "unit_var_00h_04h", "unit_var_04h_08h", "unit_var_08h_12h",
+    "unit_var_12h_16h", "unit_var_16h_20h", "unit_var_20h_00h")
+  nint <- c("00h_04h", "04h_08h", "08h_12h", "12h_16h", "16h_20h", "20h_00h")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$hourly[,2])
   sum_of_extra_means <- sum(f$mean$`4-hourly`[,2])
@@ -146,6 +209,18 @@ stat_data_aggregates <- function(x) {
   for (ii in 1:6) {
     o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
   }
+  
+  for (ii in 6:1) {
+    if (ii != 1) {
+      for (jj in (ii-1):1) {
+        rat_name <- as.name(paste(nint[ii], "_to_", nint[jj], "_ratio", sep=""))
+        top_name <- as.name(paste("mean_", nint[ii], sep=""))
+        bot_name <- as.name(paste("mean_", nint[jj], sep=""))
+        o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
+      }
+    }
+  }
+
   # Vectors of names for days
   nmd <- c(
     "mean_sun", "mean_mon", "mean_tue", "mean_wed", 
@@ -192,6 +267,9 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvwe[ii])]] = f$var$weekends[ii,2] / sum_of_extra_means
   }
   
+  o_f[["weekend_to_weekday_ratio"]] <-
+    o_f[["mean_weekend"]] / o_f[["mean_weekday"]]
+  
   # Vectors of names for months
   nmm <- c(
     "mean_jan", "mean_feb", "mean_mar", "mean_apr", "mean_may", "mean_jun",
@@ -214,6 +292,7 @@ stat_data_aggregates <- function(x) {
     "unit_mean_summer", "unit_mean_autumn")
   nuvss <- c(
     "unit_var_winter", "unit_var_spring", "unit_var_summer", "unit_var_autumn")
+  nint <- c("winter", "spring", "summer", "autumn")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$monthly[,2])
   sum_of_extra_means <- sum(f$mean$seasons[,2])
@@ -244,69 +323,18 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvss[ii])]] = f$var$seasons[ii,2] / sum_of_extra_means
   }
   
-  return(o_f)
-}
-
-################################################################################
-# load_factors
-################################################################################
-
-#' Features related to load factors
-#'
-#' @description
-#' Compute the load factor across seasonal periods (days, weeks and years).
-#'
-#' @param x Time series of class \code{msts}.
-#'
-#' @return A list with the mean and variance of the load factors across seasonal periods.
-#' @export
-
-load_factors <- function(x) {
-  # Initial date
-  ini_date <- get_extrema_dates_from_timeseries(x)
-  # Date sequence
-  samples_per_day <- attr(x, "msts")[1]
-  date_by  <- as.difftime(24 / samples_per_day, units = "hours")
-  date_seq <- seq(from       = ini_date,
-                  length.out = length(x),
-                  by         = date_by)
-  # Loop initializations
-  cut_breaks_list <- c("1 day", "1 week", "1 month")
-  load_factor <- list()
-  mean_name_list <- c(
-    as.name("load_factor_mean1"),
-    as.name("load_factor_mean2"),
-    as.name("load_factor_mean3")
-    )
-  var_name_list <- c(
-    as.name("load_factor_var1"),
-    as.name("load_factor_var2"),
-    as.name("load_factor_var3")
-  )
-  # Seasonality loop
-  for (ii in 1:length(attr(x, "msts"))) {
-    ### Bin by periods of 1 month
-    cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
-    # Aggregate data (mean) according to the bins
-    mean_aggr_ts <- stats::aggregate(
-      x   = as.numeric(x),
-      by  = list(date_time = cut_seq),
-      FUN = mean)
-    # Aggregate data (max) according to the bins
-    max_aggr_ts  <- stats::aggregate(
-      x   = as.numeric(x),
-      by  = list(date_time = cut_seq),
-      FUN = max)
-    # Compute seasonal mean load factor excluding first and last bins
-    last_1 <- dim(max_aggr_ts)[1] - 1
-    load_factor[[mean_name_list[[ii]]]] <- 
-      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
-           na.rm = TRUE)
-    load_factor[[var_name_list[[ii]]]]  <- 
-      stats::var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
-                 na.rm = TRUE)
+  for (ii in 4:1) {
+    if (ii != 1) {
+      for (jj in (ii-1):1) {
+        rat_name <- as.name(paste(nint[ii], "_to_", nint[jj], "_ratio", sep=""))
+        top_name <- as.name(paste("mean_", nint[ii], sep=""))
+        bot_name <- as.name(paste("mean_", nint[jj], sep=""))
+        o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
+      }
+    }
   }
-  return(load_factor)
+
+  return(o_f)
 }
 
 ################################################################################
@@ -426,7 +454,6 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       # Bins for 4-hour groups:
       # 0: 00h-03h  # 1: 04h-07h  # 2: 08h-11h
       # 3: 12h-15h  # 4: 16h-19h  # 5: 20h-23h
-      browser()
       extra_bins <- floor(((nice_bins) %% 24) / 4)
       # Check incomplete bins
       runs <- rle(extra_bins)
