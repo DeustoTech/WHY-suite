@@ -94,15 +94,13 @@ load_factors <- function(x) {
     as.name("load_factor_var2"),
     as.name("load_factor_var3")
   )
+  # Compute average load
+  browser()
+  avg_load <- mean(x)
   # Seasonality loop
   for (ii in 1:length(attr(x, "msts"))) {
     ### Bin by periods of 1 month
     cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
-    # Aggregate data (mean) according to the bins
-    mean_aggr_ts <- stats::aggregate(
-      x   = as.numeric(x),
-      by  = list(date_time = cut_seq),
-      FUN = mean)
     # Aggregate data (max) according to the bins
     max_aggr_ts  <- stats::aggregate(
       x   = as.numeric(x),
@@ -111,10 +109,10 @@ load_factors <- function(x) {
     # Compute seasonal mean load factor excluding first and last bins
     last_1 <- dim(max_aggr_ts)[1] - 1
     load_factor[[mean_name_list[[ii]]]] <- 
-      mean(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+      mean(avg_load / max_aggr_ts[2:last_1, 2],
            na.rm = TRUE)
     load_factor[[var_name_list[[ii]]]]  <- 
-      stats::var(mean_aggr_ts[2:last_1, 2] / max_aggr_ts[2:last_1, 2],
+      stats::var(avg_load / max_aggr_ts[2:last_1, 2],
                  na.rm = TRUE)
   }
   return(load_factor)
