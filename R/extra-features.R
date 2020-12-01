@@ -65,7 +65,7 @@ quantiles <- function(x) {
 #' Features related to load factors
 #'
 #' @description
-#' Compute the load factor across seasonal periods (days, weeks and years).
+#' Compute the load factor across seasonal periods (days, weeks and years). A high load factor means power usage is relatively constant. Low load factor shows that occasionally a high demand is set.
 #'
 #' @param x Time series of class \code{msts}.
 #'
@@ -95,7 +95,6 @@ load_factors <- function(x) {
     as.name("load_factor_var3")
   )
   # Compute average load
-  browser()
   avg_load <- mean(x)
   # Seasonality loop
   for (ii in 1:length(attr(x, "msts"))) {

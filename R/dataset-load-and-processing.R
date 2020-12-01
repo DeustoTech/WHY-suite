@@ -209,7 +209,65 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 #'
 #' @export
 
-extend_imputed_dataframe <- function(idf, wanted_days, back_years=1) {
+extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,  
+                                     extend_after_end=TRUE) {
+  # Get current length in months of idf
+  idf_init_date  <- idf$df[1,1]
+  idf_final_date <- tail(idf$df, n=1)[[1]]
+  idf_days       <- as.numeric(idf_final_date - idf_init_date)
+  # Enough days
+  if (idf_days < 364) {
+    return(NULL)
+  }
+  # Required days
+  required_days  <- ceiling(wanted_days - idf_days)
+  # Check if size is correct
+  if (required_days <= 0) {
+    return(idf)
+  }
+  # Number of NAs to append
+  number_of_NAs <- required_days * idf$seasonal_periods[1]
+  # Append NAs AFTER the end of the TS
+  if (extend_after_end) {
+    ext_vect <- c(idf$df[,2], rep(NA, times=number_of_NAs))
+  # Append NAs BEFORE the beginning of the TS
+  } else {
+    ext_vect <- c(rev(idf$df[,2]), rep(NA, times=number_of_NAs))
+  }
+  # Create ts
+  imp_ts <- ts(
+    data      = ext_vect,
+    frequency = back_years * 364 * idf$seasonal_periods[1]
+  )
+  # Index of new values
+  new_val_idx <- is.na(imp_ts)
+  extr_times  <- sum(new_val_idx)
+  
+  ##### IMPUTE #####
+  imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
+  
+  # Reverse reverted 
+  if (!extend_after_end) {
+    imp_ts <- rev(imp_ts)
+  }
+  # Extended times
+  extend_times <- seq(
+    from       = idf_final_date,
+    by         = as.difftime(86400/idf$seasonal_periods[1], units="secs"),
+    length.out = extr_times + 1
+  )
+  # Create the extended dataframe
+  extend_df <- data.frame(
+    times   = extend_times[2:length(extend_times)],
+    values  = imp_ts[new_val_idx],
+    imputed = 2
+  )
+  # Bind rows
+  idf$df <- dplyr::bind_rows(idf$df, extend_df)
+  browser()
+}
+
+extend_imputed_dataframe.OLD <- function(idf, wanted_days, back_years=1) {
   # Get current length in months of idf
   idf_init_date  <- idf$df[1,1]
   idf_final_date <- tail(idf$df, n=1)[[1]]
