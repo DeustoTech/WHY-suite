@@ -225,6 +225,7 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   if (required_days <= 0) {
     return(idf)
   }
+  
   # Number of NAs to append
   number_of_NAs <- required_days * idf$seasonal_periods[1]
   # Append NAs AFTER the end of the TS
@@ -232,7 +233,7 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
     ext_vect <- c(idf$df[,2], rep(NA, times=number_of_NAs))
   # Append NAs BEFORE the beginning of the TS
   } else {
-    ext_vect <- c(rev(idf$df[,2]), rep(NA, times=number_of_NAs))
+    ext_vect <- c(rep(NA, times=number_of_NAs), idf$df[,2])
   }
   # Create ts
   imp_ts <- ts(
@@ -246,24 +247,39 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   ##### IMPUTE #####
   imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
   
-  # Reverse reverted 
-  if (!extend_after_end) {
-    imp_ts <- rev(imp_ts)
+  # Extend AFTER the end of the time series
+  if (extend_after_end) {
+    # Extended times
+    extend_times <- seq(
+      from       = idf_final_date,
+      by         = as.difftime(86400/idf$seasonal_periods[1], units="secs"),
+      length.out = extr_times + 1
+    )
+  # Extend BEFORE the beginning of the time series
+  } else {
+    # Initial date
+    start_date <- idf_init_date - 
+      as.difftime((extr_times+1)*86400/idf$seasonal_periods[1], units="secs")
+    # Extended times
+    extend_times <- seq(
+      from       = start_date,
+      by         = as.difftime(86400/idf$seasonal_periods[1], units="secs"),
+      length.out = extr_times+1
+    )
   }
-  # Extended times
-  extend_times <- seq(
-    from       = idf_final_date,
-    by         = as.difftime(86400/idf$seasonal_periods[1], units="secs"),
-    length.out = extr_times + 1
-  )
   # Create the extended dataframe
   extend_df <- data.frame(
     times   = extend_times[2:length(extend_times)],
     values  = imp_ts[new_val_idx],
     imputed = 2
   )
-  # Bind rows
-  idf$df <- dplyr::bind_rows(idf$df, extend_df)
+  # Bind extension AFTER the time series
+  if (extend_after_end) {
+    idf$df <- dplyr::bind_rows(idf$df, extend_df)
+  } else {
+    idf$df <- dplyr::bind_rows(extend_df, idf$df)
+  }
+  
   browser()
 }
 
@@ -318,7 +334,7 @@ extend_datasets <- function(input_folder, output_folder, wanted_days) {
         short_gap = cdf$seasonal_periods[1] / 3
       )
       # Expand if needed
-      edf <- extend_imputed_dataframe(idf=idf, wanted_days=wanted_days)
+      edf <- extend_imputed_dataframe(idf=idf, wanted_days=wanted_days, extend_after_end=FALSE)
       if (is.null(edf)) {
         print("DISCARDED")
       } else {
