@@ -11,11 +11,14 @@ LazyData: true
 Imports:
   data.table,
   dbscan,
+  doParallel,
   factoextra,
+  foreach,
   forecast,
   ggplot2,
   lubridate,
   moments,
+  parallel,
   Rfast,
   tidyverse,
   tsfeatures

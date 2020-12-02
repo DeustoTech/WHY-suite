@@ -36,6 +36,7 @@ script_selection <- 1
 ################################################################################
 
 library(whyT2.1)
+library(foreach) # If foreach is not loaded here, %dopar% is NOT recognized
 
 scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------

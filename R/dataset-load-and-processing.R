@@ -381,9 +381,9 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  foreach (ii = 1:length(dset_filenames)) %dopar% {
+  foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
     # File name selection
-    dset_filename <- dset_filenames[ii]
+    dset_filename <- dset_filenames[x]
     # Load raw dataframe from dataset and impute
     print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
