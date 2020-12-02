@@ -375,8 +375,15 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   metadata_files <- metadata_files
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
+  
+  # Setup parallel backend to use many processors
+  cl <- parallel::makeCluster(parallel::detectCores() - 1)
+  doParallel::registerDoParallel(cl)
+  
   # Analysis loop
-  for (dset_filename in dset_filenames) {
+  foreach (ii = 1:length(dset_filenames)) %dopar% {
+    # File name selection
+    dset_filename <- dset_filenames[ii]
     # Load raw dataframe from dataset and impute
     print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
@@ -424,4 +431,6 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
       }
     }
   }
+  
+  parallel::stopCluster(cl)
 }
