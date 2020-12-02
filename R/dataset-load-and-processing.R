@@ -60,9 +60,9 @@ get_dataframe <- get_raw_dataframe_from_dataset
 #' Cook a raw dataframe. Cooking consists in completing missing samples with NA values, removing extra samples (those not matching the sampling period), extracting a user-defined time interval out of the raw dataframe, and checking its validity to be feature-analyzed.
 #'
 #' @param raw_df Raw dataframe.
-#' @param from_date Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.
-#' @param to_date Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.
-#' @param dset_key String indicating the key of the dataset. `lcl` for `Low Carbon London`.
+#' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.
+#' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.
+#' @param dset_key String indicating the key of the dataset. \code{lcl} for `Low Carbon London`.
 #' @param filename Filename.
 #' @param acorn_path Path to the file with the ACORN values.
 #'
@@ -199,11 +199,12 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 #' Extended dataframe from imputed dataframe
 #'
 #' @description
-#' Create an extended dataframe from an imputed dataframe by replicating previous sequences of the time series, of at least one year, as many times as necessary, until completing a certain number of days. 
+#' Create an extended dataframe from an imputed dataframe by replicating previous sequences of the time series, of at least one year, as many times as necessary, until completing a certain number of days. It is consistent with the day of the week.
 #'
 #' @param idf Imputed dataframe.
 #' @param wanted_days Number of complete days of the extended output.
 #' @param back_years Number of previous years for which the time series is copied.
+#' @param extend_after_end If \code{TRUE}, the expansion is appended after the end of the time series; if \code{FALSE}, the expansion is prepended before the beginning of the time series.
 #'
 #' @return Extended dataframe, i.e. an imputed dataframe with a 3rd column indicating if each sample has been extended or not and a 4th column indicating the original date of the replicated sample.
 #'
@@ -279,15 +280,14 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   } else {
     idf$df <- dplyr::bind_rows(extend_df, idf$df)
   }
-  
-  browser()
+  return(idf)
 }
 
 ################################################################################
-# extend_datasets
+# extend_lcl_dataset
 ################################################################################
 
-#' Extended datasets from folder of raw datasets
+#' Extension of "Low Carbon London" dataset files from folder of raw datasets
 #'
 #' @description
 #' Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.
@@ -302,10 +302,9 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
 #'
 #' @export
 
-extend_datasets <- function(input_folder, output_folder, wanted_days) {
+extend_lcl_dataset <- function(input_folder, output_folder, wanted_days) {
   # Path to ACORN folder
-  acorn_folder <- paste("G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/", 
-                        "informations_households.csv", sep="")
+  metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   # Analysis loop
@@ -320,14 +319,14 @@ extend_datasets <- function(input_folder, output_folder, wanted_days) {
       to_date    = "last", 
       dset_key   = "lcl", 
       filename   = dset_filename, 
-      acorn_path = acorn_folder
+      acorn_path = metadata_file
       )
     # Get length
     initial_date   <- cdf$df[1,1]
     final_date     <- tail(cdf$df, n=1)[[1]]
     length_in_days <- as.numeric(final_date - initial_date)
-    # If TS is longer than 365 days, impute; ELSE discard
-    if (length_in_days > 365) {
+    # If TS is longer than 364 days, impute; ELSE discard
+    if (length_in_days >= 364) {
       idf <- impute_cooked_dataframe(
         cdf       = cdf, 
         season    = cdf$seasonal_periods[1] * 7, 
@@ -345,5 +344,84 @@ extend_datasets <- function(input_folder, output_folder, wanted_days) {
       }
     }
     else print("DISCARDED")
+  }
+}
+
+################################################################################
+# extend_dataset
+################################################################################
+
+#' Extension of dataset files from folder of raw datasets
+#'
+#' @description
+#' Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.
+#' 
+#' @details Automatizes the following sequence for a whole folder: raw dataset -> raw dataframe -> cooked dataframe -> imputed dataframe -> extended dataframe -> extended dataset.
+#'
+#' @param input_folder Input folder of datasets.
+#' @param output_folder Desired output folder of extended datasets.
+#' @param wanted_days Minimum number of complete days of the final extended datasets.
+#' @param dset_key Dataset key: \code{lcl} for Low Carbon London; \code{goi} for Goiener.
+#' @param metadata_files Path or vector of paths to metadata files. 
+#' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.
+#' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.
+#'
+#' @return As many extended dataframes as files in the raw dataset folder. The dataframes are saved as R files with extension \code{.RData}.
+#'
+#' @export
+
+extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last") {
+  # Path to ACORN folder
+  metadata_files <- metadata_files
+  # Get list of filenames in dataset folder
+  dset_filenames <- list.files(input_folder)
+  # Analysis loop
+  for (dset_filename in dset_filenames) {
+    # Load raw dataframe from dataset and impute
+    print(dset_filename)
+    file_path <- paste(input_folder, dset_filename, sep="")
+    rdf <- get_raw_dataframe_from_dataset(file_path)
+    cdf <- cook_raw_dataframe(
+      raw_df     = rdf, 
+      from_date  = from_date, 
+      to_date    = to_date, 
+      dset_key   = dset_key, 
+      filename   = dset_filename, 
+      acorn_path = metadata_files
+    )
+    # Get length
+    initial_date   <- cdf$df[1,1]
+    final_date     <- tail(cdf$df, n=1)[[1]]
+    length_in_days <- as.numeric(final_date - initial_date)
+    # If TS is longer than 364 days, impute; ELSE discard
+    if (length_in_days >= 364) {
+      idf <- impute_cooked_dataframe(
+        cdf       = cdf, 
+        season    = cdf$seasonal_periods[1] * 7, 
+        short_gap = cdf$seasonal_periods[1] / 3
+      )
+      # How to extend the time series according to the dataset
+      if (any(dset_key == c("lcl"))) {
+        type_of_extension <- TRUE
+      } else { # "goi"
+        type_of_extension <- FALSE
+      }
+      # Expand if needed
+      edf <- extend_imputed_dataframe(
+        idf              = idf,
+        wanted_days      = wanted_days,
+        extend_after_end = type_of_extension
+      )
+      if (!is.null(edf)) {
+        # Save dataframe in output folder
+        path <- paste(
+          output_folder,
+          strsplit(dset_filename, ".csv")[[1]],
+          ".RData",
+          sep=""
+        )
+        save(edf, file=path)
+      }
+    }
   }
 }

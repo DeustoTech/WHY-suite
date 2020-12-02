@@ -16,11 +16,11 @@ cook_raw_dataframe(
 \arguments{
 \item{raw_df}{Raw dataframe.}
 
-\item{from_date}{Initial date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `first`.}
+\item{from_date}{Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.}
 
-\item{to_date}{Final date and time of the interval. Either a `POSIXct` class in the GMT time zone OR a string `last`.}
+\item{to_date}{Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.}
 
-\item{dset_key}{String indicating the key of the dataset. `lcl` for `Low Carbon London`.}
+\item{dset_key}{String indicating the key of the dataset. \code{lcl} for `Low Carbon London`.}
 
 \item{filename}{Filename.}
 

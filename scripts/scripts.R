@@ -44,10 +44,17 @@ scripts <- function(script_selection) {
   if (script_selection == 1) {
     # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
-    output_folder <- "G:/Mi unidad/WHY/Datasets/lcl-ext2/"
+    output_folder <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
+    acorn_file    <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
     
     # Function call
-    whyT2.1::extend_datasets(input_folder, output_folder, wanted_days=800)
+    whyT2.1::extend_dataset(
+      input_folder, 
+      output_folder, 
+      wanted_days = 800,
+      dset_key = "lcl",
+      metadata_files = acorn_file
+    )
     
     return(NULL)
   }

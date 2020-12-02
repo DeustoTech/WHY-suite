@@ -13,5 +13,5 @@ load_factors(x)
 A list with the mean and variance of the load factors across seasonal periods.
 }
 \description{
-Compute the load factor across seasonal periods (days, weeks and years).
+Compute the load factor across seasonal periods (days, weeks and years). A high load factor means power usage is relatively constant. Low load factor shows that occasionally a high demand is set.
 }
