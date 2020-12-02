@@ -284,6 +284,26 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
 }
 
 ################################################################################
+# extract_metadata
+################################################################################
+
+#' Ancillary function to extract metadata
+#'
+#' @description
+#' Extract metadata from files.
+#'
+#' @param metadata_files A string or a vector of strings with the file paths.
+#' @param dset_key Dataset key: \code{lcl}, \code{goi}, etc.
+#'
+#' @return A list of metadata.
+#'
+#' @export
+
+extract_metadata <- function(metadata_files, dset_key) {
+  
+}
+
+################################################################################
 # extend_dataset
 ################################################################################
 
@@ -307,10 +327,27 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
 #' @export
 
 extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last") {
-  # Path to ACORN folder
-  metadata_files <- metadata_files
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
+  
+  # Extract relevant data from metadata files (if any!)
+  if (!is.null(metadata_files)) {
+    # Select parameters according to the key
+    params <- list(
+      "lcl" = list(header = T, sep = "," ),
+      "goi" = list(header = T, sep = "," )
+    )
+    # Load metadata files into a big list
+    metadata_list <- lapply(
+      metadata_files,
+      data.table::fread,
+      header     = params[[dset_key]]$header,
+      sep        = params[[dset_key]]$sep,
+      na.strings = ""
+    )
+  } else metadata_list <- NULL
+  
+  browser()
   
   # Setup parallel backend to use many processors
   cl <- parallel::makeCluster(parallel::detectCores() - 1)
@@ -367,6 +404,5 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
       }
     }
   }
-  
   parallel::stopCluster(cl)
 }
