@@ -32,7 +32,7 @@
 #' `2` Create TS from FEATs using GRATIS
 
 ################################################################################
-script_selection <- 1
+script_selection <- 1.2
 ################################################################################
 
 library(whyT2.1)
@@ -46,7 +46,7 @@ scripts <- function(script_selection) {
     # User parameters
     input_folder  <- "G:/Mi unidad/WHY/Datasets/lcl/"
     output_folder <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
-    acorn_file    <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
+    metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
     
     # Function call
     whyT2.1::extend_dataset(
@@ -54,7 +54,30 @@ scripts <- function(script_selection) {
       output_folder, 
       wanted_days = 800,
       dset_key = "lcl",
-      metadata_files = acorn_file
+      metadata_files = metadata_file
+    )
+    
+    return(NULL)
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 1.2
+  if (script_selection == 1.2) {
+    # User parameters
+    input_folder  <- "G:/Mi unidad/WHY/Datasets/goiener/"
+    output_folder <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
+    metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/GOIENER/Contratos_Goiener_20201013-anonymized.csv"
+    
+    # Function call
+    whyT2.1::extend_dataset(
+      input_folder, 
+      output_folder, 
+      wanted_days = 800,
+      dset_key = "goi",
+      metadata_files = metadata_file,
+      to_date = as.POSIXct("2020-02-29 23:00:00", tz="GMT"),
+      extend_after_end = FALSE
     )
     
     return(NULL)

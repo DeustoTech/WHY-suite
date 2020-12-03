@@ -10,7 +10,7 @@ cook_raw_dataframe(
   to_date,
   dset_key,
   filename = NULL,
-  acorn_path = NULL
+  metadata = NULL
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ cook_raw_dataframe(
 \item{acorn_path}{Path to the file with the ACORN values.}
 }
 \value{
-List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros. Optional members of the list are the filename and the ACORN value.
+List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of \code{NA} values, and a boolean indicating if the dataframe values are all zeros. Optional members of the list are the filename and the ACORN value.
 }
 \description{
 Cook a raw dataframe. Cooking consists in completing missing samples with NA values, removing extra samples (those not matching the sampling period), extracting a user-defined time interval out of the raw dataframe, and checking its validity to be feature-analyzed.

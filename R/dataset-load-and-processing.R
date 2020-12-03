@@ -66,16 +66,17 @@ get_dataframe <- get_raw_dataframe_from_dataset
 #' @param filename Filename.
 #' @param acorn_path Path to the file with the ACORN values.
 #'
-#' @return List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of `NA` values, and a boolean indicating if the dataframe values are all zeros. Optional members of the list are the filename and the ACORN value.
+#' @return List with the cooked dataframe, a vector of seasonal periods, a double with the percentage of \code{NA} values, and a boolean indicating if the dataframe values are all zeros. Optional members of the list are the filename and the ACORN value.
 #'
 #' @export
 
-cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, 
-                               filename=NULL, acorn_path=NULL) {
+cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
+  
+  
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  SAMPLES_PER_DAY <- list(lcl = 48)
+  samples_per_day <- list(lcl = 48, goi = 24)
   # Selection
-  spd <- SAMPLES_PER_DAY[[dset_key]]
+  spd <- samples_per_day[[dset_key]]
   
   # Time series ends
   first_ts_date <- raw_df[[1, 1]]
@@ -125,35 +126,39 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key,
   
   # Number of NA
   number_of_na <- sum(is.na(cooked_df[,2]))
-  
   # Check if all values are 0
   cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
-  
-  # Get ACORN value
-  acorn         <- NULL
-  acorn_grouped <- NULL
-  if (!is.null(filename) & !is.null(acorn_path)) {
-    acorn_df <- read.csv(file = acorn_path,
-                         header = TRUE,
-                         sep = ",",
-                         na.strings = ""
-    )
-    acorn_tag     <- substr(filename, 1, 9)
-    acorn         <- acorn_df[acorn_df[,1] == acorn_tag, 3]
-    acorn_grouped <- acorn_df[acorn_df[,1] == acorn_tag, 4]
-  }
-  
-  # Returned list
-  output <- list(
+
+  # Common list
+  common_list <- list(
     df               = cooked_df,
     dset_key         = dset_key,
     filename         = filename,
-    acorn            = acorn,
-    acorn_grouped    = acorn_grouped,
     seasonal_periods = seasonal_periods,
     number_of_na     = number_of_na,
     is_0             = cooked_df_is_0
   )
+  # Particular list  
+  if (dset_key == "lcl") {
+    dset_list <- list(
+      acorn         = metadata[[2]],
+      acorn_grouped = metadata[[3]]
+    )
+  }
+  if (dset_key == "goi") {
+    dset_list <- list(
+      cups         = metadata[[1]],      start_date   = metadata[[2]],
+      end_date     = metadata[[3]],      tariff       = metadata[[4]],
+      p1_kw        = metadata[[5]],      p2_kw        = metadata[[6]],
+      p3_kw        = metadata[[7]],      self_consump = metadata[[8]],
+      province     = metadata[[9]],      municipality = metadata[[10]],
+      zip_code     = metadata[[11]],     cnae         = metadata[[12]]
+    )
+  }
+  
+  # Append both lists
+  output <- append(common_list, dset_list)
+  
   return(output)
 }
 
@@ -299,8 +304,32 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
 #'
 #' @export
 
-extract_metadata <- function(metadata_files, dset_key) {
-  
+extract_metadata <- function(dfs, dset_key, filename) {
+  # Low Carbon London
+  if (dset_key == "lcl") {
+    acorn_tag     <- strsplit(filename, ".csv")[[1]]
+    acorn         <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 3]
+    acorn_grouped <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 4]
+    return(list(acorn_tag, acorn, acorn_grouped))
+  }
+  # Goiener
+  if (dset_key == "goi") {
+    cups         <- strsplit(filename, ".csv")[[1]]
+    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2][1], tz="GMT")
+    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 3][1], tz="GMT")
+    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups, 4][1]
+    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 5][1])
+    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 6][1])
+    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 7][1])
+    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups, 8][1]
+    province     <-            dfs[[1]][dfs[[1]][,1] == cups, 9][1]
+    municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][1]
+    zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][1])
+    cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][1])
+    
+    return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
+                self_consump, province, municipality, zip_code, cnae))
+  }
 }
 
 ################################################################################
@@ -318,36 +347,29 @@ extract_metadata <- function(metadata_files, dset_key) {
 #' @param output_folder Desired output folder of extended datasets.
 #' @param wanted_days Minimum number of complete days of the final extended datasets.
 #' @param dset_key Dataset key: \code{lcl} for Low Carbon London; \code{goi} for Goiener.
-#' @param metadata_files Path or vector of paths to metadata files. 
+#' @param metadata_files Path or vector of paths to metadata files. Metadata files MUST contain a header and be comma-separated (",").
 #' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.
 #' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.
+#' @param extend_after_end If \code{TRUE}, the expansion is appended after the end of the time series; if \code{FALSE}, the expansion is prepended before the beginning of the time series. 
 #'
 #' @return As many extended dataframes as files in the raw dataset folder. The dataframes are saved as R files with extension \code{.RData}.
 #'
 #' @export
 
-extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last") {
+extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last", extend_after_end=TRUE) {
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
-  
   # Extract relevant data from metadata files (if any!)
   if (!is.null(metadata_files)) {
-    # Select parameters according to the key
-    params <- list(
-      "lcl" = list(header = T, sep = "," ),
-      "goi" = list(header = T, sep = "," )
-    )
-    # Load metadata files into a big list
-    metadata_list <- lapply(
+    # Load metadata dataframes into a big list
+    metadata_dataframes <- lapply(
       metadata_files,
       data.table::fread,
-      header     = params[[dset_key]]$header,
-      sep        = params[[dset_key]]$sep,
+      header     = TRUE,
+      sep        = ",",
       na.strings = ""
     )
-  } else metadata_list <- NULL
-  
-  browser()
+  }
   
   # Setup parallel backend to use many processors
   cl <- parallel::makeCluster(parallel::detectCores() - 1)
@@ -357,17 +379,24 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
     # File name selection
     dset_filename <- dset_filenames[x]
+    # Extract metadata
+    if (!is.null(metadata_files)) {
+      metadata_list <- extract_metadata(
+        dfs      = metadata_dataframes,
+        dset_key = dset_key,
+        filename = dset_filename
+      )
+    }
     # Load raw dataframe from dataset and impute
-    print(dset_filename)
     file_path <- paste(input_folder, dset_filename, sep="")
     rdf <- get_raw_dataframe_from_dataset(file_path)
     cdf <- cook_raw_dataframe(
-      raw_df     = rdf, 
-      from_date  = from_date, 
-      to_date    = to_date, 
-      dset_key   = dset_key, 
-      filename   = dset_filename, 
-      acorn_path = metadata_files
+      raw_df    = rdf,
+      from_date = from_date, 
+      to_date   = to_date, 
+      dset_key  = dset_key, 
+      filename  = dset_filename, 
+      metadata  = metadata_list
     )
     # Get length
     initial_date   <- cdf$df[1,1]
@@ -380,17 +409,11 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
         season    = cdf$seasonal_periods[1] * 7, 
         short_gap = cdf$seasonal_periods[1] / 3
       )
-      # How to extend the time series according to the dataset
-      if (any(dset_key == c("lcl"))) {
-        type_of_extension <- TRUE
-      } else { # "goi"
-        type_of_extension <- FALSE
-      }
       # Expand if needed
       edf <- extend_imputed_dataframe(
         idf              = idf,
         wanted_days      = wanted_days,
-        extend_after_end = type_of_extension
+        extend_after_end = extend_after_end
       )
       if (!is.null(edf)) {
         # Save dataframe in output folder

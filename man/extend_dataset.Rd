@@ -11,7 +11,8 @@ extend_dataset(
   dset_key,
   metadata_files = NULL,
   from_date = "first",
-  to_date = "last"
+  to_date = "last",
+  extend_after_end = TRUE
 )
 }
 \arguments{
@@ -23,11 +24,13 @@ extend_dataset(
 
 \item{dset_key}{Dataset key: \code{lcl} for Low Carbon London; \code{goi} for Goiener.}
 
-\item{metadata_files}{Path or vector of paths to metadata files.}
+\item{metadata_files}{Path or vector of paths to metadata files. Metadata files MUST contain a header and be comma-separated (",").}
 
 \item{from_date}{Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.}
 
 \item{to_date}{Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.}
+
+\item{extend_after_end}{If \code{TRUE}, the expansion is appended after the end of the time series; if \code{FALSE}, the expansion is prepended before the beginning of the time series.}
 }
 \value{
 As many extended dataframes as files in the raw dataset folder. The dataframes are saved as R files with extension \code{.RData}.

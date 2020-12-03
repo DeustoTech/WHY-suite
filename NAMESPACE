@@ -3,7 +3,7 @@
 export(cook_raw_dataframe)
 export(extend_dataset)
 export(extend_imputed_dataframe)
-export(extend_lcl_dataset)
+export(extract_metadata)
 export(get_dataframe)
 export(get_extrema_dates_from_timeseries)
 export(get_features_from_cooked_dataframe)
