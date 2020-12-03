@@ -71,8 +71,6 @@ get_dataframe <- get_raw_dataframe_from_dataset
 #' @export
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
-  
-  
   # List of samples per day (REMARK: ADD AS NEEDED!)
   samples_per_day <- list(lcl = 48, goi = 24)
   # Selection
@@ -81,7 +79,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   # Time series ends
   first_ts_date <- raw_df[[1, 1]]
   last_ts_date <- utils::tail(raw_df, 1)[[1, 1]]
-  
+
   # Check interval left end
   if (any(class(from_date) == "character")) {
     if (from_date == "first") {
@@ -93,6 +91,13 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     if (to_date == "last") {
       to_date <- utils::tail(raw_df, 1)[[1, 1]]
     }
+  }
+  # Adjust date limits to existing data
+  if (from_date < last_ts_date & to_date > first_ts_date) {
+    from_date <- max(from_date, first_ts_date)
+    to_date   <- min(to_date, last_ts_date)
+  } else {
+    return(NULL)
   }
   
   # Sampling period in seconds obtained from the dataset key
@@ -357,6 +362,12 @@ extract_metadata <- function(dfs, dset_key, filename) {
 #' @export
 
 extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last", extend_after_end=TRUE) {
+  # Check for correct date precedence
+  if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
+    if (from_date >= to_date) {
+      stop("to_date must be greater that from_date", call. = FALSE)
+    }
+  }
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   # Extract relevant data from metadata files (if any!)
@@ -376,7 +387,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
+  # foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
+  for (x in 1:length(dset_filenames)) {
     # File name selection
     dset_filename <- dset_filenames[x]
     # Extract metadata
@@ -398,32 +410,35 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
       filename  = dset_filename, 
       metadata  = metadata_list
     )
-    # Get length
-    initial_date   <- cdf$df[1,1]
-    final_date     <- tail(cdf$df, n=1)[[1]]
-    length_in_days <- as.numeric(final_date - initial_date)
-    # If TS is longer than 364 days, impute; ELSE discard
-    if (length_in_days >= 364) {
-      idf <- impute_cooked_dataframe(
-        cdf       = cdf, 
-        season    = cdf$seasonal_periods[1] * 7, 
-        short_gap = cdf$seasonal_periods[1] / 3
-      )
-      # Expand if needed
-      edf <- extend_imputed_dataframe(
-        idf              = idf,
-        wanted_days      = wanted_days,
-        extend_after_end = extend_after_end
-      )
-      if (!is.null(edf)) {
-        # Save dataframe in output folder
-        path <- paste(
-          output_folder,
-          strsplit(dset_filename, ".csv")[[1]],
-          ".RData",
-          sep=""
+    # If cdf is NULL, skip
+    if (!is.null(cdf)) {
+      # Get length
+      initial_date   <- cdf$df[1,1]
+      final_date     <- tail(cdf$df, n=1)[[1]]
+      length_in_days <- as.numeric(final_date - initial_date)
+      # If TS is longer than 364 days, impute; ELSE discard
+      if (length_in_days >= 364) {
+        idf <- impute_cooked_dataframe(
+          cdf       = cdf, 
+          season    = cdf$seasonal_periods[1] * 7, 
+          short_gap = cdf$seasonal_periods[1] / 3
         )
-        save(edf, file=path)
+        # Expand if needed
+        edf <- extend_imputed_dataframe(
+          idf              = idf,
+          wanted_days      = wanted_days,
+          extend_after_end = extend_after_end
+        )
+        if (!is.null(edf)) {
+          # Save dataframe in output folder
+          path <- paste(
+            output_folder,
+            strsplit(dset_filename, ".csv")[[1]],
+            ".RData",
+            sep=""
+          )
+          save(edf, file=path)
+        }
       }
     }
   }
