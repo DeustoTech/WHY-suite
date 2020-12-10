@@ -271,51 +271,51 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #'
 #' @export
 
-get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, resume_from_file=NULL) {
+get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
   # Initialization of outputs
-  features <- NULL
+  all_features <- NULL
   # Get list of filenames in dataset folder
-  dset_filenames <- list.files(input_folder)
+  dset_filenames <- list.files(input_folder, pattern="*.RData")
+  # Interval vector
+  # 1:length(dset_filenames)
   
-  # Resume options
-  if (is.null(resume_from_file)) {
-    from_file <- 1
-  } else {
-    from_file <- which(dset_filenames == resume_from_file)
-  }
-  # Last file
-  to_file <- length(dset_filenames)
+  # Setup parallel backend to use many processors
+  cl <- parallel::makeCluster(parallel::detectCores() - 1)
+  doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  for (dset_filename in dset_filenames[from_file:to_file]) {
-    # Print file being analyzed
-    print(paste(date(), dset_filename, sep=" --- "))
+  all_features <- foreach::foreach(x = 1:15, .combine=rbind, .inorder=FALSE) %dopar% {
+    # Select file name
+    dset_filename <- dset_filenames[x]
     # Load extended dataframe
     load(paste(input_folder, dset_filename, sep=""))
     # Set exceptions
     if (!edf$is_0) {
+      ff_file <- data.frame(file = dset_filename)
       # GET FEATURES
-      ff <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+      ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis)
       # Incorporate filename as a column
-      ff <- append(list(file = dset_filename), ff)
-      # Append line of new results to the CSV file
-      utils::write.table(
-        ff,
-        file      = paste(output_folder, "feats.csv", sep=""),
-        sep       = ",",
-        na        = "",
-        quote     = FALSE,
-        append    = TRUE,
-        col.names = dset_filename == dset_filenames[1],
-        row.names = FALSE
-      )
+      ff_feats <- cbind(ff_file, ff_feats)
       # Incorporate features to output
-      features <- rbind(features, ff)
-    } else {
-      print("SKIPPED!")
+      rbind(all_features, ff_feats)
     }
   }
   
+  # Stop parallelization
+  parallel::stopCluster(cl)
+  
+  # Save results to the CSV file
+  utils::write.table(
+    all_features,
+    file      = paste(output_folder, "feats.csv", sep=""),
+    sep       = ",",
+    na        = "",
+    quote     = FALSE,
+    append    = TRUE,
+    col.names = TRUE,
+    row.names = FALSE
+  )
+  
   # Also return the dataframes
-  return(features)
+  return(all_features)
 }

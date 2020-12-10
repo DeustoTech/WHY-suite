@@ -1,20 +1,21 @@
 #' This is a compilation of simple scripts to execute functions of the `whyT2.1` library. 
 #' 
 #' KEY OF ABBREVIATIONS:
-#' DSET = dataset | EXT = extended | FEAT = feature | LCL = Low Carbon London | PCA = principal component analysis | RAW = raw | TS = time series | W/ = with
+#' DSET = dataset | EXT = extended | FEAT = feature | GOI = Goiener | LCL = Low Carbon London | PARPCA = principal component analysis | RAW = raw | TS = time series | W/ = with
 #' 
 #' LIST OF SCRIPTS:
 #' 
 #' ** DATASET MANAGEMENT **
-#' `1` Create EXT DSETs from folder of RAW DSETs
+#' `1`  Create EXT DSETs from folder of RAW DSETs (LCL)
+#' `16` Create EXT DSETs from folder of RAW DSETs (GOI)
 #' 
 #' ** FEATURE CHECK **
 #' `10` Extraction of seasonal bins of TS
 #' `11` Extraction of load factors of TS
 #' 
 #' ** FEATURE EXTRACTION **
-#' `4` Get FEATs of (1-month LCL RAW) DSETs from folder
-#' `9` Get FEATs of 1 LCL EXT DSET file
+#' `4`  Get FEATs of (1-month LCL RAW) DSETs from folder
+#' `9`  Get FEATs of 1 LCL EXT DSET file
 #' `12` Get FEATs of LCL EXT DSET from folder
 #' 
 #' ** MACHINE LEARNING TOOLS **
@@ -25,18 +26,18 @@
 #' `15` Compute DBSCAN
 #'  
 #' ** PLOTTING DATA **
-#' `5` Plot an LCL EXT DSET
-#' `3` Create visual PDF library of FEATs
+#' `5`  Plot an LCL EXT DSET
+#' `3`  Create visual PDF library of FEATs
 #' 
 #' ** TIME SERIES GENERATION **
-#' `2` Create TS from FEATs using GRATIS
-
-################################################################################
-script_selection <- 1.2
-################################################################################
+#' `2`  Create TS from FEATs using GRATIS
 
 library(whyT2.1)
-library(foreach) # If foreach is not loaded here, %dopar% is NOT recognized
+library(foreach)
+
+################################################################################
+script_selection <- 12
+################################################################################
 
 scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------
@@ -55,29 +56,6 @@ scripts <- function(script_selection) {
       wanted_days = 800,
       dset_key = "lcl",
       metadata_files = metadata_file
-    )
-    
-    return(NULL)
-  }
-  
-  # ----------------------------------------------------------------------------
-  
-  # SCRIPT 1.2
-  if (script_selection == 1.2) {
-    # User parameters
-    input_folder  <- "G:/Mi unidad/WHY/Datasets/goiener/"
-    output_folder <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
-    metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/GOIENER/Contratos_Goiener_20201013-anonymized.csv"
-    
-    # Function call
-    whyT2.1::extend_dataset(
-      input_folder, 
-      output_folder, 
-      wanted_days = 800,
-      dset_key = "goi",
-      metadata_files = metadata_file,
-      to_date = as.POSIXct("2020-02-29 23:00:00", tz="GMT"),
-      extend_after_end = FALSE
     )
     
     return(NULL)
@@ -320,7 +298,7 @@ scripts <- function(script_selection) {
   if (script_selection == 12) {
     # User parameters
     input_folder     <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    output_folder    <- "G:/Mi unidad/WHY/Resultados/lcl/features/lcl-ext/"
+    output_folder    <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
     type_of_analysis <- "basic"
     # Compute features
     feats <- whyT2.1::get_features_from_ext_datasets(
@@ -511,14 +489,75 @@ scripts <- function(script_selection) {
   # ----------------------------------------------------------------------------  
   # SCRIPT 16
   if (script_selection == 16) {
+    # User parameters
+    input_folder  <- "G:/Mi unidad/WHY/Datasets/goiener/"
+    output_folder <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
+    metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/GOIENER/Contratos_Goiener_20201013-anonymized.csv"
     
+    # Function call
+    whyT2.1::extend_dataset(
+      input_folder, 
+      output_folder, 
+      wanted_days = 800,
+      dset_key = "goi",
+      metadata_files = metadata_file,
+      to_date = as.POSIXct("2020-02-29 23:00:00", tz="GMT"),
+      extend_after_end = FALSE
+    )
+    
+    return(NULL)
   }
   
   # ----------------------------------------------------------------------------
   
   # SCRIPT 17
   if (script_selection == 17) {
+    # Folder
+    input_folder <- "C:/goiener-ext/"
+    # Get list of dir names in dataset folder
+    dir_names <- list.files(input_folder)
+    # Function of actions to be implemented
+    goiener_ext_analyzer <- function(x) {
+      # Load the extended file
+      load(paste(input_folder, x, sep=""))
+      # Data list
+      return_list <- list(
+        filename             = edf$cups,
+        TS_length_in_seconds = length(edf$df$values)*3600,
+        TS_length_in_years   = length(edf$df$values)/8766,
+        TS_length            = "1 year or more",
+        sampling_period_in_seconds = 3600,
+        sampling_period      = "60 min or more",
+        number_of_samples    = length(edf$df$values),
+        missing_samples      = edf$number_of_na,
+        list_of_missed_samples = NA,
+        spatial_resolution   = "household",
+        type_of_submetering  = NA,
+        NACE_code            = edf$cnae,
+        NACE_subcode         = NA,
+        city                 = edf$municipality,
+        country              = "Spain",
+        units                = "kWh",
+        tariff               = edf$tariff,
+        social_category      = edf$zip_code,
+        weather_info         = "no",
+        curation             = NA,
+        synthetic            = "no"
+      )
+      return(return_list)
+    }
     
+    ext_list <- lapply(dir_names, goiener_ext_analyzer)
+    ext_df   <- do.call(rbind.data.frame, ext_list)
+    # Save
+    data.table::fwrite(
+      x = ext_df,
+      file = paste(input_folder, "@dataset_info.csv", sep=""),
+      quote = FALSE,
+      sep = ";",
+      row.names = FALSE,
+      col.names = TRUE
+    )
   }
   
   # ----------------------------------------------------------------------------

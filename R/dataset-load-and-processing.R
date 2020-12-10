@@ -320,14 +320,14 @@ extract_metadata <- function(dfs, dset_key, filename) {
   # Goiener
   if (dset_key == "goi") {
     cups         <- strsplit(filename, ".csv")[[1]]
-    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2][1], tz="GMT")
-    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 3][1], tz="GMT")
-    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups, 4][1]
-    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 5][1])
-    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 6][1])
-    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 7][1])
-    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups, 8][1]
-    province     <-            dfs[[1]][dfs[[1]][,1] == cups, 9][1]
+    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][1], tz="GMT")
+    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][1], tz="GMT")
+    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][1]
+    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][1])
+    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][1])
+    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][1])
+    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][1]
+    province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][1]
     municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][1]
     zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][1])
     cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][1])
