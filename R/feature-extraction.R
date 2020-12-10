@@ -276,15 +276,17 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   all_features <- NULL
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
-  # Interval vector
-  # 1:length(dset_filenames)
   
   # Setup parallel backend to use many processors
   cl <- parallel::makeCluster(parallel::detectCores() - 1)
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  all_features <- foreach::foreach(x = 1:15, .combine=rbind, .inorder=FALSE) %dopar% {
+  all_features <- foreach::foreach(
+    x        = 1:length(dset_filenames),
+    .combine = rbind,
+    .inorder = FALSE
+  ) %dopar% {
     # Select file name
     dset_filename <- dset_filenames[x]
     # Load extended dataframe
@@ -305,13 +307,13 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   parallel::stopCluster(cl)
   
   # Save results to the CSV file
-  utils::write.table(
+  data.table::fwrite(
     all_features,
     file      = paste(output_folder, "feats.csv", sep=""),
     sep       = ",",
     na        = "",
     quote     = FALSE,
-    append    = TRUE,
+    append    = FALSE,
     col.names = TRUE,
     row.names = FALSE
   )
