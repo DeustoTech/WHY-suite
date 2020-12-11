@@ -273,7 +273,7 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 
 get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
   # Initialization of outputs
-  all_features <- NULL
+  all_features <- data.table::data.table(NULL)
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
   
@@ -283,9 +283,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   
   # Analysis loop
   all_features <- foreach::foreach(
-    x        = 1:length(dset_filenames),
-    .combine = rbind,
-    .inorder = FALSE
+    x        = (1:length(dset_filenames))[1:300],
+    .combine = rbind
   ) %dopar% {
     # Select file name
     dset_filename <- dset_filenames[x]
@@ -308,7 +307,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   
   # Save results to the CSV file
   data.table::fwrite(
-    all_features,
+    x         = data.table::data.table(all_features),
     file      = paste(output_folder, "feats.csv", sep=""),
     sep       = ",",
     na        = "",
