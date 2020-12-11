@@ -290,6 +290,12 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   } else {
     idf$df <- dplyr::bind_rows(extend_df, idf$df)
   }
+  
+  # Modification of seasonal periods
+  if (wanted_days >= 731) {
+    idf$seasonal_periods <- 
+      c(idf$seasonal_periods, 365*idf$seasonal_periods[1])
+  }
   return(idf)
 }
 
