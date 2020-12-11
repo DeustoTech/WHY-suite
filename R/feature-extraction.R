@@ -283,7 +283,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   all_features <- foreach::foreach(
     x        = 1:length(dset_filenames),
     .combine = rbind
-  ) %do% {
+  ) %dopar% {
     # Select file name
     dset_filename <- dset_filenames[x]
     # Load extended dataframe
