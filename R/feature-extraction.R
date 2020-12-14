@@ -273,16 +273,16 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 
 get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
   # Get list of filenames in dataset folder
-  dset_filenames <- list.files(input_folder, pattern="*.RData")
+  dset_filenames <- list.files(input_folder, pattern="*.RData")[1:24]
   
   # Setup parallel backend to use many processors
-  cl <- parallel::makeCluster(parallel::detectCores() - 1)
+  cores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
   all_features <- foreach::foreach(
-    x        = 1:length(dset_filenames),
-    .combine = rbind
+    x        = 1:length(dset_filenames)
   ) %dopar% {
     # Select file name
     dset_filename <- dset_filenames[x]
@@ -295,24 +295,25 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis)
       # Incorporate filename as a column
       all_features <- cbind(ff_file, ff_feats)
-    }
+      # Output file name
+      o_file <- paste(output_folder, "feats-", Sys.getpid(), ".csv", sep="")
+      # Save results to the CSV file
+      data.table::fwrite(
+        x         = all_features,
+        file      = o_file,
+        sep       = ",",
+        na        = "",
+        quote     = FALSE,
+        append    = TRUE,
+        col.names = x <= cores,
+        row.names = FALSE
+      )
+    } 
   }
   
   # Stop parallelization
   parallel::stopCluster(cl)
   
-  # Save results to the CSV file
-  data.table::fwrite(
-    x         = all_features,
-    file      = paste(output_folder, "feats.csv", sep=""),
-    sep       = ",",
-    na        = "",
-    quote     = FALSE,
-    append    = FALSE,
-    col.names = TRUE,
-    row.names = FALSE
-  )
-  
   # Also return the dataframes
-  return(all_features)
+  return(NULL)
 }

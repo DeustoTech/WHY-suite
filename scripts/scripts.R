@@ -297,7 +297,7 @@ scripts <- function(script_selection) {
   # SCRIPT 12
   if (script_selection == 12) {
     # User parameters
-    input_folder     <- "G:/Mi unidad/WHY/Datasets/goiener-ext/"
+    input_folder     <- "C:/goiener-ext/" #"G:/Mi unidad/WHY/Datasets/goiener-ext/"
     output_folder    <- "G:/Mi unidad/WHY/Datasets/test.BORRAR/"
     type_of_analysis <- "basic"
     # Compute features
