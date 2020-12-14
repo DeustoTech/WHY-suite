@@ -273,7 +273,7 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 
 get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
   # Get list of filenames in dataset folder
-  dset_filenames <- list.files(input_folder, pattern="*.RData")[1:24]
+  dset_filenames <- list.files(input_folder, pattern="*.RData")
   
   # Setup parallel backend to use many processors
   cores <- parallel::detectCores() - 1
