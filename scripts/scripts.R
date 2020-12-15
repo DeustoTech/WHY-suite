@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 19
+script_selection <- 12
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -591,8 +591,6 @@ scripts <- function(script_selection) {
   
   # SCRIPT 19
   if (script_selection == 19) {
-    # Transform pre-raw file with repeated lines in 'goiener_users' folder into raw file with no repeated lines
-    
     
   }
   
