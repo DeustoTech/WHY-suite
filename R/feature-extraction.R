@@ -281,9 +281,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  all_features <- foreach::foreach(
-    x        = 1:length(dset_filenames)
-  ) %dopar% {
+  foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
     # Select file name
     dset_filename <- dset_filenames[x]
     # Load extended dataframe

@@ -38,9 +38,9 @@ plot_dataframe <- function(dset_data, title=NULL) {
     # Title
     ggplot2::ggtitle(title) +
     # Labels
-    ggplot2::labs(x = "Date", y = "kWh") + 
+    ggplot2::labs(x = "Date", y = "kWh") #+ 
     # Axis limits
-    ggplot2::scale_y_continuous(limits = c(0,5))
+    #ggplot2::scale_y_continuous(limits = c(0,5))
 
   print(p)
 }

@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 12
+script_selection <- 19
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -589,9 +589,34 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 19
+  # SCRIPT 19 - SCRIPT TO CORRECT THE REPEATED THIRD SEASONAL PERIODS (GOIENER)
   if (script_selection == 19) {
-    
+    # Path to the file of repetitions
+    rep_file <- "C:/correct/correct_files.csv"
+    # Path to the folder of ext Goiener files
+    goi_folder <- "G:/Mi unidad/WHY/Datasets/goiener-ext/"
+    # Path to the output folder
+    output_folder <- "C:/correct/"
+    # Load list of incorrect ext files
+    ext_files <- data.table::fread(file = rep_file, header = F)
+    # # Setup parallel backend to use many processors
+    # cores <- parallel::detectCores() - 1
+    # cl <- parallel::makeCluster(cores)
+    # doParallel::registerDoParallel(cl)
+    # Correction loop
+    # foreach::foreach(ii = 1:dim(ext_files)[1]) %dopar% {
+    for (ext_file in ext_files$V1) {
+      load(paste(goi_folder, ext_file, sep=""))
+      lst <- length(edf$seasonal_periods)
+      if (edf$seasonal_periods[lst-1] == edf$seasonal_periods[lst]) {
+        edf$seasonal_periods <- head(edf$seasonal_periods, -1)
+        save(edf, file=paste(output_folder, ext_file, sep=""))
+      } else {
+        print(ext_file)
+      }
+    } 
+    # # Stop parallelization
+    # parallel::stopCluster(cl)
   }
   
   # ----------------------------------------------------------------------------
