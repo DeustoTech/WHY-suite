@@ -15,7 +15,6 @@
 #' @export
 
 plot_dataframe <- function(dset_data, title=NULL) {
-
   # Check existence of a 3rd column to apply color
   if (dim(dset_data)[2] > 2) {
     # Color vector is blue by default

@@ -271,17 +271,12 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #'
 #' @export
 
-get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis) {
+get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, parallelize=TRUE) {
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
   
-  # Setup parallel backend to use many processors
-  cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores)
-  doParallel::registerDoParallel(cl)
-  
-  # Analysis loop
-  foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
+  # FUNCTION to get features
+  inloop_feats <- function(x, col_names) {
     # Select file name
     dset_filename <- dset_filenames[x]
     # Load extended dataframe
@@ -303,15 +298,34 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         na        = "",
         quote     = FALSE,
         append    = TRUE,
-        col.names = x <= cores,
+        col.names = col_names,
         row.names = FALSE
       )
     } 
   }
   
-  # Stop parallelization
-  parallel::stopCluster(cl)
+  ### PARALLELIZATION 
+  if (parallelize) {
+    # Setup parallel backend to use many processors
+    cores <- parallel::detectCores() - 1
+    cl <- parallel::makeCluster(cores)
+    doParallel::registerDoParallel(cl)
+    # Analysis loop
+    foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
+      # Compute features
+      inloop_feats(x, x <= cores)
+    }
+    # Stop parallelization
+    parallel::stopCluster(cl)
   
-  # Also return the dataframes
+  ### NO PARALLELIZATION 
+  } else {
+    # Analysis loop
+    for(x in 1:length(dset_filenames)) {
+      # Compute features
+      inloop_feats(x, x == 1)
+    }
+  }
+  
   return(NULL)
 }

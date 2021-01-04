@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 19
+script_selection <- 20
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -621,7 +621,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 20
+  # SCRIPT 20 - SCRIPT TO INCORPORATE FILES WITH REPEATED DATES
   if (script_selection == 20) {
     
   }
