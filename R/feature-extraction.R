@@ -322,6 +322,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   } else {
     # Analysis loop
     for(x in 1:length(dset_filenames)) {
+      # Print
+      print(dset_filenames[x])
       # Compute features
       inloop_feats(x, x == 1)
     }
