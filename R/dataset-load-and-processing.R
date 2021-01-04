@@ -294,7 +294,7 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   # Modification of seasonal periods
   if (wanted_days >= 731) {
     idf$seasonal_periods <- 
-      c(idf$seasonal_periods, 365*idf$seasonal_periods[1])
+      unique(c(idf$seasonal_periods, 365*idf$seasonal_periods[1]))
   }
   return(idf)
 }
