@@ -8,7 +8,7 @@ get_features_from_ext_datasets(
   input_folder,
   output_folder,
   type_of_analysis,
-  resume_from_file = NULL
+  parallelize = TRUE
 )
 }
 \arguments{

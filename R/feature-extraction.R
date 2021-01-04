@@ -29,7 +29,7 @@ get_timeseries_from_cooked_dataframe <- function(cdf) {
   # Convert to time series (using "msts")
   tseries <- forecast::msts(
     data             = cdf$df[,2],
-    seasonal.periods = cdf$seasonal_periods,
+    seasonal.periods = unique(cdf$seasonal_periods),
     ts.frequency     = lowest_season, 
     start            = c(start_yearday, start_offset)
   )
