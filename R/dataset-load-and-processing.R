@@ -397,7 +397,7 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   # Check for correct date precedence
   if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
     if (from_date >= to_date) {
-      stop("to_date must be greater that from_date", call. = FALSE)
+      stop("to_date must be greater than from_date", call. = FALSE)
     }
   }
   # Get list of filenames in dataset folder

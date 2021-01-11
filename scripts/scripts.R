@@ -624,17 +624,17 @@ scripts <- function(script_selection) {
   # SCRIPT 20
   if (script_selection == 20) {
     # User parameters
-    input_folder  <- "G:/Mi unidad/WHY/Datos (raw)/REFIT/out/"
-    output_folder <- "G:/Mi unidad/WHY/Datos (raw)/REFIT/ext/"
-    #metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
+    input_folder  <- "C:/issda/"
+    output_folder <- "C:/issda/"
+    metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/ISSDA/38_CER Electricity_Gas/CER Electricity Revised March 2012/CER_Electricity_Documentation/allocations.csv"
     
     # Function call
     whyT2.1::extend_dataset(
       input_folder, 
       output_folder, 
       wanted_days = 800,
-      dset_key = "ref" 
-      #metadata_files = metadata_file
+      dset_key = "iss",
+      metadata_files = metadata_file
     )
     
     return(NULL)

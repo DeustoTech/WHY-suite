@@ -3,12 +3,12 @@ library(devtools)
 setwd("..")
 
 # roxygen2::roxygenize()
-devtools::build()
+# devtools::build()
 # devtools::check()
-devtools::install(
-  upgrade = FALSE,
-  quick   = TRUE
-  )
+# devtools::install(
+#   upgrade = FALSE,
+#   quick   = TRUE
+#   )
 
 devtools::load_all()
 
