@@ -356,10 +356,10 @@ extract_metadata <- function(dfs, dset_key, filename) {
   # ISSDA
   if (dset_key == "iss") {
     id         <- strsplit(filename, ".csv")[[1]]
-    code       <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 2][1])
-    res_stimul <-            dfs[[1]][dfs[[1]][,1] == cups, 3][1]
-    res_tariff <-            dfs[[1]][dfs[[1]][,1] == cups, 4][1]
-    sme_alloc  <-            dfs[[1]][dfs[[1]][,1] == cups, 5][1]
+    code       <- as.numeric(dfs[[1]][dfs[[1]][,1] == id, 2][1])
+    res_stimul <-            dfs[[1]][dfs[[1]][,1] == id, 3][1]
+    res_tariff <-            dfs[[1]][dfs[[1]][,1] == id, 4][1]
+    sme_alloc  <-            dfs[[1]][dfs[[1]][,1] == id, 5][1]
     
     return(list(id, code, res_stimul, res_tariff, sme_alloc))
   }
