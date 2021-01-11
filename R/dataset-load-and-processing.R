@@ -72,7 +72,7 @@ get_dataframe <- get_raw_dataframe_from_dataset
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  samples_per_day <- list(lcl = 48, goi = 24)
+  samples_per_day <- list(lcl = 48, goi = 24, ref = 24, iss = 48)
   # Selection
   spd <- samples_per_day[[dset_key]]
   
@@ -159,6 +159,17 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
       province     = metadata[[9]],      municipality = metadata[[10]],
       zip_code     = metadata[[11]],     cnae         = metadata[[12]]
     )
+  }
+  if (dset_key == "iss") {
+    dset_list <- list(
+      id         = metadata[[2]],
+      code       = metadata[[3]],
+      res_stimul = metadata[[4]],
+      res_tariff = metadata[[5]]
+    )
+  }
+  if (dset_key == "ref") {
+    dset_list <- list()
   }
   
   # Append both lists
@@ -321,6 +332,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
     acorn_tag     <- strsplit(filename, ".csv")[[1]]
     acorn         <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 3]
     acorn_grouped <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 4]
+    
     return(list(acorn_tag, acorn, acorn_grouped))
   }
   # Goiener
@@ -340,6 +352,20 @@ extract_metadata <- function(dfs, dset_key, filename) {
     
     return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
                 self_consump, province, municipality, zip_code, cnae))
+  }
+  # ISSDA
+  if (dset_key == "iss") {
+    id         <- strsplit(filename, ".csv")[[1]]
+    code       <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 2][1])
+    res_stimul <-            dfs[[1]][dfs[[1]][,1] == cups, 3][1]
+    res_tariff <-            dfs[[1]][dfs[[1]][,1] == cups, 4][1]
+    sme_alloc  <-            dfs[[1]][dfs[[1]][,1] == cups, 5][1]
+    
+    return(list(id, code, res_stimul, res_tariff, sme_alloc))
+  }
+  # REFIT
+  if (dset_key == "ref") {
+    return(NULL)
   }
 }
 

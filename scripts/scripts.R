@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 23
+script_selection <- 20
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -621,9 +621,23 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 20 - SCRIPT TO INCORPORATE FILES WITH REPEATED DATES
+  # SCRIPT 20
   if (script_selection == 20) {
+    # User parameters
+    input_folder  <- "G:/Mi unidad/WHY/Datos (raw)/REFIT/out/"
+    output_folder <- "G:/Mi unidad/WHY/Datos (raw)/REFIT/ext/"
+    #metadata_file <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
     
+    # Function call
+    whyT2.1::extend_dataset(
+      input_folder, 
+      output_folder, 
+      wanted_days = 800,
+      dset_key = "ref" 
+      #metadata_files = metadata_file
+    )
+    
+    return(NULL)
   }
   
   # ----------------------------------------------------------------------------
