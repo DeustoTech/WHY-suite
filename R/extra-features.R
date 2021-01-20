@@ -210,8 +210,6 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
   }
   
-  browser()
-  
   # for (ii in 6:1) {
   #   if (ii != 1) {
   #     for (jj in (ii-1):1) {
@@ -289,6 +287,14 @@ stat_data_aggregates <- function(x) {
     "unit_var_jan", "unit_var_feb", "unit_var_mar", "unit_var_apr", 
     "unit_var_may", "unit_var_jun", "unit_var_jul", "unit_var_aug",
     "unit_var_sep", "unit_var_oct", "unit_var_nov", "unit_var_dec")
+  nuwmm <- c(
+    "unit_wmean_jan", "unit_wmean_feb", "unit_wmean_mar", "unit_wmean_apr", 
+    "unit_wmean_may", "unit_wmean_jun", "unit_wmean_jul", "unit_wmean_aug",
+    "unit_wmean_sep", "unit_wmean_oct", "unit_wmean_nov", "unit_wmean_dec")
+  nuwvm <- c(
+    "unit_wvar_jan", "unit_wvar_feb", "unit_wvar_mar", "unit_wvar_apr", 
+    "unit_wvar_may", "unit_wvar_jun", "unit_wvar_jul", "unit_wvar_aug",
+    "unit_wvar_sep", "unit_wvar_oct", "unit_wvar_nov", "unit_wvar_dec")
   numss <- c(
     "unit_mean_winter", "unit_mean_spring",
     "unit_mean_summer", "unit_mean_autumn")
@@ -298,6 +304,8 @@ stat_data_aggregates <- function(x) {
   # Incorporation to output list
   sum_of_means <- sum(f$mean$monthly[,2])
   sum_of_extra_means <- sum(f$mean$seasons[,2])
+  # Correction factor: as if all months had virtually 31 days
+  corr_factor <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31) / 31
   
   for (ii in 1:12) {
     o_f[[as.name(nmm[ii])]]  = f$mean$monthly[ii,2]
@@ -310,6 +318,17 @@ stat_data_aggregates <- function(x) {
   }
   for (ii in 1:12) {
     o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] / sum_of_means
+  }
+  
+  sum_of_wmeans <- 0
+  for (ii in 1:12) {
+    o_f[[as.name(nuwmm[ii])]] = o_f[[as.name(numm[ii])]] / corr_factor[ii]
+    o_f[[as.name(nuwvm[ii])]] = o_f[[as.name(nuvm[ii])]] / corr_factor[ii]
+    sum_of_wmeans <- sum_of_wmeans + o_f[[as.name(nuwmm[ii])]]
+  }
+  for (ii in 1:12) {
+    o_f[[as.name(nuwmm[ii])]] = o_f[[as.name(nuwmm[ii])]] / sum_of_wmeans
+    o_f[[as.name(nuwvm[ii])]] = o_f[[as.name(nuwvm[ii])]] / sum_of_wmeans
   }
   
   for (ii in 1:4) {
