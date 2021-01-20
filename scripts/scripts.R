@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 20
+script_selection <- 9
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -257,9 +257,10 @@ scripts <- function(script_selection) {
   # SCRIPT 9
   if (script_selection == 9) {
     # Load extended dataframe (edf) from file
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    #load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
+    load("C:/Users/carlos.quesada/Documents/lcl/MAC000813.RData")
     # Get features
-    feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "extra")
+    feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
     
     return(feats)
   }
@@ -385,14 +386,55 @@ scripts <- function(script_selection) {
   # SCRIPT 14 --> ANALYSIS OF FEATURES FROM EXTENDED TIME SERIES
   if (script_selection == 14) {
     # Folder to features' file
-    feats_folder <- "C:/Users/carlos.quesada/Documents/temptative-results/"
-    ftp          <- c(5:9, 60:83, 128:134, 168:179)
-    centers      <- 3
+    # feats_folder <- "C:/Users/carlos.quesada/Documents/features/lcl/"
+    feats_folder <- "C:/Users/carlos.quesada/Documents/features/issda/"
+    ftp          <- c(#6:10, 
+                      61:84, 162:168, 209:220)
+    centers      <- 12
+    is.goiener   <- TRUE
+    
+    # Load features
+    feats <- data.table::fread(
+      file   = paste(feats_folder, "feats.csv", sep = ""),
+      header = TRUE,
+      sep    = ","
+    )
+    
+    if (is.goiener) {
+      # # Folder of extended data
+      # goi_folder <- "C:/issda-ext/" #"C:/goiener-ext/"
+      # # Files in the folder
+      # fnames <- list.files(goi_folder)
+      # # List of valid filenames (cnae is ok)
+      # ok_cnae_fnames <- c()
+      # # Loop
+      # for (fname in fnames) {
+      #   load(paste(goi_folder, fname, sep=""))
+      #   # Check CNAE code and fill list of valid filenames
+      #   if (!is.na(
+      #     edf$id
+      #     #edf$cnae
+      #     )) {
+      # 
+      #     # if (edf$cnae == 9810 | edf$cnae == 9811 |
+      #     #     edf$cnae == 9820 | edf$cnae == 9821) {
+      #     if (edf$id == 1) {
+      #       ok_cnae_fnames <- c(ok_cnae_fnames, edf$filename)
+      #     }
+      #   }
+      # }
+      # browser()
+      load("iss_ok_cnae_idx.Rdata")
+      otp <- ok_cnae_idx
+    }
+    
+
     
     # Compute k-means
     km <- whyT2.1::pca_kmeans_analysis(
       feats_folder = feats_folder,
       ftp          = ftp,
+      otp          = otp,
       min_var      = 0.90,
       centers      = centers
     )
@@ -404,31 +446,29 @@ scripts <- function(script_selection) {
       plot_clusters = TRUE
     )
     
-    # Load features
-    feats <- utils::read.table(
-      file   = paste(feats_folder, "feats.csv", sep = ""),
-      header = TRUE,
-      sep    = ","
-    )
-    
     # Plotting constants
-    cols1_block <- c(5, 60, 128, 168)
-    cols2_block <- c(9, 83, 134, 179)
-    x1_block <- c(1, 0, 1, 1)
-    x2_block <- c(5, 23, 7, 12)
+    cols1_block <- c(#6, 
+                    61, 162, 209)-1
+    cols2_block <- c(#10, 
+                    84, 168, 220)-1
+    x1_block <- c(#1,
+                  0, 1, 1)
+    x2_block <- c(#5,
+                  23, 7, 12)
     
     # Analysis
     for (cc in 1:centers) {
       cluster_idx <- which(km$results$cluster == cc)
-      feat_means  <- colMeans(feats[cluster_idx,])
-      feat_vars   <- Rfast::colVars(as.matrix(feats[cluster_idx,]))
+      feat_means  <- colMeans(feats[cluster_idx,-1])
+      feat_vars   <- Rfast::colVars(as.matrix(feats[cluster_idx,-1]))
       feat_df     <- data.frame(feat_means, feat_vars)
       
       title <- paste(
         "Cluster #", cc, " - Elements: ",
         length(cluster_idx),
         sep = "")
-      for (ii in 1:4) {
+      for (ii in 1:#4
+           3) {
         p <- 
           # Data to be plotted
           ggplot2::ggplot(
@@ -642,7 +682,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 21
+  # SCRIPT 21 
   if (script_selection == 21) {
     
   }

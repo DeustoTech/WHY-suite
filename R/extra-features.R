@@ -94,25 +94,28 @@ load_factors <- function(x) {
     as.name("load_factor_var2"),
     as.name("load_factor_var3")
   )
-  # Compute average load
-  avg_load <- mean(x)
   # Seasonality loop
   for (ii in 1:length(attr(x, "msts"))) {
     ### Bin by periods of 1 month
     cut_seq <- cut(date_seq, breaks = cut_breaks_list[ii])
+    # Aggregate data (mean) according to the bins
+    avg_aggr_ts  <- stats::aggregate(
+      x   = as.numeric(x),
+      by  = list(date_time = cut_seq),
+      FUN = mean)
     # Aggregate data (max) according to the bins
     max_aggr_ts  <- stats::aggregate(
       x   = as.numeric(x),
       by  = list(date_time = cut_seq),
       FUN = max)
     # Compute seasonal mean load factor excluding first and last bins
-    last_1 <- dim(max_aggr_ts)[1] - 1
-    load_factor[[mean_name_list[[ii]]]] <- 
-      mean(avg_load / max_aggr_ts[2:last_1, 2],
-           na.rm = TRUE)
-    load_factor[[var_name_list[[ii]]]]  <- 
-      stats::var(avg_load / max_aggr_ts[2:last_1, 2],
-                 na.rm = TRUE)
+    out <- c(-1, -dim(max_aggr_ts)[1])
+    avg_over_max <- avg_aggr_ts[out, 2] / max_aggr_ts[out, 2]
+    # Turn NaN into 0's (this happens when avg = max = 0)
+    avg_over_max[is.na(avg_over_max)] <- 0
+    # Load factor means and vars 
+    load_factor[[mean_name_list[[ii]]]] <- mean(avg_over_max)
+    load_factor[[ var_name_list[[ii]]]] <- stats::var(avg_over_max)
   }
   return(load_factor)
 }
@@ -126,7 +129,7 @@ load_factors <- function(x) {
 #' @description 
 #' Compute means and variances of time series aggregates, where bins are days, weeks and months.
 #' 
-#' @details \code{mean_XXh} and \code{var_XXh}: the mean and variance of the time series at \code{XX} hours, where \code{XX} goes from 00 to 23. \code{unit_mean_XXh} and \code{unit_var_XXh}: the same as before but values are normalized so that the sum is 1. \code{mean_xxx} and \code{var_xxx}: the mean and variance of the time series on \code{xxx}, where \code{xxx} goes from sun (Sunday) to sat (Saturday). \code{unit_mean_xxx} and \code{unit_var_xxx}: the same as before but values are normalized so that the sum is 1. \code{mean_yyy} and \code{var_yyy}: the mean and variance of the time series in \code{yyy}, where \code{yyy} goes from jan (January) to dec (December). \code{unit_mean_yyy} and \code{unit_var_yyy}: the same as before but values are normalized so that the sum is 1.
+#' @details \code{mean_XXh} and \code{var_XXh}: the mean and variance of the time series at \code{XX} hours, where \code{XX} goes from 00 to 23. \code{unit_mean_XXh} and \code{unit_var_XXh}: the same as before but values of the mean are normalized so that the sum is 1. \code{mean_xxx} and \code{var_xxx}: the mean and variance of the time series on \code{xxx}, where \code{xxx} goes from sun (Sunday) to sat (Saturday). \code{unit_mean_xxx} and \code{unit_var_xxx}: the same as before but values are normalized so that the sum is 1. \code{mean_yyy} and \code{var_yyy}: the mean and variance of the time series in \code{yyy}, where \code{yyy} goes from jan (January) to dec (December). \code{unit_mean_yyy} and \code{unit_var_yyy}: the same as before but values are normalized so that the sum is 1.
 #' 
 #' @param x Time series of class \code{msts}.
 #'
