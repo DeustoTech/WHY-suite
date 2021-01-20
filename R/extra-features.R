@@ -179,7 +179,7 @@ stat_data_aggregates <- function(x) {
   nuv4h <- c(
     "unit_var_00h_04h", "unit_var_04h_08h", "unit_var_08h_12h",
     "unit_var_12h_16h", "unit_var_16h_20h", "unit_var_20h_00h")
-  nint <- c("00h_04h", "04h_08h", "08h_12h", "12h_16h", "16h_20h", "20h_00h")
+  # nint <- c("00h_04h", "04h_08h", "08h_12h", "12h_16h", "16h_20h", "20h_00h")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$hourly[,2])
   sum_of_extra_means <- sum(f$mean$`4-hourly`[,2])
@@ -210,16 +210,18 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
   }
   
-  for (ii in 6:1) {
-    if (ii != 1) {
-      for (jj in (ii-1):1) {
-        rat_name <- as.name(paste(nint[ii], "_to_", nint[jj], "_ratio", sep=""))
-        top_name <- as.name(paste("mean_", nint[ii], sep=""))
-        bot_name <- as.name(paste("mean_", nint[jj], sep=""))
-        o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
-      }
-    }
-  }
+  browser()
+  
+  # for (ii in 6:1) {
+  #   if (ii != 1) {
+  #     for (jj in (ii-1):1) {
+  #       rat_name <- as.name(paste("ratio_", nint[ii], "_to_", nint[jj], sep=""))
+  #       top_name <- as.name(paste("mean_", nint[ii], sep=""))
+  #       bot_name <- as.name(paste("mean_", nint[jj], sep=""))
+  #       o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
+  #     }
+  #   }
+  # }
 
   # Vectors of names for days
   nmd <- c(
@@ -267,8 +269,8 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvwe[ii])]] = f$var$weekends[ii,2] / sum_of_extra_means
   }
   
-  o_f[["weekend_to_weekday_ratio"]] <-
-    o_f[["mean_weekend"]] / o_f[["mean_weekday"]]
+  # o_f[["ratio_weekend_to_weekday"]] <-
+  #   o_f[["mean_weekend"]] / o_f[["mean_weekday"]]
   
   # Vectors of names for months
   nmm <- c(
@@ -292,7 +294,7 @@ stat_data_aggregates <- function(x) {
     "unit_mean_summer", "unit_mean_autumn")
   nuvss <- c(
     "unit_var_winter", "unit_var_spring", "unit_var_summer", "unit_var_autumn")
-  nint <- c("winter", "spring", "summer", "autumn")
+  # nint <- c("winter", "spring", "summer", "autumn")
   # Incorporation to output list
   sum_of_means <- sum(f$mean$monthly[,2])
   sum_of_extra_means <- sum(f$mean$seasons[,2])
@@ -323,16 +325,16 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nuvss[ii])]] = f$var$seasons[ii,2] / sum_of_extra_means
   }
   
-  for (ii in 4:1) {
-    if (ii != 1) {
-      for (jj in (ii-1):1) {
-        rat_name <- as.name(paste(nint[ii], "_to_", nint[jj], "_ratio", sep=""))
-        top_name <- as.name(paste("mean_", nint[ii], sep=""))
-        bot_name <- as.name(paste("mean_", nint[jj], sep=""))
-        o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
-      }
-    }
-  }
+  # for (ii in 4:1) {
+  #   if (ii != 1) {
+  #     for (jj in (ii-1):1) {
+  #       rat_name <- as.name(paste("ratio_", nint[ii], "_to_", nint[jj], sep=""))
+  #       top_name <- as.name(paste("mean_", nint[ii], sep=""))
+  #       bot_name <- as.name(paste("mean_", nint[jj], sep=""))
+  #       o_f[[rat_name]] <- o_f[[top_name]] / o_f[[bot_name]]
+  #     }
+  #   }
+  # }
 
   return(o_f)
 }
