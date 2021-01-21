@@ -109,6 +109,9 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_functions=c(), .scale=FALSE) {
   # Set a seed for random numbers
   set.seed(1981)
+  # Get multiseasonal time series
+  tseries <- get_timeseries_from_cooked_dataframe(cdf)
+  
   ### type_of_analysis is CUSTOM
   if (type_of_analysis == "custom") {
     feats <- tsfeatures::tsfeatures(
@@ -141,8 +144,6 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
       basic = basic_fns,
       extra = c(basic_fns, extra_fns),
       )
-    # Get multiseasonal time series
-    tseries <- get_timeseries_from_cooked_dataframe(cdf)
     
     # Extract features that DON'T require normalization of the time series
     not_norm_feats <- tsfeatures::tsfeatures(
