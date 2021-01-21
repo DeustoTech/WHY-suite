@@ -279,13 +279,15 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #' @param input_folder Absolute path to the dataset folder.
 #' @param output_folder Absolute path where the results are wanted.
 #' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
+#' @param list_of_functions If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.
+#' @param If \code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.
 #' @param resume_from_file A string indicating the name of the file to start the analysis.
 #'
 #' @return File containing the features
 #'
 #' @export
 
-get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, parallelize=TRUE) {
+get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, list_of_functions=c(), .scale=FALSE, parallelize=TRUE) {
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
   
@@ -299,7 +301,12 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     if (!edf$is_0) {
       ff_file <- data.frame(file = dset_filename)
       # GET FEATURES
-      ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis)
+      ff_feats <- get_features_from_cooked_dataframe(
+        edf,
+        type_of_analysis,
+        list_of_functions,
+        .scale
+      )
       # Incorporate filename as a column
       all_features <- cbind(ff_file, ff_feats)
       # Output file name
