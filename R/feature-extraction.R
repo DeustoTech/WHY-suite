@@ -301,12 +301,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     if (!edf$is_0) {
       ff_file <- data.frame(file = dset_filename)
       # GET FEATURES
-      ff_feats <- get_features_from_cooked_dataframe(
-        edf,
-        type_of_analysis,
-        list_of_functions,
-        .scale
-      )
+      ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis,
+        list_of_functions, .scale)
       # Incorporate filename as a column
       all_features <- cbind(ff_file, ff_feats)
       # Output file name
