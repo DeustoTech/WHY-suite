@@ -98,58 +98,69 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 #' Get features of a cooked (or extended) dataframe.
 #'
 #' @param df Cooked (or extended) dataframe.
-#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}. ALSO, a string with the name of a function can be passed.
+#' @param type_of_analysis A string indicating the type of analysis: \code{basic}, \code{extra} or \code{custom}.
+#' @param list_of_functions If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.
+#' @param If \code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.
 #'
 #' @return List of features.
 #'
 #' @export
 
-get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
+get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_functions=c(), .scale=FALSE) {
   # Set a seed for random numbers
   set.seed(1981)
-  # List of functions that DON'T require normalization -> they are included in 
-  # BOTH "basic" and "extra" analyses
-  not_norm_fns <- c(
-    "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
-  # List of BASIC functions that REQUIRE normalization
-  basic_fns <- c(
-    "frequency", "stl_features", "entropy", "acf_features")
-  # List of EXTRA functions that REQUIRE normalization
-  extra_fns <- c(
-    "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", "max_level_shift",
-    "ac_9", "crossing_points", "max_var_shift", "nonlinearity",
-    "spreadrandomlocal_meantaul", "flat_spots", "pacf_features", "firstmin_ac",
-    "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
-    "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss", 
-    "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
-    "motiftwo_entro3")
-  # List of functions that REQUIRE normalization ("extra" includes "basic")
-  analysis_fns <- list(
-    basic = basic_fns,
-    extra = c(basic_fns, extra_fns)
+  ### type_of_analysis is CUSTOM
+  if (type_of_analysis == "custom") {
+    feats <- tsfeatures::tsfeatures(
+      tslist    = list(tseries),
+      features  = list_of_functions,
+      scale     = .scale,    # <-- time series ARE SCALED to mean 0 and sd 1
+      na.action = forecast::na.interp
     )
-  if (is.null(analysis_fns[[type_of_analysis]])) {
-    analysis_fns[[type_of_analysis]] <- type_of_analysis
   }
-  # Get multiseasonal time series
-  tseries <- get_timeseries_from_cooked_dataframe(cdf)
-  # Extract features that DON'T require normalization of the time series
-  not_norm_feats <- tsfeatures::tsfeatures(
-    tslist    = list(tseries),
-    features  = not_norm_fns,
-    scale     = FALSE,   # <-- time series are NOT SCALED
-    na.action = forecast::na.interp
-  )
-  # Extract features that REQUIRE normalization of the time series
-  norm_feats <- tsfeatures::tsfeatures(
-    tslist    = list(tseries),
-    features  = analysis_fns[[type_of_analysis]],
-    scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
-    na.action = forecast::na.interp
-  )
-  # Bind features into a unique dataframe
-  feats <- cbind(not_norm_feats, norm_feats)
-  
+  ### type_of_analysis is BASIC or EXTRA
+  else {
+    # List of functions that DON'T require normalization -> they are included in 
+    # BOTH "basic" and "extra" analyses
+    not_norm_fns <- c(
+      "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
+    # List of BASIC functions that REQUIRE normalization
+    basic_fns <- c(
+      "frequency", "stl_features", "entropy", "acf_features")
+    # List of EXTRA functions that REQUIRE normalization
+    extra_fns <- c(
+      "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", "max_level_shift",
+      "ac_9", "crossing_points", "max_var_shift", "nonlinearity",
+      "spreadrandomlocal_meantaul", "flat_spots", "pacf_features","firstmin_ac",
+      "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
+      "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss", 
+      "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
+      "motiftwo_entro3")
+    # List of functions that REQUIRE normalization ("extra" includes "basic")
+    analysis_fns <- list(
+      basic = basic_fns,
+      extra = c(basic_fns, extra_fns),
+      )
+    # Get multiseasonal time series
+    tseries <- get_timeseries_from_cooked_dataframe(cdf)
+    
+    # Extract features that DON'T require normalization of the time series
+    not_norm_feats <- tsfeatures::tsfeatures(
+      tslist    = list(tseries),
+      features  = not_norm_fns,
+      scale     = FALSE,   # <-- time series are NOT SCALED
+      na.action = forecast::na.interp
+    )
+    # Extract features that REQUIRE normalization of the time series
+    norm_feats <- tsfeatures::tsfeatures(
+      tslist    = list(tseries),
+      features  = analysis_fns[[type_of_analysis]],
+      scale     = TRUE,    # <-- time series ARE SCALED to mean 0 and sd 1
+      na.action = forecast::na.interp
+    )
+    # Bind features into a unique dataframe
+    feats <- cbind(not_norm_feats, norm_feats)
+  }
   return(feats)
 }
 
