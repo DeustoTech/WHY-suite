@@ -98,7 +98,7 @@ get_extrema_dates_from_timeseries <- function(tseries, only_initial=TRUE) {
 #' Get features of a cooked (or extended) dataframe.
 #'
 #' @param df Cooked (or extended) dataframe.
-#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
+#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}. ALSO, a string with the name of a function can be passed.
 #'
 #' @return List of features.
 #'
@@ -128,6 +128,9 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis) {
     basic = basic_fns,
     extra = c(basic_fns, extra_fns)
     )
+  if (is.null(analysis_fns[[type_of_analysis]])) {
+    analysis_fns[[type_of_analysis]] <- type_of_analysis
+  }
   # Get multiseasonal time series
   tseries <- get_timeseries_from_cooked_dataframe(cdf)
   # Extract features that DON'T require normalization of the time series
