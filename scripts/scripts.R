@@ -258,7 +258,8 @@ scripts <- function(script_selection) {
   if (script_selection == 9) {
     # Load extended dataframe (edf) from file
     #load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
-    load("C:/Users/carlos.quesada/Documents/lcl/MAC000037.RData")
+    # load("C:/Users/carlos.quesada/Documents/lcl/MAC000037.RData")
+    load("C:/Documents and Settings/carlos.quesada/Documents/goiener_users/2ddd8889c59d39e6460b7c65967d7bb9.RData")
     # Get features
     feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
     

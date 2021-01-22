@@ -142,6 +142,9 @@ stat_data_aggregates <- function(x) {
   # Output feature list
   o_f <- list()
   
+  # DEFINITION OF SPECIAL FUNCTION TO AVOID NaN WHEN DIVIDING BY 0
+  "%/%" <- function(x,y) ifelse(y==0, 0, x/y)
+  
   # Vectors of names for hours
   nmh <- c(
     "mean_00h", "mean_01h", "mean_02h", "mean_03h", "mean_04h", "mean_05h",
@@ -191,12 +194,11 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nvh[ii])]]  = f$var$hourly[ii,2]
   }
   for (ii in 1:24) {
-    o_f[[as.name(numh[ii])]] = f$mean$hourly[ii,2] / sum_of_means
+    o_f[[as.name(numh[ii])]] = f$mean$hourly[ii,2] %/% sum_of_means
   }
   for (ii in 1:24) {
-    o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] / sum_of_means
+    o_f[[as.name(nuvh[ii])]] = f$var$hourly[ii,2] %/% sum_of_means
   }
-
   for (ii in 1:6) {
     o_f[[as.name(nm4h[ii])]]  = f$mean$`4-hourly`[ii,2]
   }
@@ -204,10 +206,10 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nv4h[ii])]]  = f$var$`4-hourly`[ii,2]
   }
   for (ii in 1:6) {
-    o_f[[as.name(num4h[ii])]] = f$mean$`4-hourly`[ii,2] / sum_of_extra_means
+    o_f[[as.name(num4h[ii])]] = f$mean$`4-hourly`[ii,2] %/% sum_of_extra_means
   }
   for (ii in 1:6) {
-    o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] / sum_of_extra_means
+    o_f[[as.name(nuv4h[ii])]] = f$var$`4-hourly`[ii,2] %/% sum_of_extra_means
   }
   
   # for (ii in 6:1) {
@@ -248,10 +250,10 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nvd[ii])]]  = f$var$daily[ii,2]
   }
   for (ii in 1:7) {
-    o_f[[as.name(numd[ii])]] = f$mean$daily[ii,2] / sum_of_means
+    o_f[[as.name(numd[ii])]] = f$mean$daily[ii,2] %/% sum_of_means
   }
   for (ii in 1:7) {
-    o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] / sum_of_means
+    o_f[[as.name(nuvd[ii])]] = f$var$daily[ii,2] %/% sum_of_means
   }
 
   for (ii in 1:2) {
@@ -261,10 +263,10 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nvwe[ii])]]  = f$var$weekends[ii,2]
   }
   for (ii in 1:2) {
-    o_f[[as.name(numwe[ii])]] = f$mean$weekends[ii,2] / sum_of_extra_means
+    o_f[[as.name(numwe[ii])]] = f$mean$weekends[ii,2] %/% sum_of_extra_means
   }
   for (ii in 1:2) {
-    o_f[[as.name(nuvwe[ii])]] = f$var$weekends[ii,2] / sum_of_extra_means
+    o_f[[as.name(nuvwe[ii])]] = f$var$weekends[ii,2] %/% sum_of_extra_means
   }
   
   # o_f[["ratio_weekend_to_weekday"]] <-
@@ -314,10 +316,10 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nvm[ii])]]  = f$var$monthly[ii,2]
   }
   for (ii in 1:12) {
-    o_f[[as.name(numm[ii])]] = f$mean$monthly[ii,2] / sum_of_means
+    o_f[[as.name(numm[ii])]] = f$mean$monthly[ii,2] %/% sum_of_means
   }
   for (ii in 1:12) {
-    o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] / sum_of_means
+    o_f[[as.name(nuvm[ii])]] = f$var$monthly[ii,2] %/% sum_of_means
   }
   
   sum_of_wmeans <- 0
@@ -327,8 +329,8 @@ stat_data_aggregates <- function(x) {
     sum_of_wmeans <- sum_of_wmeans + o_f[[as.name(nuwmm[ii])]]
   }
   for (ii in 1:12) {
-    o_f[[as.name(nuwmm[ii])]] = o_f[[as.name(nuwmm[ii])]] / sum_of_wmeans
-    o_f[[as.name(nuwvm[ii])]] = o_f[[as.name(nuwvm[ii])]] / sum_of_wmeans
+    o_f[[as.name(nuwmm[ii])]] = o_f[[as.name(nuwmm[ii])]] %/% sum_of_wmeans
+    o_f[[as.name(nuwvm[ii])]] = o_f[[as.name(nuwvm[ii])]] %/% sum_of_wmeans
   }
   
   for (ii in 1:4) {
@@ -338,10 +340,10 @@ stat_data_aggregates <- function(x) {
     o_f[[as.name(nvss[ii])]]  = f$var$seasons[ii,2]
   }
   for (ii in 1:4) {
-    o_f[[as.name(numss[ii])]] = f$mean$seasons[ii,2] / sum_of_extra_means
+    o_f[[as.name(numss[ii])]] = f$mean$seasons[ii,2] %/% sum_of_extra_means
   }
   for (ii in 1:4) {
-    o_f[[as.name(nuvss[ii])]] = f$var$seasons[ii,2] / sum_of_extra_means
+    o_f[[as.name(nuvss[ii])]] = f$var$seasons[ii,2] %/% sum_of_extra_means
   }
   
   # for (ii in 4:1) {

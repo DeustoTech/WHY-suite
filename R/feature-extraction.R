@@ -142,7 +142,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
     # List of functions that REQUIRE normalization ("extra" includes "basic")
     analysis_fns <- list(
       basic = basic_fns,
-      extra = c(basic_fns, extra_fns),
+      extra = c(basic_fns, extra_fns)
       )
     
     # Extract features that DON'T require normalization of the time series
