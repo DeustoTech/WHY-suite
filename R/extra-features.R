@@ -375,7 +375,89 @@ stat_data_aggregates <- function(x) {
 #' 
 #' @export
 
+get_bin_factors <- function(t, mode) {
+  # By hours
+  if (mode == 1) {
+    t_factor <- cut(t, breaks = "1 hour")
+  }
+  # By groups of 4 hours
+  if (mode == 2) {
+    t_f <- cut(t, breaks = "1 hour")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor <- t_v - hours(hour(t_v) %% 4)
+    t_factor <- as.factor(t_factor)
+  }
+  # By groups of 6 hours
+  if (mode == 3) {
+    t_f <- cut(t, breaks = "1 hour")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor <- t_v - hours(hour(t_v) %% 6)
+    t_factor <- as.factor(t_factor)
+  }
+  # By days
+  if (mode == 4) {
+    t_factor <- cut(t, breaks = "1 day")
+  }
+  # By weekdays/weekends
+  if (mode == 5) {
+    t_f <- cut(t, breaks = "1 day")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Numbers indicating 0-4 weekdays, 5-6 weekends
+    t_factor <- (wday(t_v) - 2) %% 7
+    # Sequence 0,1,2,3,4,0,1
+    t_factor <- replace(t_factor, t_factor == 5, 0)
+    t_factor <- replace(t_factor, t_factor == 6, 1)
+    # Subtract properly to get the new groups
+    t_factor <- t_v - days(t_factor)
+    t_factor <- as.factor(t_factor)
+  }
+  # By months
+  if (mode == 6) {
+    t_factor <- cut(t, breaks = "1 month")
+  }
+  # By Northern hemisphere meteorological seasons
+  if (mode == 7) {
+    t_f <- cut(t, breaks = "1 month")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor <- t_v - months(month(t_v) %% 3)
+    t_factor <- as.factor(t_factor)
+  }
+  return(t_factor)
+}
+
 get_seasonal_features_from_timeseries <- function(tseries) {
+  # Initial date
+  ini_date <- get_extrema_dates_from_timeseries(tseries)
+  # Date sequence
+  samples_per_day <- attr(tseries, "msts")[1]
+  date_by <- as.difftime(24 / samples_per_day, units = "hours")
+  t <- seq(from = ini_date, length.out = length(tseries), by = date_by)
+  # Loop for the 7 different bins
+  for (bb in 1:7) {
+    browser()
+    # Get the bins
+    bin_factor <- get_bin_factors(t, bb)
+    # Aggregate data (sum) according to the bins
+    aggr_data <- stats::aggregate(
+      x   = as.numeric(tseries),
+      by  = list(date_time = bin_factor),
+      FUN = sum
+    )
+    # There's no need to check the completeness of the bins. Just remove first
+    # and last bins by default. In case there's a unique bin when computing
+    # means, standard deviation is set to 0. This might only happen with
+    # meteorological seasons.
+  }
+}
+
+get_seasonal_features_from_timeseries_OLD <- function(tseries) {
   # Estimation threshold
   estimation_threshold <- 0.85
   # Initial date
@@ -388,7 +470,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
                   by         = date_by)
   
   # Loop initializations
-  cut_breaks_list <- c("1 hour", "1 day", "1 month")
+  t <- c("1 hour", "1 day", "1 month")
   name_list <- c(as.name("hourly"), as.name("daily"), as.name("monthly"))
   elems_per_bin_list <- c(
     samples_per_day / 24,
