@@ -258,8 +258,8 @@ scripts <- function(script_selection) {
   if (script_selection == 9) {
     # Load extended dataframe (edf) from file
     #load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
-    # load("C:/Users/carlos.quesada/Documents/lcl/MAC000037.RData")
-    load("C:/Documents and Settings/carlos.quesada/Documents/goiener_users/2ddd8889c59d39e6460b7c65967d7bb9.RData")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC000005.RData")
+    # load("C:/Documents and Settings/carlos.quesada/Documents/goiener_users/2ddd8889c59d39e6460b7c65967d7bb9.RData")
     # Get features
     feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
     
@@ -388,10 +388,9 @@ scripts <- function(script_selection) {
   if (script_selection == 14) {
     # Folder to features' file
     # feats_folder <- "C:/Users/carlos.quesada/Documents/features/lcl/"
-    feats_folder <- "C:/Users/carlos.quesada/Documents/features/issda/"
-    ftp          <- c(#6:10, 
-                      61:84, 162:168, 209:220)
-    centers      <- 12
+    feats_folder <- "C:/Users/carlos.quesada/Documents/features/goiener/"
+    ftp          <- c(6:10, 61:84, 162:168, 209:220)
+    centers      <- 6
     is.goiener   <- TRUE
     
     # Load features
@@ -425,7 +424,7 @@ scripts <- function(script_selection) {
       #   }
       # }
       # browser()
-      load("iss_ok_cnae_idx.Rdata")
+      load("goi_ok_cnae_idx.Rdata")
       otp <- ok_cnae_idx
     }
     
@@ -448,14 +447,10 @@ scripts <- function(script_selection) {
     )
     
     # Plotting constants
-    cols1_block <- c(#6, 
-                    61, 162, 209)-1
-    cols2_block <- c(#10, 
-                    84, 168, 220)-1
-    x1_block <- c(#1,
-                  0, 1, 1)
-    x2_block <- c(#5,
-                  23, 7, 12)
+    cols1_block <- c(6,61, 162, 209)-1
+    cols2_block <- c(10,84, 168, 220)-1
+    x1_block <- c(1,0, 1, 1)
+    x2_block <- c(5,23, 7, 12)
     
     # Analysis
     for (cc in 1:centers) {
@@ -468,8 +463,7 @@ scripts <- function(script_selection) {
         "Cluster #", cc, " - Elements: ",
         length(cluster_idx),
         sep = "")
-      for (ii in 1:#4
-           3) {
+      for (ii in 1:4) {
         p <- 
           # Data to be plotted
           ggplot2::ggplot(
@@ -490,6 +484,8 @@ scripts <- function(script_selection) {
                          ymax = feat_means + sqrt(feat_vars)))
         print(p)
       }
+      print(feat_means)
+      browser()
     }
     
     return(km)
