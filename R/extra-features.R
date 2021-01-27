@@ -280,6 +280,8 @@ get_seasonal_features_from_timeseries <- function(tseries) {
 #' @description 
 #' Generate the names of the features.
 #' 
+#' @details NAMING FORMAT: [a|r]_[mn|sd]_type_(pd)
+#' 
 #' @return List of lists with the feature names.
 #' 
 #' @export
@@ -287,44 +289,46 @@ get_seasonal_features_from_timeseries <- function(tseries) {
 get_feature_names <- function() {
   n <- list()
   # 1-hour names
-  n$hour1 <- c()
+  n$str$hour1 <- c()
   for (ii in 0:23) {
     padded_num <- stringr::str_pad(ii, 2, pad = "0")
-    n$hour1 <- c(n$hour1, paste(padded_num, "h", sep =""))
+    n$str$hour1 <- c(n$str$hour1, paste(padded_num, "h", sep =""))
   }
   # 4-hour names
-  n$hour4 <- c()
+  n$str$hour4 <- c()
   for (ii in 0:5) {
     padded_num1 <- stringr::str_pad(ii*4, 2, pad = "0")
     padded_num2 <- stringr::str_pad(((ii + 1) * 4) %% 24, 2, pad = "0")
-    n$hour4 <- c(n$hour4, paste(padded_num1, "h", padded_num2, "h", sep =""))
+    n$str$hour4 <-
+      c(n$str$hour4, paste(padded_num1, "h", padded_num2, "h", sep =""))
   }
   # 6-hour names
-  n$hour6 <- c()
+  n$str$hour6 <- c()
   for (ii in 0:3) {
     padded_num1 <- stringr::str_pad(ii*6, 2, pad = "0")
     padded_num2 <- stringr::str_pad(((ii + 1) * 6) %% 24, 2, pad = "0")
-    n$hour6 <- c(n$hour6, paste(padded_num1, "h", padded_num2, "h", sep =""))
+    n$str$hour6 <-
+      c(n$str$hour6, paste(padded_num1, "h", padded_num2, "h", sep =""))
   }
   # Day names
-  n$day <- c('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
+  n$str$day <- c('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
   # Weekday names
-  n$weekday <- c('weekday', 'weekend')
+  n$str$weekday <- c('wday', 'wend')
   # Month names
-  n$month <- c()
+  n$str$month <- c()
   for (ii in 1:12) {
-    n$month <- c(n$month, tolower(month.abb[ii]))
+    n$str$month <- c(n$str$month, tolower(month.abb[ii]))
   }
   # Season names
-  n$season <- c('spring', 'summer', 'autumn', 'winter')
+  n$str$season <- c('spr', 'sum', 'aut', 'win')
   
   ### Some constants
-  # Days per parts of the week
-  n$dpw <- c(5, 2)
+  # Days per weekday/weekend 
+  n$const$dpw <- c(5, 2)
   # Days per month
-  n$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  n$const$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   # Days per season
-  n$dps <- c(90.25, 92, 92, 91)
+  n$const$dps <- c(90.25, 92, 92, 91)
   
   return(n)
 }
@@ -336,9 +340,9 @@ get_feature_names <- function() {
 #' Features related to statistical data aggregates
 #' 
 #' @description 
-#' Compute means and variances of time series aggregates, where bins are days, weeks and months.
+#' Compute means and standard deviations of time series aggregates, where bins relate to day, week and year periods.
 #' 
-#' @details \code{mean_XXh} and \code{var_XXh}: the mean and variance of the time series at \code{XX} hours, where \code{XX} goes from 00 to 23. \code{unit_mean_XXh} and \code{unit_var_XXh}: the same as before but values of the mean are normalized so that the sum is 1. \code{mean_xxx} and \code{var_xxx}: the mean and variance of the time series on \code{xxx}, where \code{xxx} goes from sun (Sunday) to sat (Saturday). \code{unit_mean_xxx} and \code{unit_var_xxx}: the same as before but values are normalized so that the sum is 1. \code{mean_yyy} and \code{var_yyy}: the mean and variance of the time series in \code{yyy}, where \code{yyy} goes from jan (January) to dec (December). \code{unit_mean_yyy} and \code{unit_var_yyy}: the same as before but values are normalized so that the sum is 1.
+#' @details \code{RE-WRITE THIS} 
 #' 
 #' @param x Time series of class \code{msts}.
 #'
@@ -353,10 +357,10 @@ stat_data_aggregates <- function(x) {
   
   # DEFINITION OF FUNCTION TO AVOID NaN WHEN DIVIDING BY 0
   "%/%" <- function(x,y) ifelse(y==0, 0, x/y)
-  # DEFINITION OF FUNCTION TO AVOID NaN WHEN SD OF ONE VALUE
-  sd <- function(x) ifelse(length(x)==1, 0, stats::sd(x))
+  # DEFINITION OF FUNCTION TO AVOID NaN WHEN ONE-VALUE SD 
+  sd_ <- function(x) ifelse(length(x)==1, 0, stats::sd(x))
   
-  # Get names & constants --> NAME FORMAT: (daily)_[abs|rel]_[mean|sd]_type
+  # Get names & constants
   nn <- get_feature_names()
   
 }
