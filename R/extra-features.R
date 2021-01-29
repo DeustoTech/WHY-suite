@@ -190,6 +190,31 @@ get_bins <- function(t, type) {
     t_factor <- t_v - months(month(t_v) %% 3)
     t_factor <- as.factor(t_factor)
   }
+  # By groups of 4 hours and Northern hemisphere meteorological seasons
+  if (type == 8) {
+    ### 4-hour groups
+    t_f <- cut(t, breaks = "1 hour")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor_1 <- t_v - hours(lubridate::hour(t_v) %% 4)
+    ### Season groups
+    t_f <- cut(t, breaks = "1 month")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor_2 <- t_v - months(month(t_v) %% 3)
+    ### Combination
+    t_factor <- ISOdate(
+      year  = 2000,
+      month = month(t_factor_2),
+      day   = day(t_factor_2),
+      hour  = hour(t_factor_1),
+      tz    = "GMT"
+    )
+    t_factor <- as.factor(t_factor)
+    browser()
+  }
   return(t_factor)
 }
 
@@ -203,12 +228,13 @@ get_bins <- function(t, type) {
 #' Get the mean values and standard deviations for all hours in a day, weekdays in a week and months in a year across a time series of class \code{msts}.
 #' 
 #' @param tseries Time series of class \code{msts}.
+#' @param maxmin Compute, in addition to mean and sd, max and min.
 #' 
 #' @return List of lists with the mean values and standard deviations.
 #' 
 #' @export
 
-get_seasonal_features_from_timeseries <- function(tseries) {
+get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
   # Initialize results list
   o <- list()
   # DEFINITION OF FUNCTION TO AVOID NaN WHEN VECTOR LENGTH IS 1
@@ -229,8 +255,8 @@ get_seasonal_features_from_timeseries <- function(tseries) {
     as.name("month"),
     as.name("season")
   )
-  # Loop for the 7 different bins
-  for (bb in 1:7) {
+  # Loop for the 8 different bins
+  for (bb in 1:8) {
     # Get the bins to compute the sum
     sum_factor <- get_bins(t, bb)
     # Aggregate data (sum) according to the bins
@@ -272,22 +298,21 @@ get_seasonal_features_from_timeseries <- function(tseries) {
       by  = list(bin = sum_factor),
       FUN = sd_
     )
-    # Aggregate data (max) according to the bins
-    o[[name[[bb]]]]$"max" <- stats::aggregate(
-      x   = aggr_data$x,
-      by  = list(bin = sum_factor),
-      FUN = max
-    )
-    # Aggregate data (min) according to the bins
-    o[[name[[bb]]]]$"min" <- stats::aggregate(
-      x   = aggr_data$x,
-      by  = list(bin = sum_factor),
-      FUN = min
-    )
+    if (maxmin) {
+      # Aggregate data (max) according to the bins
+      o[[name[[bb]]]]$"max" <- stats::aggregate(
+        x   = aggr_data$x,
+        by  = list(bin = sum_factor),
+        FUN = max
+      )
+      # Aggregate data (min) according to the bins
+      o[[name[[bb]]]]$"min" <- stats::aggregate(
+        x   = aggr_data$x,
+        by  = list(bin = sum_factor),
+        FUN = min
+      )
+    }
   }
-  
-  plot(o$hour_4$mean)
-  browser()
   
   return(o)
 }
