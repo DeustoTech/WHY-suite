@@ -85,14 +85,14 @@ load_factors <- function(x) {
   cut_breaks_list <- c("1 day", "1 week", "1 month")
   load_factor <- list()
   mean_name_list <- c(
-    as.name("load_factor_mean1"),
-    as.name("load_factor_mean2"),
-    as.name("load_factor_mean3")
+    as.name("load_factor_mean_day"),
+    as.name("load_factor_mean_week"),
+    as.name("load_factor_mean_month")
   )
-  var_name_list <- c(
-    as.name("load_factor_var1"),
-    as.name("load_factor_var2"),
-    as.name("load_factor_var3")
+  sd_name_list <- c(
+    as.name("load_factor_sd_day"),
+    as.name("load_factor_sd_week"),
+    as.name("load_factor_sd_month")
   )
   # Seasonality loop
   for (ii in 1:length(attr(x, "msts"))) {
@@ -115,13 +115,13 @@ load_factors <- function(x) {
     avg_over_max[is.na(avg_over_max)] <- 0
     # Load factor means and vars 
     load_factor[[mean_name_list[[ii]]]] <- mean(avg_over_max)
-    load_factor[[ var_name_list[[ii]]]] <- stats::var(avg_over_max)
+    load_factor[[  sd_name_list[[ii]]]] <- sd(avg_over_max)
   }
   return(load_factor)
 }
 
 ################################################################################
-# get_bin_factors
+# get_bins
 ################################################################################
 
 #' Bin factors from a date sequence
@@ -136,7 +136,7 @@ load_factors <- function(x) {
 #' 
 #' @export
 
-get_bin_factors <- function(t, type) {
+get_bins <- function(t, type) {
   # By hours
   if (type == 1) {
     t_factor <- cut(t, breaks = "1 hour")
@@ -147,7 +147,7 @@ get_bin_factors <- function(t, type) {
     # Convert to vector of dates
     t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
     # Subtract properly to get the new groups
-    t_factor <- t_v - hours(hour(t_v) %% 4)
+    t_factor <- t_v - hours(lubridate::hour(t_v) %% 4)
     t_factor <- as.factor(t_factor)
   }
   # By groups of 6 hours
@@ -156,7 +156,7 @@ get_bin_factors <- function(t, type) {
     # Convert to vector of dates
     t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
     # Subtract properly to get the new groups
-    t_factor <- t_v - hours(hour(t_v) %% 6)
+    t_factor <- t_v - hours(lubridate::hour(t_v) %% 6)
     t_factor <- as.factor(t_factor)
   }
   # By days
@@ -232,7 +232,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
   # Loop for the 7 different bins
   for (bb in 1:7) {
     # Get the bins to compute the sum
-    sum_factor <- get_bin_factors(t, bb)
+    sum_factor <- get_bins(t, bb)
     # Aggregate data (sum) according to the bins
     aggr_data <- stats::aggregate(
       x   = as.numeric(tseries),
@@ -247,29 +247,48 @@ get_seasonal_features_from_timeseries <- function(tseries) {
     # Get the new bins to compute the mean
     # Hours
     if (bb == 1 | bb == 2 | bb == 3) {
-      mean_factor <- as.factor(hour(as.POSIXct(aggr_data[,1], tz="GMT")))
+      sum_factor <- 
+        as.factor(lubridate::hour(as.POSIXct(aggr_data[,1], tz="GMT")))
     }
     # Days
     if (bb == 4 | bb == 5) {
-      mean_factor <- as.factor(wday(as.POSIXct(aggr_data[,1], tz="GMT")))
+      sum_factor <- 
+        as.factor(lubridate::wday(as.POSIXct(aggr_data[,1], tz="GMT")))
     }
     # Months
     if (bb == 6 | bb == 7) {
-      mean_factor <- as.factor(month(as.POSIXct(aggr_data[,1], tz="GMT")))
+      sum_factor <- 
+        as.factor(lubridate::month(as.POSIXct(aggr_data[,1], tz="GMT")))
     }
     # Aggregate data (mean) according to the bins
     o[[name[[bb]]]]$"mean" <- stats::aggregate(
       x   = aggr_data$x,
-      by  = list(bin = mean_factor),
+      by  = list(bin = sum_factor),
       FUN = mean
     )
     # Aggregate data (sd) according to the bins
     o[[name[[bb]]]]$"sd" <- stats::aggregate(
       x   = aggr_data$x,
-      by  = list(bin = mean_factor),
+      by  = list(bin = sum_factor),
       FUN = sd_
     )
+    # Aggregate data (max) according to the bins
+    o[[name[[bb]]]]$"max" <- stats::aggregate(
+      x   = aggr_data$x,
+      by  = list(bin = sum_factor),
+      FUN = max
+    )
+    # Aggregate data (min) according to the bins
+    o[[name[[bb]]]]$"min" <- stats::aggregate(
+      x   = aggr_data$x,
+      by  = list(bin = sum_factor),
+      FUN = min
+    )
   }
+  
+  plot(o$hour_4$mean)
+  browser()
+  
   return(o)
 }
 
@@ -282,7 +301,7 @@ get_seasonal_features_from_timeseries <- function(tseries) {
 #' @description 
 #' Generate the names of the features.
 #' 
-#' @details NAMING FORMAT: [abs|rel]_[mean|sd]_type_(perday)
+#' @details NAMING FORMAT: [abs|rel]_[mean|sd|max|mean]_type_(pday)
 #' 
 #' @return List of lists with the feature names.
 #' 
@@ -363,7 +382,7 @@ stat_data_aggregates <- function(x) {
   # Get names & constants
   n <- get_feature_names()
   # Mean & sd strings
-  msd_str <- c("mean", "sd")
+  msd_str <- c("mean", "sd", "max", "min")
   pd <- "pday"
   
   # Season loop
@@ -373,7 +392,7 @@ stat_data_aggregates <- function(x) {
     if (ss >= 5) {
       sum_of_wmeans <- sum(f[[ss]]$mean$x / n$const[[ss-4]])
     }
-    # Loop mean/sd
+    # Loop mean|sd|max|min
     for (mm in 1:2) {
       # Loop for elements in the dataframe
       for (ii in 1:dim(f[[ss]]$mean)[1]) {

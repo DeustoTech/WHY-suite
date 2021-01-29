@@ -258,7 +258,7 @@ scripts <- function(script_selection) {
   if (script_selection == 9) {
     # Load extended dataframe (edf) from file
     #load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC001001")
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC000005.RData")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC000012.RData")
     # load("C:/Documents and Settings/carlos.quesada/Documents/goiener_users/2ddd8889c59d39e6460b7c65967d7bb9.RData")
     # Get features
     feats <- whyT2.1::get_features_from_cooked_dataframe(edf, "basic")
@@ -387,11 +387,11 @@ scripts <- function(script_selection) {
   # SCRIPT 14 --> ANALYSIS OF FEATURES FROM EXTENDED TIME SERIES
   if (script_selection == 14) {
     # Folder to features' file
-    # feats_folder <- "C:/Users/carlos.quesada/Documents/features/lcl/"
-    feats_folder <- "C:/Users/carlos.quesada/Documents/features/goiener/"
+    feats_folder <- "C:/Users/carlos.quesada/Documents/features/lcl/"
+    # feats_folder <- "C:/Users/carlos.quesada/Documents/features/goiener/"
     ftp          <- c(6:10, 61:84, 162:168, 209:220)
     centers      <- 6
-    is.goiener   <- TRUE
+    is.goiener   <- F
     
     # Load features
     feats <- data.table::fread(
@@ -400,6 +400,7 @@ scripts <- function(script_selection) {
       sep    = ","
     )
     
+    otp <- 1:dim(feats)[1]
     if (is.goiener) {
       # # Folder of extended data
       # goi_folder <- "C:/issda-ext/" #"C:/goiener-ext/"
@@ -485,7 +486,6 @@ scripts <- function(script_selection) {
         print(p)
       }
       print(feat_means)
-      browser()
     }
     
     return(km)
