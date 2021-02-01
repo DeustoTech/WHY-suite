@@ -206,14 +206,13 @@ get_bins <- function(t, type) {
     t_factor_2 <- t_v - months(month(t_v) %% 3)
     ### Combination
     t_factor <- ISOdate(
-      year  = 2000,
+      year  = year(t_factor_2),
       month = month(t_factor_2),
       day   = day(t_factor_2),
       hour  = hour(t_factor_1),
       tz    = "GMT"
     )
     t_factor <- as.factor(t_factor)
-    browser()
   }
   return(t_factor)
 }
@@ -253,7 +252,8 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
     as.name("day"),
     as.name("weekday"),
     as.name("month"),
-    as.name("season")
+    as.name("season"),
+    as.name("hour4_season")
   )
   # Loop for the 8 different bins
   for (bb in 1:8) {
@@ -286,6 +286,13 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
       sum_factor <- 
         as.factor(lubridate::month(as.POSIXct(aggr_data[,1], tz="GMT")))
     }
+    # Hours & seasons
+    if (bb == 8) {
+      sum_factor <- as.factor(
+        lubridate::hour(as.POSIXct(aggr_data[,1], tz="GMT")) + 
+        lubridate::month(as.POSIXct(aggr_data[,1], tz="GMT")) * 100
+      )  
+    }
     # Aggregate data (mean) according to the bins
     o[[name[[bb]]]]$"mean" <- stats::aggregate(
       x   = aggr_data$x,
@@ -313,7 +320,6 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
       )
     }
   }
-  
   return(o)
 }
 
@@ -367,6 +373,19 @@ get_feature_names <- function() {
   }
   # Season names
   n$str$season <- c('spring', 'summer', 'autumn', 'winter')
+  # 4-hour & seasons names
+  n$str$hour4_season <- c()
+  for (ii in 0:23) {
+    # Hours
+    jj <- ii %% 6
+    padded_num1 <- stringr::str_pad(jj*4, 2, pad = "0")
+    padded_num2 <- stringr::str_pad(((jj + 1) * 4) %% 24, 2, pad = "0")
+    x <- paste(padded_num1, "h", padded_num2, "h", sep ="")
+    # Seasons
+    kk <- floor(ii / 6) + 1
+    x <- paste(x, substr(n$str$season[[kk]], 1, 3), sep="")
+    n$str$hour4_season <- c(n$str$hour4_season, x)
+  }
   
   ### Some constants
   # Days per weekday/weekend 
@@ -374,8 +393,9 @@ get_feature_names <- function() {
   # Days per month
   n$const$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   # Days per season
-  n$const$dps <- c(90.25, 92, 92, 91)
-  
+  n$const$dps <- c(92, 92, 91, 90.25)
+  # Days per hour & season
+  n$const$dphs <- rep(n$const$dps, each=6)
   return(n)
 }
 
@@ -411,7 +431,7 @@ stat_data_aggregates <- function(x) {
   pd <- "pday"
   
   # Season loop
-  for(ss in 1:7) {
+  for(ss in 1:8) {
     # Sum of means
     sum_of_means <- sum(f[[ss]]$mean$x)
     if (ss >= 5) {
@@ -444,6 +464,8 @@ stat_data_aggregates <- function(x) {
       }
     }
   }
+  
+  browser()
   
   return(o)
 }
