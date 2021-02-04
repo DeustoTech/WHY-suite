@@ -484,7 +484,6 @@ get_peak_times <- function(ft) {
   
   ### Loop of types per day
   for (ii in 5:8) {
-    browser()
     # Peak
     time_name <- paste("peak", names(ft)[ii], "pday", sep="_")
     idx <- which.max(ft[[ii]][[1]]$x / const[[ii-4]])
