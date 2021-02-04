@@ -449,7 +449,7 @@ get_feature_names <- function() {
 #' @description 
 #' Indicates the peak and off-peaks times of all the available seasons
 #' 
-#' @details Possible values. hour_1: 0 to 23; hour_4: 0 (from 00:00 to 04:00, and so on), 4, 8, 12, 16, 20; hour_6: 0 (from 00:00 to 06:00, and so on), 6, 12, 18; day: from 1 (Sunday) to 7 (Saturday); weekday: 2 (weekdays) or 7 (weekends); month: 1 to 12; season: 3 (spring), 6 (summer), 9 (autumn), 12 (winter); hour4_season: two last digits indicate hour_4, remaining digits indicate season.
+#' @details Possible values. hour_1: 0 to 23; hour_4: 0 (from 00:00 to 04:00), 4, 8, 12, 16, 20; hour_6: 0 (from 00:00 to 06:00), 6, 12, 18; day: from 1 (Sunday) to 7 (Saturday); weekday: 2 (weekdays) or 7 (weekends); month: 1 to 12; season: 3 (spring), 6 (summer), 9 (autumn), 12 (winter); hour4_season: two last digits indicate hour_4, remaining digits indicate season.
 #' 
 #' @return List with feature values of peaks and off-peaks.
 #' 
@@ -537,7 +537,5 @@ stat_data_aggregates <- function(x) {
       }
     }
   }
-  
-  browser()
   return(o)
 }
