@@ -129,16 +129,16 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
       "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
     # List of BASIC functions that REQUIRE normalization
     basic_fns <- c(
-      "frequency", "stl_features", "entropy", "acf_features")
+      "frequency", "stl_features", "entropy", "acf_features", "daily_acf")
     # List of EXTRA functions that REQUIRE normalization
     extra_fns <- c(
-      "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", "max_level_shift",
-      "ac_9", "crossing_points", "max_var_shift", "nonlinearity",
-      "spreadrandomlocal_meantaul", "flat_spots", "pacf_features","firstmin_ac",
-      "std1st_der", "heterogeneity", "stability", "firstzero_ac", "trev_num",
-      "holt_parameters", "walker_propcross", "hurst", "unitroot_kpss", 
-      "histogram_mode", "unitroot_pp", "localsimple_taures", "lumpiness",
-      "motiftwo_entro3")
+      "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", 
+      "max_level_shift", "ac_9", "crossing_points", "max_var_shift",
+      "nonlinearity", "spreadrandomlocal_meantaul", "flat_spots",
+      "pacf_features","firstmin_ac", "std1st_der", "heterogeneity", "stability", 
+      "firstzero_ac", "trev_num", "holt_parameters", "walker_propcross", 
+      "hurst", "unitroot_kpss", "histogram_mode", "unitroot_pp",
+      "localsimple_taures", "lumpiness", "motiftwo_entro3")
     # List of functions that REQUIRE normalization ("extra" includes "basic")
     analysis_fns <- list(
       basic = basic_fns,

@@ -4,12 +4,21 @@
 \alias{get_features_from_cooked_dataframe}
 \title{Features of a cooked dataframe}
 \usage{
-get_features_from_cooked_dataframe(cdf, type_of_analysis)
+get_features_from_cooked_dataframe(
+  cdf,
+  type_of_analysis,
+  list_of_functions = c(),
+  .scale = FALSE
+)
 }
 \arguments{
-\item{type_of_analysis}{A string indicating the type of analysis: either \code{basic} or \code{extra}.}
+\item{type_of_analysis}{A string indicating the type of analysis: \code{basic}, \code{extra} or \code{custom}.}
+
+\item{list_of_functions}{If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.}
 
 \item{df}{Cooked (or extended) dataframe.}
+
+\item{If}{\code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.}
 }
 \value{
 List of features.

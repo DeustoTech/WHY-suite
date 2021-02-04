@@ -13,8 +13,8 @@ stat_data_aggregates(x)
 A list with statistical values of the different bins.
 }
 \description{
-Compute means and variances of time series aggregates, where bins are days, weeks and months.
+Compute means and standard deviations of time series aggregates, where bins relate to day, week and year periods.
 }
 \details{
-\code{mean_XXh} and \code{var_XXh}: the mean and variance of the time series at \code{XX} hours, where \code{XX} goes from 00 to 23. \code{unit_mean_XXh} and \code{unit_var_XXh}: the same as before but values are normalized so that the sum is 1. \code{mean_xxx} and \code{var_xxx}: the mean and variance of the time series on \code{xxx}, where \code{xxx} goes from sun (Sunday) to sat (Saturday). \code{unit_mean_xxx} and \code{unit_var_xxx}: the same as before but values are normalized so that the sum is 1. \code{mean_yyy} and \code{var_yyy}: the mean and variance of the time series in \code{yyy}, where \code{yyy} goes from jan (January) to dec (December). \code{unit_mean_yyy} and \code{unit_var_yyy}: the same as before but values are normalized so that the sum is 1.
+\code{RE-WRITE THIS}
 }

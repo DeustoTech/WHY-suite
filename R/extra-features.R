@@ -121,6 +121,35 @@ load_factors <- function(x) {
 }
 
 ################################################################################
+# daily_acf
+################################################################################
+
+#' Features related to the autocorrelation lags for each day
+#'
+#' @description
+#' Compute the autocorrelation lags for each day, from day 1 to 28.
+#'
+#' @param x Time series of class \code{msts}.
+#'
+#' @return A list with the value of the autocorrelation for each day from 1 to
+#' 28.
+#' @export
+
+daily_acf <- function(x) {
+  # Samples per day
+  samples_per_day <- attr(x, "msts")[1]
+  # Autocorrelation function
+  acfx <- acf(x, lag.max = 30 * samples_per_day)
+  # Loop
+  ac_list <- list()
+  for (ii in 1:28) {
+    feat_name <- as.name(paste("ac_day", ii, sep="_"))
+    ac_list[[feat_name]] <- acfx$acf[1 + samples_per_day * ii]
+  }
+  return(ac_list)
+}
+
+################################################################################
 # get_bins
 ################################################################################
 
@@ -137,6 +166,7 @@ load_factors <- function(x) {
 #' @export
 
 get_bins <- function(t, type) {
+  library(lubridate)
   # By hours
   if (type == 1) {
     t_factor <- cut(t, breaks = "1 hour")
@@ -147,7 +177,7 @@ get_bins <- function(t, type) {
     # Convert to vector of dates
     t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
     # Subtract properly to get the new groups
-    t_factor <- t_v - hours(lubridate::hour(t_v) %% 4)
+    t_factor <- t_v - hours(hour(t_v) %% 4)
     t_factor <- as.factor(t_factor)
   }
   # By groups of 6 hours
@@ -156,7 +186,7 @@ get_bins <- function(t, type) {
     # Convert to vector of dates
     t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
     # Subtract properly to get the new groups
-    t_factor <- t_v - hours(lubridate::hour(t_v) %% 6)
+    t_factor <- t_v - hours(hour(t_v) %% 6)
     t_factor <- as.factor(t_factor)
   }
   # By days
@@ -197,7 +227,7 @@ get_bins <- function(t, type) {
     # Convert to vector of dates
     t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
     # Subtract properly to get the new groups
-    t_factor_1 <- t_v - hours(lubridate::hour(t_v) %% 4)
+    t_factor_1 <- t_v - hours(hour(t_v) %% 4)
     ### Season groups
     t_f <- cut(t, breaks = "1 month")
     # Convert to vector of dates
@@ -449,7 +479,7 @@ stat_data_aggregates <- function(x) {
         fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], sep = "_")
         # Save the value of the feature
         o[[as.name(fname)]] <- f[[ss]][[mm]]$x[ii] %/% sum_of_means
-        # For seasons higher than the day
+        # For seasons higher than the day ('per day' features)
         if (ss >= 5) {
           # Assemble the name of the ABSOLUTE feature
           fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], pd, sep = "_")
@@ -464,8 +494,5 @@ stat_data_aggregates <- function(x) {
       }
     }
   }
-  
-  browser()
-  
   return(o)
 }
