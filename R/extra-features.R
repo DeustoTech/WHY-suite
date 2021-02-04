@@ -29,17 +29,20 @@ stat_moments <- function(x) {
 #' Features related to quantiles
 #'
 #' @description
-#' Compute the minimum, lower quartile, median, upper quartile and maximum of a time series. Also the Q3 to Q1 range.
+#' Compute the minimum, median and maximum, quartiles, deciles, interquartile (Q3 to Q1) range and percentage of outliers.
 #'
 #' @param x Time series of class \code{msts}.
 #'
-#' @return A list with the minimum, lower quartile, median, upper quartile, maximum and Q3-Q1 range of the time series.
+#' @return A list with the minimum, median and maximum, quartiles, deciles, interquartile (Q3 to Q1) range and percentage of outliers.
 #'
 #' @export
 
 quantiles <- function(x) {
-  # Compute quantiles
+  # Compute quartiles
   q <- stats::quantile(x)
+  # Compute deciles
+  d <- stats::quantile(x, probs = seq(0, 1, 0.1))
+  browser()
   # Interquartile range
   iqr <- q[[4]] - q[[2]]
   # IQR criterion for outlier detection
@@ -49,10 +52,18 @@ quantiles <- function(x) {
   
   list(
     minimum        = q[[1]],
-    lower_quartile = q[[2]],
-    median         = q[[3]],
-    upper_quartile = q[[4]],
     maximum        = q[[5]],
+    median         = q[[3]],
+    quartile_1     = q[[2]],
+    quartile_3     = q[[4]],
+    decile_1       = d[[2]],
+    decile_2       = d[[3]],
+    decile_3       = d[[4]],
+    decile_4       = d[[5]],
+    decile_6       = d[[7]],
+    decile_7       = d[[8]],
+    decile_8       = d[[9]],
+    decile_9       = d[[10]],
     iqr            = iqr,
     iqr_outlier_pc = outlier_pc
   )
