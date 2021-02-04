@@ -458,7 +458,19 @@ get_feature_names <- function() {
 get_peak_times <- function(ft) {
   # Initialize output
   o <- list()
-  # Loop of types
+  
+  # Some constants
+  const <- list()
+  # Days per weekday/weekend 
+  const$dpw <- c(5, 2)
+  # Days per month
+  const$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  # Days per season
+  const$dps <- c(92, 92, 91, 90.25)
+  # Days per hour & season
+  const$dphs <- rep(const$dps, each=6)
+  
+  ### Loop of types
   for (ii in 1:8) {
     # Peak
     time_name <- paste("peak", names(ft)[ii], sep="_")
@@ -469,6 +481,20 @@ get_peak_times <- function(ft) {
     idx <- which.min(ft[[ii]][[1]]$x)
     o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
   }
+  
+  ### Loop of types per day
+  for (ii in 5:8) {
+    browser()
+    # Peak
+    time_name <- paste("peak", names(ft)[ii], "pday", sep="_")
+    idx <- which.max(ft[[ii]][[1]]$x / const[[ii-4]])
+    o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
+    # Off-peak
+    time_name <- paste("off_peak", names(ft)[ii], "pday", sep="_")
+    idx <- which.min(ft[[ii]][[1]]$x / const[[ii-4]])
+    o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
+  }
+  
   return(o)
 }
 
