@@ -42,7 +42,6 @@ quantiles <- function(x) {
   q <- stats::quantile(x)
   # Compute deciles
   d <- stats::quantile(x, probs = seq(0, 1, 0.1))
-  browser()
   # Interquartile range
   iqr <- q[[4]] - q[[2]]
   # IQR criterion for outlier detection
@@ -361,6 +360,7 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
       )
     }
   }
+  
   return(o)
 }
 
@@ -441,6 +441,38 @@ get_feature_names <- function() {
 }
 
 ################################################################################
+# get_peak_times
+################################################################################
+
+#' Peak and off-peak times
+#' 
+#' @description 
+#' Indicates the peak and off-peaks times of all the available seasons
+#' 
+#' @details Possible values. hour_1: 0 to 23; hour_4: 0 (from 00:00 to 04:00, and so on), 4, 8, 12, 16, 20; hour_6: 0 (from 00:00 to 06:00, and so on), 6, 12, 18; day: from 1 (Sunday) to 7 (Saturday); weekday: 2 (weekdays) or 7 (weekends); month: 1 to 12; season: 3 (spring), 6 (summer), 9 (autumn), 12 (winter); hour4_season: two last digits indicate hour_4, remaining digits indicate season.
+#' 
+#' @return List with feature values of peaks and off-peaks.
+#' 
+#' @export
+
+get_peak_times <- function(ft) {
+  # Initialize output
+  o <- list()
+  # Loop of types
+  for (ii in 1:8) {
+    # Peak
+    time_name <- paste("peak", names(ft)[ii], sep="_")
+    idx <- which.max(ft[[ii]][[1]]$x)
+    o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
+    # Off-peak
+    time_name <- paste("off_peak", names(ft)[ii], sep="_")
+    idx <- which.min(ft[[ii]][[1]]$x)
+    o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
+  }
+  return(o)
+}
+
+################################################################################
 # stat_data_aggregates
 ################################################################################
 
@@ -458,9 +490,9 @@ get_feature_names <- function() {
 
 stat_data_aggregates <- function(x) {
   # Get the seasonal features
-  f <- whyT2.1::get_seasonal_features_from_timeseries(x)
-  # Output feature list
-  o <- list()
+  ft <- whyT2.1::get_seasonal_features_from_timeseries(x)
+  # Get peak and off-peak times
+  o <- get_peak_times(ft)
   
   # DEFINITION OF FUNCTION TO AVOID NaN WHEN DIVIDING BY 0
   "%/%" <- function(x,y) ifelse(y==0, 0, x/y)
@@ -474,36 +506,38 @@ stat_data_aggregates <- function(x) {
   # Season loop
   for(ss in 1:8) {
     # Sum of means
-    sum_of_means <- sum(f[[ss]]$mean$x)
+    sum_of_means <- sum(ft[[ss]]$mean$x)
     if (ss >= 5) {
-      sum_of_wmeans <- sum(f[[ss]]$mean$x / n$const[[ss-4]])
+      sum_of_wmeans <- sum(ft[[ss]]$mean$x / n$const[[ss-4]])
     }
     # Loop mean|sd|max|min
     for (mm in 1:2) {
       # Loop for elements in the dataframe
-      for (ii in 1:dim(f[[ss]]$mean)[1]) {
+      for (ii in 1:dim(ft[[ss]]$mean)[1]) {
         # Assemble the name of the ABSOLUTE feature
         fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], sep = "_")
         # Save the value of the feature
-        o[[as.name(fname)]] <- f[[ss]][[mm]]$x[ii]
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
         # Assemble the name of the RELATIVE feature
         fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], sep = "_")
         # Save the value of the feature
-        o[[as.name(fname)]] <- f[[ss]][[mm]]$x[ii] %/% sum_of_means
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% sum_of_means
         # For seasons higher than the day ('per day' features)
         if (ss >= 5) {
           # Assemble the name of the ABSOLUTE feature
           fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], pd, sep = "_")
           # Save the value of the feature
-          o[[as.name(fname)]] <- f[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii]
+          o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii]
           # Assemble the name of the RELATIVE feature
           fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], pd, sep = "_")
           # Save the value of the feature
           o[[as.name(fname)]] <- 
-            f[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii] %/% sum_of_wmeans
+            ft[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii] %/% sum_of_wmeans
         }
       }
     }
   }
+  
+  browser()
   return(o)
 }
