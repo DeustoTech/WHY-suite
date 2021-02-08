@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 9
+script_selection <- 21
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -679,8 +679,148 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 21 
+  # SCRIPT 21 - Put feats together
   if (script_selection == 21) {
+    library(tibble)
+    base_folder <- c(
+      "EMPTY",
+      "C:/Users/carlos.quesada/Documents/features/issda_21.01.12/",
+      "C:/Users/carlos.quesada/Documents/features/lcl_20.12.15/",
+      "C:/Users/carlos.quesada/Documents/features/refit_21.01.09/"
+    )
+    goiener_folder <- c(
+      "C:/Users/carlos.quesada/Documents/features/goiener_20.12.15/",
+      "C:/Users/carlos.quesada/Documents/features/goiener_20.12.16/",
+      "C:/Users/carlos.quesada/Documents/features/goiener_21.01.04/"
+    )
+    improved_folder <- c(
+      "C:/Users/carlos.quesada/Documents/features/goiener_21.02.04/",
+      "C:/Users/carlos.quesada/Documents/features/issda_21.02.04/",
+      "C:/Users/carlos.quesada/Documents/features/lcl_21.02.04/",
+      "C:/Users/carlos.quesada/Documents/features/refit_21.02.04/"
+    )
+    output_folder <- "C:/Users/carlos.quesada/Documents/features/"
+    codes <- c("goi", "iss", "lcl", "ref")
+    
+    tbb_list <- list()
+    
+    for (ii in 1:4) {
+      print(ii)
+      base_tbb <- data.frame()
+      # Goiener - there are 3 different folders to load!
+      if (ii == 1) {
+        for (jj in 1:3) {
+          # Get list of dir names in dataset folder
+          dir_names_b <- list.files(goiener_folder[jj], pattern = "*.csv")
+
+          ### GET BASE DATAFRAME
+          # Get feats from base_folder
+          for (csv_file in dir_names_b) {
+            # Load features
+            feats <- data.table::fread(
+              file   = paste(goiener_folder[jj], csv_file, sep = ""),
+              header = TRUE,
+              sep    = ","
+            )
+            # Merge
+            base_tbb <- rbind(base_tbb, feats)
+          }
+        }
+      # Rest of datasets
+      } else {
+        # Get list of dir names in dataset folder
+        dir_names_b <- list.files(base_folder[ii], pattern = "*.csv")
+
+        ### GET BASE DATAFRAME
+        # Get feats from base_folder
+        for (csv_file in dir_names_b) {
+          # Load features
+          feats <- data.table::fread(
+            file   = paste(base_folder[ii], csv_file, sep = ""),
+            header = TRUE,
+            sep    = ","
+          )
+          # Merge
+          base_tbb <- rbind(base_tbb, feats)
+        }
+      }
+      # Remove feats
+      rm(feats)
+      # Convert to tibble
+      base_tbb <- tibble(base_tbb)
+      
+      ### GET IMPROVED DATAFRAME
+      impr_tbb <- data.frame()
+      # Get list of dir names in dataset folder
+      dir_names_i <- list.files(improved_folder[ii], pattern = "*.csv")
+      # Get feats from improved_folder
+      for (csv_file in dir_names_i) {
+        # Load features
+        feats <- data.table::fread(
+          file   = paste(improved_folder[ii], csv_file, sep = ""),
+          header = TRUE,
+          sep    = ","
+        )
+        # Merge
+        impr_tbb <- rbind(impr_tbb, feats)
+      }
+      # Remove feats
+      rm(feats)
+      # Convert to tibble
+      impr_tbb <- tibble(impr_tbb)
+      
+      ### OPERATIONS WITH BOTH TIBBLES
+      # Columns from base_tbb to be removed (from "mean" to "seas_acf1")
+      idx_base <- 2:288
+      # Columns from impr_tbb to be extracted (from "mean" to "ac_day_28")
+      idx_impr <- 1:606
+      
+      # Remove columns in base tibble
+      base_tbb <- dplyr::select(base_tbb, -all_of(idx_base))
+      base_tbb <- dplyr::arrange(base_tbb, file)
+      # Extract columns in improved tibble
+      impr_tbb <- dplyr::select(impr_tbb, all_of(idx_impr))
+      impr_tbb <- dplyr::arrange(impr_tbb, file)
+      # Add columns
+
+      if (all(base_tbb[,1] == impr_tbb[,1])) {
+        base_tbb <- base_tbb %>% add_column(impr_tbb[,2:606], .after = 1)
+      } else {
+        print("NO COINCIDENCE!")
+      }
+      
+      # Add a new "data_set" column after "file" column
+      base_tbb <- tibble::add_column(
+        base_tbb, 
+        data_set = codes[ii], 
+        .after   = "file"
+      )
+      # Remove ".RData" extension from "file" column
+      base_tbb[,1] <- lapply(
+        base_tbb[,1],
+        gsub,
+        pattern = ".RData",
+        replacement = ""
+      )
+      
+      tbb_list[[ii]] <- base_tbb
+    }
+  
+    out <- data.frame()
+    for (ii in 1:4) {
+      out <- rbind(out, tbb_list[[ii]])
+    }
+    
+    # Save
+    data.table::fwrite(
+      x = out,
+      file = paste(output_folder, "feats.csv", sep=""),
+      append    = F,
+      quote     = F,
+      sep       = ",",
+      row.names = F,
+      col.names = T
+    )
     
   }
   
