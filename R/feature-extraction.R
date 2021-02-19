@@ -176,7 +176,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
 #'
 #' @param folder_path String with the absolute path to the dataset folder (ending in `/`).
 #' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{first}.
-#' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{last}.
+#' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR the string \code{last}. 
 #' @param dset_key Key of the dataset.
 #' @param allowed_na A numerical value between 0 and 1. It represents the maximum percentage of admissible \code{NA} values in the cooked dataframe for which the feature extraction is performed. The \code{NA} values will be STL-interpolated (using \code{forecast::na.interp}) prior to the feature extraction.
 #' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
