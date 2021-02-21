@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 23
+script_selection <- 24
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -908,7 +908,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 23
+  # SCRIPT 23 - ADD ALL METADATA OF VERSIONS 1.01 AND 1.02 [NO TARIFFS]
   if (script_selection == 23) {
     # File path to big CSV
     feats_path <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.0.csv"
@@ -1109,6 +1109,340 @@ scripts <- function(script_selection) {
   }
   
   # ----------------------------------------------------------------------------
+  
+  # SCRIPT 24 - ADD GOIENER TARIFFS
+  if (script_selection == 24) {
+    library(lubridate)
+    # File path to big CSV
+    feats_path <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.02.csv"
+    # GOIENER data
+    goien_fold <- "G:/Mi unidad/WHY/Datos (raw)/GOIENER/"
+    # GOIENER extended data
+    goien_ext_fold <- "G:/Mi unidad/WHY/Datasets/goiener-ext/"
+    # GOIENER file 1
+    goi_1_file <- "Contratos_Goiener_20201013_anonymized.csv"
+    # GOIENER file 2
+    goi_2_file <- "Contratos_Goiener_20201209_anonymized.csv"
+    # GOIENER file paths
+    goi_1_path <- paste(goien_fold, goi_1_file, sep="")
+    goi_2_path <- paste(goien_fold, goi_2_file, sep="")
+    
+    # Load feats
+    feats <- data.table::fread(
+      file   = feats_path,
+      header = TRUE,
+      sep    = ","
+    )
+    # List of GOIENER filenames
+    goi_cups <- feats[feats$data_set == "goi",]$file
+    
+    # Load Goiener 1 metadata
+    goi_1 <- data.table::fread(
+      file   = goi_1_path,
+      header = TRUE,
+      sep    = ","
+    )
+    # Load Goiener 2 metadata
+    goi_2 <- data.table::fread(
+      file   = goi_2_path,
+      header = TRUE,
+      sep    = ","
+    )
+    # Goiener
+    names(goi_1) <- names(goi_2)
+    goien <- rbind(goi_1, goi_2)
+    goien <- unique(goien)
+    goien <- dplyr::arrange(
+      goien,
+      cups_ref,
+      desc(fecha_alta),
+      desc(fecha_baja)
+    )
+    
+    # Compute data
+    o <- data.frame()
+    for (gg in goi_cups) {
+      # Indices of CUPS
+      idx <- which(goien$cups_ref == gg)
+      # If CUPS has metadata
+      if (length(idx) != 0) {
+        # Tariff type
+        tariff <- goien$tarifa.tarifa_atr_ref[min(idx)]
+        # Get start period
+        end_period <- as.POSIXct(
+          feats[feats$data_set == "goi",]$overall_end_date[min(idx)]
+        )
+        start_period <- end_period %m-% years(2)
+        # Load extended time series file
+        load(paste(goien_ext_fold, gg, ".RData", sep = ""))
+        # Get just two years of the dataframe
+        t <- edf$df[edf$df$times > start_period,1:2]
+        # Get the new bins to compute the sum
+        sum_factor <- 
+          as.factor(lubridate::hour(as.POSIXct(t[,1], tz="GMT")))
+        # Aggregate data (sum) according to the bins
+        sum_aggr <- stats::aggregate(
+          x   = t[,2],
+          by  = list(bin = sum_factor),
+          FUN = sum
+        )
+        ### Compute energy of last two years - OLD tariffs
+        # From 00:00 to 23:59 is PEAK
+        if (tariff == "2.0A" | tariff == "2.1A") {
+          kwh_2y_peak_old   <- sum(sum_aggr$x)
+          kwh_2y_flat_old   <- NA
+          kwh_2y_valley_old <- NA
+        }
+        # From 12:00 to 21:59 is PEAK
+        # From 22:00 to 11:59 is VALLEY
+        if (tariff == "2.0DHA" | tariff == "2.1DHA") {
+          kwh_2y_peak_old   <- sum(sum_aggr$x[13:22])
+          kwh_2y_flat_old   <- NA
+          kwh_2y_valley_old <- sum(sum_aggr$x[23:24]) + sum(sum_aggr$x[1:12])
+        }
+        # From 13:00 to 22:59 is PEAK
+        # From 23:00 to 00:59 & from 07:00 to 12:59 is FLAT
+        # From 01:00 to 06:59 is VALLEY
+        if (tariff == "2.0DHS" | tariff == "2.1DHS") {
+          kwh_2y_peak_old   <- sum(sum_aggr$x[14:23])
+          kwh_2y_flat_old   <-
+            sum_aggr$x[24] + sum_aggr$x[1] + sum(sum_aggr$x[8:13])
+          kwh_2y_valley_old <- sum(sum_aggr$x[2:7])
+        }
+        browser()
+        ### Compute energy of last two years - NEW tariffs
+        kwh_2y_peak_new   <- NA
+        kwh_2y_flat_new   <- NA
+        kwh_2y_valley_new <- NA
+        # Put all data together into a dataframe
+        df <- data.frame(
+          cups              = gg, 
+          tariff            = tariff,
+          kwh_2y_peak_old   = NA,
+          kwh_2y_flat_old   = NA,
+          kwh_2y_valley_old = NA,
+          kwh_2y_peak_new   = NA,
+          kwh_2y_flat_new   = NA,
+          kwh_2y_valley_new = NA
+        )
+      # If CUPS does NOT have metadata
+      } else {
+        df <- data.frame(
+          cups              = gg,
+          tariff            = NA,
+          kwh_2y_peak_old   = NA,
+          kwh_2y_flat_old   = NA,
+          kwh_2y_valley_old = NA,
+          kwh_2y_peak_new   = NA,
+          kwh_2y_flat_new   = NA,
+          kwh_2y_valley_new = NA
+        )
+      }
+      # Add to final dataframe
+      o <- rbind(o, df)
+    }
+    
+    
+    
+    
+    # Output path
+    outpt_path <- "G:/Mi unidad/WHY/Datasets/@FEATURES/tariffs.csv"
+    # File path to Goiener 
+    goien_path <- "G:/Mi unidad/WHY/Datasets/goiener-ext/"
+    # File path to ISSDA 
+    issda_path <- "G:/Mi unidad/WHY/Datasets/issda-ext/"
+    # File path to Low Carbon London 
+    loclo_path <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
+    # File path to REFIT 
+    refit_path <- "G:/Mi unidad/WHY/Datasets/refit-ext/"
+    
+    # Load feats
+    feats <- data.table::fread(
+      file   = feats_path,
+      header = TRUE,
+      sep    = ","
+    )
+    
+    # FUNCTION TO LOAD METADATA FROM RDATA FILES
+    load_metadata <- function(input_df) {
+      ## INPUTS
+      file_name <- input_df[[1]]
+      data_set  <- input_df[[2]]
+      ## OUTPUT
+      o <- list()
+      
+      
+      ## LOAD FILE
+      # Goiener data set
+      if (data_set == "goi") {
+        load(paste(goien_path, file_name, ".RData", sep=""))
+      }
+      # ISSDA data set
+      if (data_set == "iss") {
+        load(paste(issda_path, file_name, ".RData", sep=""))
+      }
+      # Low Carbon London data set
+      if (data_set == "lcl") {
+        load(paste(loclo_path, file_name, ".RData", sep=""))
+      }
+      # REFIT data set
+      if (data_set == "ref") {
+        load(paste(refit_path, file_name, ".RData", sep=""))
+      }
+      
+      ## COMMON METADATA
+      # file
+      o$file <- file_name
+      # overall_start_date
+      o$overall_start_date <- edf$df$times[1]
+      # overall_end_date
+      o$overall_end_date <- dplyr::last(edf$df$times)
+      # overall_days
+      o$overall_days <- as.numeric(
+        difftime(
+          o$overall_end_date,
+          o$overall_start_date,
+          units = "days")
+      )
+      ## Get vector of imputed dates
+      imputed_dates <- which(edf$df$imputed == 2)
+      # imputed_start_date
+      o$imputed_start_date <- edf$df$times[imputed_dates[1]]
+      # imputed_end_date
+      o$imputed_end_date <- edf$df$times[dplyr::last(imputed_dates)]
+      # imputed_days
+      o$imputed_days <- as.numeric(
+        difftime(
+          o$imputed_end_date,
+          o$imputed_start_date,
+          units = "days")
+      )
+      if (is.na(o$imputed_days)) o$imputed_days <- 0
+      # imputed_days_pct
+      o$imputed_days_pct <- o$imputed_days / o$overall_days
+      # imputed_na
+      o$imputed_na <- edf$number_of_na
+      # imputed_na_pct
+      o$imputed_na_pct <- edf$number_of_na / length(edf$df$times)
+      # total_imputed_pct
+      o$total_imputed_pct <- o$imputed_days_pct + o$imputed_na_pct
+      
+      ## GOIENER-SPECIFIC METADATA
+      if (data_set == "goi") {
+        # country
+        o$country <- "es"
+        # administrative_division
+        o$administrative_division <-
+          stringr::str_replace(edf$province, ",", ";")
+        # municipality
+        o$municipality <-
+          stringr::str_replace(edf$municipality, ",", ";")
+        # zip_code
+        o$zip_code <- edf$zip_code
+        ## Spatial resolution
+        if (is.na(edf$cnae)) {
+          o$is_household <- NA
+        } else {
+          if (floor(edf$cnae/100) == 98) {
+            o$is_household <- 1
+          } else {
+            o$is_household <- 0
+          }
+        }
+        # cnae
+        o$cnae <- edf$cnae
+        # acorn
+        o$acorn <- NA
+        # acorn_grouped
+        o$acorn_grouped <- NA
+      }
+      
+      ## ISSDA-SPECIFIC METADATA
+      if (data_set == "iss") {
+        # country
+        o$country <- "ie"
+        # administrative_division
+        o$administrative_division <- NA
+        # municipality
+        o$municipality <- NA
+        # zip_code
+        o$zip_code <- NA
+        ## Spatial resolution
+        if (edf$id == 1) {
+          o$is_household <- 1
+        } else {
+          o$is_household <- 0
+        }
+        # cnae
+        o$cnae <- NA
+        # acorn
+        o$acorn <- NA
+        # acorn_grouped
+        o$acorn_grouped <- NA
+      }
+      
+      ## LOW CARBON LONDON-SPECIFIC METADATA
+      if (data_set == "lcl") {
+        # country
+        o$country <- "gb"
+        # administrative_division
+        o$administrative_division <- "Greater London"
+        # municipality
+        o$municipality <- NA
+        # zip_code
+        o$zip_code <- NA
+        ## Spatial resolution
+        o$is_household <- 1
+        # cnae
+        o$cnae <- NA
+        # acorn
+        o$acorn <- edf$acorn
+        # acorn_grouped
+        o$acorn_grouped <- edf$acorn_grouped
+      }
+      
+      ## REFIT-SPECIFIC METADATA
+      if (data_set == "ref") {
+        # country
+        o$country <- "gb"
+        # administrative_division
+        o$administrative_division <- NA
+        # municipality
+        o$municipality <- "Loughborough"
+        # zip_code
+        o$zip_code <- NA
+        ## Spatial resolution
+        o$is_household <- 1
+        # cnae
+        o$cnae <- NA
+        # acorn
+        o$acorn <- NA
+        # acorn_grouped
+        o$acorn_grouped <- NA
+      }
+      
+      return(o)
+    }
+    
+    # Generate table
+    feats <- feats[1:14,]
+    library(pbapply)    
+    x <- do.call(dplyr::bind_rows, pbapply(feats[,1:2], 1, load_metadata))
+    # Save
+    data.table::fwrite(
+      x         = x,
+      file      = outpt_path,
+      append    = F,
+      quote     = F,
+      sep       = ",",
+      row.names = F,
+      col.names = T,
+      dateTimeAs = "write.csv"
+    )
+  }
+  
+  # ----------------------------------------------------------------------------
+  
 }
 
 # Execute selected script
