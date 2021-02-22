@@ -331,7 +331,7 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
       sum_factor <- as.factor(
         lubridate::hour(as.POSIXct(aggr_data[,1], tz="GMT")) + 
         lubridate::month(as.POSIXct(aggr_data[,1], tz="GMT")) * 100
-      )  
+      )
     }
     # Aggregate data (mean) according to the bins
     o[[name[[bb]]]]$"mean" <- stats::aggregate(

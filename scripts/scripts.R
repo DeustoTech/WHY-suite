@@ -938,7 +938,6 @@ scripts <- function(script_selection) {
       ## OUTPUT
       o <- list()
       
-      
       ## LOAD FILE
       # Goiener data set
       if (data_set == "goi") {
@@ -1126,6 +1125,8 @@ scripts <- function(script_selection) {
     # GOIENER file paths
     goi_1_path <- paste(goien_fold, goi_1_file, sep="")
     goi_2_path <- paste(goien_fold, goi_2_file, sep="")
+    # Output folder
+    output_folder <- NA
     
     # Load feats
     feats <- data.table::fread(
@@ -1161,15 +1162,19 @@ scripts <- function(script_selection) {
     
     # Compute data
     o <- data.frame()
-    for (gg in goi_cups) {
-      # Indices of CUPS
+    for (gg in goi_cups[2141:2150]) {
+      browser()
+      # Indices of CUPS 
+      # OJOOOOO!!!! idx REFERENCIA A goien NO A feats !!!!!!!!!!
       idx <- which(goien$cups_ref == gg)
       # If CUPS has metadata
       if (length(idx) != 0) {
+        print(gg)
         # Tariff type
         tariff <- goien$tarifa.tarifa_atr_ref[min(idx)]
         # Get start period
         end_period <- as.POSIXct(
+          ##### OJO AQUIIIII
           feats[feats$data_set == "goi",]$overall_end_date[min(idx)]
         )
         start_period <- end_period %m-% years(2)
@@ -1177,261 +1182,139 @@ scripts <- function(script_selection) {
         load(paste(goien_ext_fold, gg, ".RData", sep = ""))
         # Get just two years of the dataframe
         t <- edf$df[edf$df$times > start_period,1:2]
-        # Get the new bins to compute the sum
-        sum_factor <- 
-          as.factor(lubridate::hour(as.POSIXct(t[,1], tz="GMT")))
+        t[,1] <- as.POSIXct(t[,1], tz="GMT")
+        # Get the bins of the hours
+        h_factor <- as.factor(lubridate::hour(t[,1]))
         # Aggregate data (sum) according to the bins
-        sum_aggr <- stats::aggregate(
+        aggr <- stats::aggregate(
           x   = t[,2],
-          by  = list(bin = sum_factor),
+          by  = list(bin = h_factor),
           FUN = sum
         )
-        ### Compute energy of last two years - OLD tariffs
-        # From 00:00 to 23:59 is PEAK
+        ### OLD TARIFFS ########################################################
+        kwh_2y_total <- sum(aggr$x)
+        # 00:00-23:59 -> PEAK
         if (tariff == "2.0A" | tariff == "2.1A") {
-          kwh_2y_peak_old   <- sum(sum_aggr$x)
+          kwh_2y_peak_old   <- sum(aggr$x)
           kwh_2y_flat_old   <- NA
           kwh_2y_valley_old <- NA
+          pct_2y_peak_old   <- 1.0 
+          pct_2y_flat_old   <- NA
+          pct_2y_valley_old <- NA
         }
-        # From 12:00 to 21:59 is PEAK
-        # From 22:00 to 11:59 is VALLEY
+        # 12:00-21:59 -> PEAK
+        # 22:00-11:59 -> VALLEY
         if (tariff == "2.0DHA" | tariff == "2.1DHA") {
-          kwh_2y_peak_old   <- sum(sum_aggr$x[13:22])
+          kwh_2y_peak_old   <- sum(aggr$x[13:22])
           kwh_2y_flat_old   <- NA
-          kwh_2y_valley_old <- sum(sum_aggr$x[23:24]) + sum(sum_aggr$x[1:12])
+          kwh_2y_valley_old <- sum(aggr$x[23:24]) + sum(aggr$x[1:12])
+          pct_2y_peak_old   <- kwh_2y_peak_old / kwh_2y_total
+          pct_2y_flat_old   <- NA
+          pct_2y_valley_old <- kwh_2y_valley_old / kwh_2y_total
         }
-        # From 13:00 to 22:59 is PEAK
-        # From 23:00 to 00:59 & from 07:00 to 12:59 is FLAT
-        # From 01:00 to 06:59 is VALLEY
+        # 13:00-22:59 -> PEAK
+        # 23:00-00:59 & 07:00-12:59 -> FLAT
+        # 01:00-06:59 -> VALLEY
         if (tariff == "2.0DHS" | tariff == "2.1DHS") {
-          kwh_2y_peak_old   <- sum(sum_aggr$x[14:23])
-          kwh_2y_flat_old   <-
-            sum_aggr$x[24] + sum_aggr$x[1] + sum(sum_aggr$x[8:13])
-          kwh_2y_valley_old <- sum(sum_aggr$x[2:7])
+          kwh_2y_peak_old   <- sum(aggr$x[14:23])
+          kwh_2y_flat_old   <- aggr$x[24] + aggr$x[1] + sum(aggr$x[8:13])
+          kwh_2y_valley_old <- sum(aggr$x[2:7])
+          pct_2y_peak_old   <- kwh_2y_peak_old / kwh_2y_total
+          pct_2y_flat_old   <- kwh_2y_flat_old / kwh_2y_total
+          pct_2y_valley_old <- kwh_2y_valley_old / kwh_2y_total
         }
-        browser()
-        ### Compute energy of last two years - NEW tariffs
-        kwh_2y_peak_new   <- NA
-        kwh_2y_flat_new   <- NA
-        kwh_2y_valley_new <- NA
-        # Put all data together into a dataframe
+        ### NEW TARIFFS (2.0TD) ################################################
+        # Aggregate by workday/weekend
+        d_f <- cut(t[,1], breaks = "1 day")
+        # Convert to vector of dates
+        d_v <- as.POSIXct(as.vector(d_f), tz="GMT")
+        # Numbers indicating 0-4 weekdays, 5-6 weekends
+        d_factor <- (wday(d_v) - 2) %% 7
+        # Get TD bins
+        td_factor <- as.numeric(h_factor)
+        td_factor[d_factor == 5 | d_factor == 6] <- 0
+        td_factor <- as.factor(td_factor)
+        # 10:00-13:59 & 18:00-21:59 -> PEAK
+        # 08:00-09:59 & 14:00-17:59 & 22:00-23:59 -> FLAT
+        # 00:00-07:59 & WEEKENDS -> VALLEY
+        kwh_2y_peak_new   <- sum(aggr$x[11:14]) + sum(aggr$x[19:22])
+        kwh_2y_flat_new   <- sum(aggr$x[9:10]) + sum(aggr$x[15:18]) +
+                             sum(aggr$x[23:24])
+        kwh_2y_valley_new <- sum(aggr$x[0:8])
+        pct_2y_peak_new   <- kwh_2y_peak_new / kwh_2y_total
+        pct_2y_flat_new   <- kwh_2y_flat_new / kwh_2y_total
+        pct_2y_valley_new <- kwh_2y_valley_new / kwh_2y_total
+        
+        ### Put all data together into a dataframe #############################
         df <- data.frame(
           cups              = gg, 
           tariff            = tariff,
-          kwh_2y_peak_old   = NA,
-          kwh_2y_flat_old   = NA,
-          kwh_2y_valley_old = NA,
-          kwh_2y_peak_new   = NA,
-          kwh_2y_flat_new   = NA,
-          kwh_2y_valley_new = NA
+          kwh_2y_peak_old   = kwh_2y_peak_old,
+          kwh_2y_flat_old   = kwh_2y_flat_old,
+          kwh_2y_valley_old = kwh_2y_valley_old,
+          pct_2y_peak_old   = pct_2y_peak_old,
+          pct_2y_flat_old   = pct_2y_flat_old,
+          pct_2y_valley_old = pct_2y_valley_old,
+          kwh_2y_peak_new   = kwh_2y_peak_new,
+          kwh_2y_flat_new   = kwh_2y_flat_new,
+          kwh_2y_valley_new = kwh_2y_valley_new,
+          pct_2y_peak_new   = pct_2y_peak_new,
+          pct_2y_flat_new   = pct_2y_flat_new,
+          pct_2y_valley_new = pct_2y_valley_new
         )
       # If CUPS does NOT have metadata
       } else {
         df <- data.frame(
-          cups              = gg,
-          tariff            = NA,
-          kwh_2y_peak_old   = NA,
-          kwh_2y_flat_old   = NA,
-          kwh_2y_valley_old = NA,
-          kwh_2y_peak_new   = NA,
-          kwh_2y_flat_new   = NA,
-          kwh_2y_valley_new = NA
+          cups              = gg,   tariff            = NA,
+          kwh_2y_peak_old   = NA,   kwh_2y_flat_old   = NA,
+          kwh_2y_valley_old = NA,   pct_2y_peak_old   = NA,
+          pct_2y_flat_old   = NA,   pct_2y_valley_old = NA,
+          kwh_2y_peak_new   = NA,   kwh_2y_flat_new   = NA,
+          kwh_2y_valley_new = NA,   pct_2y_peak_new   = NA,
+          pct_2y_flat_new   = NA,   pct_2y_valley_new = NA
         )
       }
       # Add to final dataframe
       o <- rbind(o, df)
     }
-    
-    
-    
-    
-    # Output path
-    outpt_path <- "G:/Mi unidad/WHY/Datasets/@FEATURES/tariffs.csv"
-    # File path to Goiener 
-    goien_path <- "G:/Mi unidad/WHY/Datasets/goiener-ext/"
-    # File path to ISSDA 
-    issda_path <- "G:/Mi unidad/WHY/Datasets/issda-ext/"
-    # File path to Low Carbon London 
-    loclo_path <- "G:/Mi unidad/WHY/Datasets/lcl-ext/"
-    # File path to REFIT 
-    refit_path <- "G:/Mi unidad/WHY/Datasets/refit-ext/"
-    
-    # Load feats
-    feats <- data.table::fread(
-      file   = feats_path,
-      header = TRUE,
-      sep    = ","
-    )
-    
-    # FUNCTION TO LOAD METADATA FROM RDATA FILES
-    load_metadata <- function(input_df) {
-      ## INPUTS
-      file_name <- input_df[[1]]
-      data_set  <- input_df[[2]]
-      ## OUTPUT
-      o <- list()
-      
-      
-      ## LOAD FILE
-      # Goiener data set
-      if (data_set == "goi") {
-        load(paste(goien_path, file_name, ".RData", sep=""))
-      }
-      # ISSDA data set
-      if (data_set == "iss") {
-        load(paste(issda_path, file_name, ".RData", sep=""))
-      }
-      # Low Carbon London data set
-      if (data_set == "lcl") {
-        load(paste(loclo_path, file_name, ".RData", sep=""))
-      }
-      # REFIT data set
-      if (data_set == "ref") {
-        load(paste(refit_path, file_name, ".RData", sep=""))
-      }
-      
-      ## COMMON METADATA
-      # file
-      o$file <- file_name
-      # overall_start_date
-      o$overall_start_date <- edf$df$times[1]
-      # overall_end_date
-      o$overall_end_date <- dplyr::last(edf$df$times)
-      # overall_days
-      o$overall_days <- as.numeric(
-        difftime(
-          o$overall_end_date,
-          o$overall_start_date,
-          units = "days")
-      )
-      ## Get vector of imputed dates
-      imputed_dates <- which(edf$df$imputed == 2)
-      # imputed_start_date
-      o$imputed_start_date <- edf$df$times[imputed_dates[1]]
-      # imputed_end_date
-      o$imputed_end_date <- edf$df$times[dplyr::last(imputed_dates)]
-      # imputed_days
-      o$imputed_days <- as.numeric(
-        difftime(
-          o$imputed_end_date,
-          o$imputed_start_date,
-          units = "days")
-      )
-      if (is.na(o$imputed_days)) o$imputed_days <- 0
-      # imputed_days_pct
-      o$imputed_days_pct <- o$imputed_days / o$overall_days
-      # imputed_na
-      o$imputed_na <- edf$number_of_na
-      # imputed_na_pct
-      o$imputed_na_pct <- edf$number_of_na / length(edf$df$times)
-      # total_imputed_pct
-      o$total_imputed_pct <- o$imputed_days_pct + o$imputed_na_pct
-      
-      ## GOIENER-SPECIFIC METADATA
-      if (data_set == "goi") {
-        # country
-        o$country <- "es"
-        # administrative_division
-        o$administrative_division <-
-          stringr::str_replace(edf$province, ",", ";")
-        # municipality
-        o$municipality <-
-          stringr::str_replace(edf$municipality, ",", ";")
-        # zip_code
-        o$zip_code <- edf$zip_code
-        ## Spatial resolution
-        if (is.na(edf$cnae)) {
-          o$is_household <- NA
-        } else {
-          if (floor(edf$cnae/100) == 98) {
-            o$is_household <- 1
-          } else {
-            o$is_household <- 0
-          }
-        }
-        # cnae
-        o$cnae <- edf$cnae
-        # acorn
-        o$acorn <- NA
-        # acorn_grouped
-        o$acorn_grouped <- NA
-      }
-      
-      ## ISSDA-SPECIFIC METADATA
-      if (data_set == "iss") {
-        # country
-        o$country <- "ie"
-        # administrative_division
-        o$administrative_division <- NA
-        # municipality
-        o$municipality <- NA
-        # zip_code
-        o$zip_code <- NA
-        ## Spatial resolution
-        if (edf$id == 1) {
-          o$is_household <- 1
-        } else {
-          o$is_household <- 0
-        }
-        # cnae
-        o$cnae <- NA
-        # acorn
-        o$acorn <- NA
-        # acorn_grouped
-        o$acorn_grouped <- NA
-      }
-      
-      ## LOW CARBON LONDON-SPECIFIC METADATA
-      if (data_set == "lcl") {
-        # country
-        o$country <- "gb"
-        # administrative_division
-        o$administrative_division <- "Greater London"
-        # municipality
-        o$municipality <- NA
-        # zip_code
-        o$zip_code <- NA
-        ## Spatial resolution
-        o$is_household <- 1
-        # cnae
-        o$cnae <- NA
-        # acorn
-        o$acorn <- edf$acorn
-        # acorn_grouped
-        o$acorn_grouped <- edf$acorn_grouped
-      }
-      
-      ## REFIT-SPECIFIC METADATA
-      if (data_set == "ref") {
-        # country
-        o$country <- "gb"
-        # administrative_division
-        o$administrative_division <- NA
-        # municipality
-        o$municipality <- "Loughborough"
-        # zip_code
-        o$zip_code <- NA
-        ## Spatial resolution
-        o$is_household <- 1
-        # cnae
-        o$cnae <- NA
-        # acorn
-        o$acorn <- NA
-        # acorn_grouped
-        o$acorn_grouped <- NA
-      }
-      
-      return(o)
-    }
-    
-    # Generate table
-    feats <- feats[1:14,]
-    library(pbapply)    
-    x <- do.call(dplyr::bind_rows, pbapply(feats[,1:2], 1, load_metadata))
-    # Save
+
+    ### ADD SHORT DATAFRAME TO BIG FEATURES DATAFRAME
+    # Save o
     data.table::fwrite(
-      x         = x,
-      file      = outpt_path,
+      x         = o,
+      file      = paste(output_folder, "goi_tariffs.csv", sep=""),
+      append    = F,
+      quote     = F,
+      sep       = ",",
+      row.names = F,
+      col.names = T,
+      dateTimeAs = "write.csv"
+    )
+    # Get dimensions of both dataframes
+    dim_feats <- dim(feats)
+    dim_o <- dim(o)
+    # Check that CUPS are properly sorted
+    if (all(feats$file[1:dim_o[1]] == o$file)) {
+      # Pad short dataframe with NAs
+      pad_o <- data.frame(
+        matrix(
+          NA,
+          nrow = dim_feats[1] - dim_o[1],
+          ncol = dim_o[2]
+        )
+      )
+      names(pad_o) <- names(o)
+      pad_o <- rbind(o, pad_o)
+      # Incorporate columns
+      feats <- feats %>% add_column(pad_o[,2:dim_o[2]], .before = "file")
+      browser()
+    } else {
+      print("ERROR")
+    }
+    # Save feats
+    data.table::fwrite(
+      x         = o,
+      file      = paste(output_folder, "new_feats.csv", sep=""),
       append    = F,
       quote     = F,
       sep       = ",",
