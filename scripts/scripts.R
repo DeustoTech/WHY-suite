@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 24
+script_selection <- 25
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -1126,7 +1126,8 @@ scripts <- function(script_selection) {
     goi_1_path <- paste(goien_fold, goi_1_file, sep="")
     goi_2_path <- paste(goien_fold, goi_2_file, sep="")
     # Output folder
-    output_folder <- NA
+    output_folder <- goien_fold
+    browser()
     
     # Load feats
     feats <- data.table::fread(
@@ -1162,24 +1163,20 @@ scripts <- function(script_selection) {
     
     # Compute data
     o <- data.frame()
-    for (gg in goi_cups[2141:2150]) {
-      browser()
+    for (gg in goi_cups) {
       # Indices of CUPS 
-      # OJOOOOO!!!! idx REFERENCIA A goien NO A feats !!!!!!!!!!
       idx <- which(goien$cups_ref == gg)
       # If CUPS has metadata
       if (length(idx) != 0) {
         print(gg)
         # Tariff type
         tariff <- goien$tarifa.tarifa_atr_ref[min(idx)]
-        # Get start period
-        end_period <- as.POSIXct(
-          ##### OJO AQUIIIII
-          feats[feats$data_set == "goi",]$overall_end_date[min(idx)]
-        )
-        start_period <- end_period %m-% years(2)
         # Load extended time series file
         load(paste(goien_ext_fold, gg, ".RData", sep = ""))
+        # Get start period
+        # as.POSIXct(feats[feats$file == gg,]$overall_end_date, tz = "GMT")
+        end_period <- edf$df$times[length(edf$df$times)]
+        start_period <- end_period %m-% years(2)
         # Get just two years of the dataframe
         t <- edf$df[edf$df$times > start_period,1:2]
         t[,1] <- as.POSIXct(t[,1], tz="GMT")
@@ -1322,6 +1319,93 @@ scripts <- function(script_selection) {
       col.names = T,
       dateTimeAs = "write.csv"
     )
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 25 - SAVE feats.csv WITH goi_tariffs.csv DATA
+  if (script_selection == 25) {
+    
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.02.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    
+    # Load o
+    o <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/goi_tariffs.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    
+    # Get dimensions of both dataframes
+    dim_feats <- dim(feats)
+    dim_o <- dim(o)
+    # Check that CUPS are properly sorted
+    if (all(feats$file[1:dim_o[1]] == o$file)) {
+      # Pad short dataframe with NAs
+      pad_o <- data.frame(
+        matrix(
+          NA,
+          nrow = dim_feats[1] - dim_o[1],
+          ncol = dim_o[2]
+        )
+      )
+      names(pad_o) <- names(o)
+      pad_o <- rbind(o, pad_o)
+      # Incorporate columns
+      feats <- feats %>% add_column(pad_o[,2:dim_o[2]], .before = "file")
+      browser()
+    } else {
+      print("ERROR")
+    }
+    # Save feats
+    data.table::fwrite(
+      x         = feats,
+      file      = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.03.csv",
+      append    = F,
+      quote     = F,
+      sep       = ",",
+      row.names = F,
+      col.names = T,
+      dateTimeAs = "write.csv"
+    )
+
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 26
+  if (script_selection == 26) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 27
+  if (script_selection == 27) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 28
+  if (script_selection == 28) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 29
+  if (script_selection == 29) {
+    
+    return()
   }
   
   # ----------------------------------------------------------------------------
