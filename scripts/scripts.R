@@ -1356,8 +1356,9 @@ scripts <- function(script_selection) {
       names(pad_o) <- names(o)
       pad_o <- rbind(o, pad_o)
       # Incorporate columns
-      feats <- feats %>% add_column(pad_o[,2:dim_o[2]], .before = "file")
-      browser()
+      feats <- feats %>% add_column(
+        pad_o[,2:dim_o[2]], .after = "acorn_grouped"
+      )
     } else {
       print("ERROR")
     }
