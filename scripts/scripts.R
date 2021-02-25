@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 25
+script_selection <- 26
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -826,84 +826,9 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 22 - Add metadata [UNFINISHED - see script 23]
+  # SCRIPT 22
   if (script_selection == 22) {
-    library(tibble)
-    # Files
-    file_feats <- "G:/.shortcut-targets-by-id/1g1D2rJfAektwZCB-O_F0EHxDYHxJmhmc/20WHY datasets/Features/feats_v1.0.csv"
-    file_goi_1 <- "G:/.shortcut-targets-by-id/1g1D2rJfAektwZCB-O_F0EHxDYHxJmhmc/20WHY datasets/GOIENER/Contratos_Goiener_20201013_anonymized.csv"
-    file_goi_2 <- "G:/.shortcut-targets-by-id/1g1D2rJfAektwZCB-O_F0EHxDYHxJmhmc/20WHY datasets/GOIENER/Contratos_Goiener_20201209_anonymized.csv"
-    file_issda <- "G:/Mi unidad/WHY/Datos (raw)/ISSDA/38_CER Electricity_Gas/CER Electricity Revised March 2012/CER_Electricity_Documentation/allocations.csv"
-    file_LoCLo <- "G:/Mi unidad/WHY/Datos (raw)/Low Carbon London/informations_households.csv"
     
-    # Load feats
-    feats <- data.table::fread(
-      file   = file_feats,
-      header = TRUE,
-      sep    = ","
-    )
-    feats <- tibble(feats)
-    # Load Goiener 1 metadata
-    goi_1 <- data.table::fread(
-      file   = file_goi_1,
-      header = TRUE,
-      sep    = ","
-    )
-    # Load Goiener 2 metadata
-    goi_2 <- data.table::fread(
-      file   = file_goi_2,
-      header = TRUE,
-      sep    = ","
-    )
-    # Goiener
-    names(goi_1) <- names(goi_2)
-    goien <- rbind(goi_1, goi_2)
-    goien <- unique(goien)
-    goien <- dplyr::arrange(goien, cups_ref)
-    # Load ISSDA metadata
-    issda <- data.table::fread(
-      file   = file_issda,
-      header = FALSE,
-      sep    = ";"
-    )
-    # Load LCL metadata
-    loclo <- data.table::fread(
-      file   = file_LoCLo,
-      header = TRUE,
-      sep    = ","
-    )
-
-    # Relationship feats-goiener
-    rel_feats_goien <- sapply(
-      goien$cups_ref,
-      function(i) which(i == feats$file)
-    )
-    # Relationship feats-ISSDA
-    rel_feats_issda <- sapply(
-      as.character(issda$V1),
-      function(i) which(i == feats$file)
-    )
-    # Relationship feats-LCL
-    rel_feats_loclo <- sapply(
-      loclo$LCLid,
-      function(i) which(i == feats$file)
-    )
-    
-    # Add column to table
-    feats <- feats %>% add_column(
-      administrative_division = NA,
-      .after = "data_set"
-    )
-    
-    # Goiener provinces
-    goien_prov <- sapply(
-      names(rel_feats_goien[feats[[1]]]),
-      function(i) {
-        goien$cups.direccion_prov.nombre_oficial[which(goien$cups_ref == i)[1]]
-      }
-    )
-    
-    browser()
   }
   
   # ----------------------------------------------------------------------------
@@ -1379,8 +1304,32 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 26
+  # SCRIPT 26 - Read original SIMEL files and get their inside hashes
   if (script_selection == 26) {
+    # SIMEL file folder
+    file_folder <- "/home/ubuntu/carlos.quesada/disk/goiener/original/"
+    # Get list of dir names in dataset folder
+    file_names <- list.files(file_folder)
+    
+    # FUNCTION THAT READ EACH FILE AND GET THE HASHES
+    get_hashes <- function(file_name) {
+      # Read 
+      simel <- data.table::fread(
+        file   = paste(file_folder, file_name, sep=""),
+        header = FALSE,
+        sep    = ";"
+      )
+      # Get hashes
+      hash_list <- list(file_name = unique(simel$V1))
+      return(hash_list)
+    }
+    
+    # Get hashes
+    o <- lapply(file_names, get_hashes)
+    save(
+      list = c("o"),
+      file = paste(file_folder, "hashes.RData", sep="")
+    )
     
     return()
   }
