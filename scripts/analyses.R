@@ -71,8 +71,6 @@ analysis_fn <- function(analysis_val, feats) {
       
       silh <- cluster::silhouette(x = res_km$cluster, dist = retr_data_dist)
       
-      
-      
       browser()
 
       # Plot

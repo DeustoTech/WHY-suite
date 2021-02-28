@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 26
+script_selection <- 28
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -1336,16 +1336,96 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 27
+  # SCRIPT 27 - From hashes.RData, assign hashes to file names
   if (script_selection == 27) {
+    # Load hashes.RData
+    load("G:/Mi unidad/WHY/Datasets/@FEATURES/hashes.RData")
+    # Initialization
+    hash2file <- list()
+    browser()
+    # Loop
+    for (o_ii in o) {
+      nn <- names(o_ii)
+      print(nn)
+      for (ff in o_ii[[nn]]) {
+        # Create key if not exist
+        if (is.null(hash2file[[ff]])) {
+          hash2file[[ff]] <- NULL
+        }
+        hash2file[[ff]] <- c(hash2file[[ff]], nn)
+      }
+    }
     
-    return()
+    save(
+      list = c("hash2file"),
+      file = paste(file_folder, "hash2file.RData", sep="")
+    )
+    
+    return(hash2file)
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 28
+  # SCRIPT 28 -- ANALYSE ORIGIN OF NON-METADATA HASHES
   if (script_selection == 28) {
+    # Load files per hash
+    load("G:/Mi unidad/WHY/Datos (raw)/GOIENER/files-per-hash-2.RData")
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.03.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    # Select hashes with no metadata
+    hash_list <- feats[
+      feats$data_set == "goi" &
+      feats$municipality == "", 1
+    ]
+    # Loop
+    bad_files <- c()
+    bad_n <- c()
+    for(hash in hash_list$file) {
+      bad_files <- unique(c(bad_files, hash2file[[hash]]))
+      bad_n <- c(bad_n, length(hash2file[[hash]]))
+    }
+    # # Save feats
+    # data.table::fwrite(
+    #   x         = data.frame(bad_files),
+    #   file      = "G:/Mi unidad/WHY/Datos (raw)/GOIENER/no-metadata.csv",
+    #   append    = F,
+    #   quote     = F,
+    #   sep       = ",",
+    #   row.names = F,
+    #   col.names = F,
+    #   dateTimeAs = "write.csv"
+    # )
+    
+    # Select hashes with metadata
+    hash_list <- feats[
+      feats$data_set == "goi" &
+        feats$municipality != "", 1
+    ]
+    # Loop
+    good_files <- c()
+    good_n <- c()
+    for(hash in hash_list$file) {
+      good_files <- unique(c(good_files, hash2file[[hash]]))
+      good_n <- c(good_n, length(hash2file[[hash]]))
+    }
+    # # Save feats
+    # data.table::fwrite(
+    #   x         = data.frame(good_files),
+    #   file      = "G:/Mi unidad/WHY/Datos (raw)/GOIENER/with-metadata.csv",
+    #   append    = F,
+    #   quote     = F,
+    #   sep       = ",",
+    #   row.names = F,
+    #   col.names = F,
+    #   dateTimeAs = "write.csv"
+    # )
+    
+    
+    browser()
     
     return()
   }

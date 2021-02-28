@@ -9,6 +9,8 @@ License: The Unlicense
 Encoding: UTF-8
 LazyData: true
 Imports:
+  cluster,
+  clusterSim,
   data.table,
   dbscan,
   doParallel,

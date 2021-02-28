@@ -144,3 +144,22 @@ pca_kmeans_analysis <- function(feats_folder, ftp, otp=NULL, min_var=0.95, cente
   )
   return(km)
 }
+
+################################################################################
+# get_cluster_measures
+################################################################################
+
+get_cluster_measures <- function(data_df, cluster_vect) {
+  # FUNCTION THAT COMPUTES SS (SQUARED SUM)
+  ss <- function(x) sum(scale(x, scale = FALSE)^2)
+  
+  ### Compute tot.withinss
+  withinss <- sapply(split(data_df, cluster_vect), ss)
+  tot_withinss <- sum(withinss)
+  
+  ### Compute silhouette function
+  sil <- cluster::silhouette(x = cluster_vect, dist = dist(data_df))
+  sil2 <- data.frame(cluster=sil[,1], sil_width=sil[,3])
+  mean_silhoutte <- sapply(split(sil2$sil_width, sil2$cluster), mean)
+  browser() 
+}
