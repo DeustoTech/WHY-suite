@@ -160,6 +160,16 @@ get_cluster_measures <- function(data_df, cluster_vect) {
   ### Compute silhouette function
   sil <- cluster::silhouette(x = cluster_vect, dist = dist(data_df))
   sil2 <- data.frame(cluster=sil[,1], sil_width=sil[,3])
-  mean_silhoutte <- sapply(split(sil2$sil_width, sil2$cluster), mean)
-  browser() 
+  sil_coeff <- max(sapply(split(sil2$sil_width, sil2$cluster), mean))
+  
+  ### Davies-Bouldin's Index
+  db_index <- clusterSim::index.DB(x = data_df, cl = cluster_vect)
+
+  ### Return
+  o <- list(
+    tot_withinss = tot_withinss,
+    sil_coeff    = sil_coeff,
+    db_index     = db_index$DB
+  )
+  return(o)
 }
