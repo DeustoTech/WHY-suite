@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 28
+script_selection <- 29
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -1432,8 +1432,74 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 29
+  # SCRIPT 29 - Analysis loop
   if (script_selection == 29) {
+    # Generate fake data with 4 real clusters
+    a <- c()
+    a <- c(a, rnorm(30, mean=2, sd=0.1))
+    a <- c(a, rnorm(30, mean=-2, sd=0.1))
+    a <- c(a, rnorm(30, mean=3, sd=0.1))
+    a <- c(a, rnorm(30, mean=4, sd=0.1))
+    a <- c(a, rnorm(30, mean=6, sd=0.1))
+    a <- c(a, rnorm(30, mean=5, sd=0.1))
+    a <- c(a, rnorm(30, mean=-1, sd=0.1))
+    b <- c()
+    b <- c(b, rnorm(30, mean=-1, sd=0.1))
+    b <- c(b, rnorm(30, mean=7, sd=0.1))
+    b <- c(b, rnorm(30, mean=-5, sd=0.1))
+    b <- c(b, rnorm(30, mean=0, sd=0.1))
+    b <- c(b, rnorm(30, mean=-6, sd=0.1))
+    b <- c(b, rnorm(30, mean=-6, sd=0.1))
+    b <- c(b, rnorm(30, mean=8, sd=0.1))
+    d <- c()
+    d <- c(d, rnorm(30, mean=5, sd=0.1))
+    d <- c(d, rnorm(30, mean=1, sd=0.1))
+    d <- c(d, rnorm(30, mean=3, sd=0.1))
+    d <- c(d, rnorm(30, mean=-6, sd=0.1))
+    d <- c(d, rnorm(30, mean=-2, sd=0.1))
+    d <- c(d, rnorm(30, mean=0, sd=0.1))
+    d <- c(d, rnorm(30, mean=4, sd=0.1))
+    x <- data.frame(a,b,d)
+    plot(x)
+    # K-means
+    centers <- c()
+    tot_withinss <- c()
+    mean_sil <- c()
+    db_index <- c()
+    for (cc in 2:12) {
+      res_km <- stats::kmeans(x, cc, iter.max = 100, nstart = 30)
+      cl_meas <- get_cluster_measures(x, res_km$cluster)
+      centers <- c(centers, cc)
+      tot_withinss <- c(tot_withinss, cl_meas$tot_withinss)
+      mean_sil <- c(mean_sil, cl_meas$mean_sil)
+      db_index <- c(db_index, cl_meas$db_index)
+    }
+    plot(centers, tot_withinss) # CHECK THE ELBOW
+    plot(centers, mean_sil)     # CHECK THE MAXIMUM
+    plot(centers, db_index)     # CHECK THE MINIMUM
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 30
+  if (script_selection == 30) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 31
+  if (script_selection == 31) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 32
+  if (script_selection == 32) {
     
     return()
   }
