@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 29
+script_selection <- 22
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -826,9 +826,67 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 22
+  # SCRIPT 22 - ADD TARIFF METADATA TO BIG CSV
   if (script_selection == 22) {
+    # File path to big CSV
+    feats_path <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.04.csv"
     
+    # Load feats
+    feats <- data.table::fread(
+      file   = feats_path,
+      header = TRUE,
+      sep    = ","
+    )
+    
+    # Load Contratos_Goiener_20201013_anonymized.csv
+    goi_1 <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datos (raw)/GOIENER/Contratos_Goiener_20201013_anonymized.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    
+    goi_2 <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datos (raw)/GOIENER/Contratos_Goiener_20201209_anonymized.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    
+    names(goi_1) <- names(goi_2)
+    goien <- rbind(goi_1, goi_2)
+    goien <- unique(goien)
+    goien <- dplyr::arrange(
+      goien,
+      cups_ref,
+      desc(fecha_alta),
+      desc(fecha_baja)
+    )
+    remove(goi_1)
+    remove(goi_2)
+    
+    f_sz <- dim(feats)[1]
+    o <- data.frame(
+      file = rep(NA,f_sz),
+      p1_kw = rep(NA,f_sz),
+      p2_kw = rep(NA,f_sz),
+      p3_kw = rep(NA,f_sz),
+      self_consumption_type = rep(NA,f_sz))
+  
+    for (ii in 1:f_sz) {
+      o$file[ii] <- feats$file[ii]
+      if (feats$tariff[ii] != "") {
+        o$p1_kw[ii] <- goien[goien$cups_ref == o$file[ii], p1_kw][1]
+        o$p2_kw[ii] <- goien[goien$cups_ref == o$file[ii], p2_kw][1]
+        o$p3_kw[ii] <- goien[goien$cups_ref == o$file[ii], p3_kw][1]
+        o$self_consumption_type[ii] <- 
+          goien[goien$cups_ref == o$file[ii], tipo_autoconsumo_ref][1]
+        
+        if (o$p2_kw[ii] == 0 | is.na(o$p2_kw[ii])) o$p2_kw[ii] <- o$p1_kw[ii]
+        if (o$p3_kw[ii] == 0 | is.na(o$p3_kw[ii])) o$p3_kw[ii] <- o$p2_kw[ii]
+        if (o$self_consumption_type[ii] == "") o$self_consumption_type[ii] <- NA
+      }
+    }
+    
+    browser()
   }
   
   # ----------------------------------------------------------------------------
@@ -1432,7 +1490,7 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 29 - Analysis loop
+  # SCRIPT 29 - Synthetic example of an analysis loop
   if (script_selection == 29) {
     # Generate fake data with 4 real clusters
     a <- c()
@@ -1482,24 +1540,386 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 30
+  # SCRIPT 30 - Real analysis loop
   if (script_selection == 30) {
+    # Set random seed
+    set.seed(1981)
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.03.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    # Features to be analyzed
+    column_subset <- list(
+      # Aggregates by 4-hour by season
+      feats_set_1 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin"
+      ),
+      # Aggregates by 4-hour by season & weekly autocorrelations
+      feats_set_2 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Aggregates by 4-hour by season & aggregates by workdays/weekends
+      feats_set_3 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday"
+      ),
+      # Aggregates by 4-hour by season & aggregates by workdays/weekends &
+      # weekly autocorrelations
+      feats_set_4 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Aggregates by 1-hour & aggregates by workdays/weekends & 
+      # aggregates by month
+      feats_set_5 = c(
+        "rel_mean_00h", "rel_mean_01h", "rel_mean_02h", "rel_mean_03h", 
+        "rel_mean_04h", "rel_mean_05h", "rel_mean_06h", "rel_mean_07h", 
+        "rel_mean_08h", "rel_mean_09h", "rel_mean_10h", "rel_mean_11h", 
+        "rel_mean_12h", "rel_mean_13h", "rel_mean_14h", "rel_mean_15h",
+        "rel_mean_16h", "rel_mean_17h", "rel_mean_18h", "rel_mean_19h",
+        "rel_mean_20h", "rel_mean_21h", "rel_mean_22h", "rel_mean_23h", 
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "rel_mean_jan", "rel_mean_feb", "rel_mean_mar", "rel_mean_apr", 
+        "rel_mean_may", "rel_mean_jun", "rel_mean_jul", "rel_mean_aug",
+        "rel_mean_sep", "rel_mean_oct", "rel_mean_nov", "rel_mean_dec"
+      ),
+      # Aggregates by 1-hour & aggregates by workdays/weekends & 
+      # aggregates by month & weekly autocorrelations
+      feats_set_6 = c(
+        "rel_mean_00h", "rel_mean_01h", "rel_mean_02h", "rel_mean_03h", 
+        "rel_mean_04h", "rel_mean_05h", "rel_mean_06h", "rel_mean_07h", 
+        "rel_mean_08h", "rel_mean_09h", "rel_mean_10h", "rel_mean_11h", 
+        "rel_mean_12h", "rel_mean_13h", "rel_mean_14h", "rel_mean_15h",
+        "rel_mean_16h", "rel_mean_17h", "rel_mean_18h", "rel_mean_19h",
+        "rel_mean_20h", "rel_mean_21h", "rel_mean_22h", "rel_mean_23h", 
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "rel_mean_jan", "rel_mean_feb", "rel_mean_mar", "rel_mean_apr", 
+        "rel_mean_may", "rel_mean_jun", "rel_mean_jul", "rel_mean_aug",
+        "rel_mean_sep", "rel_mean_oct", "rel_mean_nov", "rel_mean_dec",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Peaks/Off-peaks
+      feats_set_7 = c(
+        "peak_hour_1", "off_peak_hour_1", "peak_month", "off_peak_month",
+        "peak_weekday_pday"
+      ),
+      # Aggregates by 6-hour & aggregates by workdays/weekends &
+      # weekly autocorrelations & aggregates by season
+      feats_set_8 = c(
+        "rel_mean_00h06h", "rel_mean_06h12h", "rel_mean_12h18h",
+        "rel_mean_18h00h",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28",
+        "rel_mean_spring_pday", "rel_mean_summer_pday", "rel_mean_autumn_pday",
+        "rel_mean_winter_pday"
+      ),
+      # Weekly autocorrelations
+      feats_set_9 = c(
+        "ac_day_1", "ac_day_2", "ac_day_3", "ac_day_4", "ac_day_5",
+        "ac_day_6", "ac_day_7", "ac_day_8", "ac_day_9", "ac_day_10",
+        "ac_day_11", "ac_day_12", "ac_day_13", "ac_day_14", "ac_day_15",
+        "ac_day_16", "ac_day_17", "ac_day_18", "ac_day_19", "ac_day_20", 
+        "ac_day_21", "ac_day_22", "ac_day_23", "ac_day_24", "ac_day_25", 
+        "ac_day_26", "ac_day_27", "ac_day_28")
+    )
+    # Set selection
+    for (ss in 1:length(column_subset)) {
+      print(paste("SET", ss, sep=" "))
+      # Retrieve working data
+      working_data <- subset(
+        x      = feats,
+        subset =
+          data_set == "iss" & is_household == 1 & total_imputed_pct < 2/3,
+        select = column_subset[[ss]]
+      )
+      # Loop for k-means centers
+      for (cc in 2:25) { #2:30) {
+        print(paste("CC", cc, sep=" "))
+        # Compute k-means
+        km <- stats::kmeans(
+          working_data,
+          cc,
+          iter.max = 200,
+          nstart = 50,
+          algorithm = "MacQueen"
+        )
+        # Compute cluster measures
+        cluster_measures <- get_cluster_measures(working_data, km$cluster)
+        # Save variables
+        save(
+          list = c("km", "cluster_measures"),
+          file = paste(
+            "G:/Mi unidad/WHY/Analyses/",
+            "analysis_iss_set", ss, "_cc", cc, ".RData",
+            sep = "")
+        )
+      }
+    }
     
     return()
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 31
+  # SCRIPT 31 - Analysis assessment
   if (script_selection == 31) {
     
+    for (ss in 1:9) {
+      # Initializations
+      tot_withinss <- c()
+      mean_sil     <- c()
+      db_index     <- c()
+      # Centers loop
+      for (cc in 2:25) {
+        # Load analyses
+        load(
+          paste(
+            "G:/Mi unidad/WHY/Analyses/",
+            "analysis_iss_set", ss, "_cc", cc, ".RData",
+            sep = ""
+          )
+        )
+        # Create graphs
+        tot_withinss <- c(tot_withinss, cluster_measures$tot_withinss)
+        mean_sil     <- c(mean_sil,     cluster_measures$mean_sil)
+        db_index     <- c(db_index,     cluster_measures$db_index)
+      }
+      # Plot
+      plot_name <- paste("iss tot_withinss set", ss, sep="")
+      pdf(paste("G:/Mi unidad/WHY/Analyses/", plot_name, ".pdf", sep="")) 
+      plot(2:25, tot_withinss)
+      title(plot_name)
+      dev.off()
+      
+      plot_name <- paste("iss mean_sil set", ss, sep="")
+      pdf(paste("G:/Mi unidad/WHY/Analyses/", plot_name, ".pdf", sep="")) 
+      plot(2:25, mean_sil)
+      title(plot_name)
+      dev.off()
+      
+      plot_name <- paste("iss db_index set", ss, sep="")
+      pdf(paste("G:/Mi unidad/WHY/Analyses/", plot_name, ".pdf", sep="")) 
+      plot(2:25, db_index)
+      title(plot_name)
+      dev.off()
+    }
+    
     return()
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 32
+  # SCRIPT 32 - BOXPLOTS OF CLUSTERS
   if (script_selection == 32) {
+    # Which result to load
+    dataset   <- "goi"
+    feats_set <- 7
+    centers   <- 10
+    # Features to be analyzed
+    column_subset <- list(
+    # Aggregates by 4-hour by season
+      feats_set_1 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin"
+      ),
+      # Aggregates by 4-hour by season & weekly autocorrelations
+      feats_set_2 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Aggregates by 4-hour by season & aggregates by workdays/weekends
+      feats_set_3 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday"
+      ),
+      # Aggregates by 4-hour by season & aggregates by workdays/weekends &
+      # weekly autocorrelations
+      feats_set_4 = c(
+        "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+        "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+        "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+        "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+        "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+        "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+        "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+        "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Aggregates by 1-hour & aggregates by workdays/weekends & 
+      # aggregates by month
+      feats_set_5 = c(
+        "rel_mean_00h", "rel_mean_01h", "rel_mean_02h", "rel_mean_03h", 
+        "rel_mean_04h", "rel_mean_05h", "rel_mean_06h", "rel_mean_07h", 
+        "rel_mean_08h", "rel_mean_09h", "rel_mean_10h", "rel_mean_11h", 
+        "rel_mean_12h", "rel_mean_13h", "rel_mean_14h", "rel_mean_15h",
+        "rel_mean_16h", "rel_mean_17h", "rel_mean_18h", "rel_mean_19h",
+        "rel_mean_20h", "rel_mean_21h", "rel_mean_22h", "rel_mean_23h", 
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "rel_mean_jan", "rel_mean_feb", "rel_mean_mar", "rel_mean_apr", 
+        "rel_mean_may", "rel_mean_jun", "rel_mean_jul", "rel_mean_aug",
+        "rel_mean_sep", "rel_mean_oct", "rel_mean_nov", "rel_mean_dec"
+      ),
+      # Aggregates by 1-hour & aggregates by workdays/weekends & 
+      # aggregates by month & weekly autocorrelations
+      feats_set_6 = c(
+        "rel_mean_00h", "rel_mean_01h", "rel_mean_02h", "rel_mean_03h", 
+        "rel_mean_04h", "rel_mean_05h", "rel_mean_06h", "rel_mean_07h", 
+        "rel_mean_08h", "rel_mean_09h", "rel_mean_10h", "rel_mean_11h", 
+        "rel_mean_12h", "rel_mean_13h", "rel_mean_14h", "rel_mean_15h",
+        "rel_mean_16h", "rel_mean_17h", "rel_mean_18h", "rel_mean_19h",
+        "rel_mean_20h", "rel_mean_21h", "rel_mean_22h", "rel_mean_23h", 
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "rel_mean_jan", "rel_mean_feb", "rel_mean_mar", "rel_mean_apr", 
+        "rel_mean_may", "rel_mean_jun", "rel_mean_jul", "rel_mean_aug",
+        "rel_mean_sep", "rel_mean_oct", "rel_mean_nov", "rel_mean_dec",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28"
+      ),
+      # Peaks/Off-peaks
+      feats_set_7 = c(
+        "peak_hour_1", "off_peak_hour_1", "peak_month", "off_peak_month",
+        "peak_weekday_pday"
+      ),
+      # Aggregates by 6-hour & aggregates by workdays/weekends &
+      # weekly autocorrelations & aggregates by season
+      feats_set_8 = c(
+        "rel_mean_00h06h", "rel_mean_06h12h", "rel_mean_12h18h",
+        "rel_mean_18h00h",
+        "rel_mean_weekday_pday", "rel_mean_weekend_pday",
+        "ac_day_7", "ac_day_14", "ac_day_21", "ac_day_28",
+        "rel_mean_spring_pday", "rel_mean_summer_pday", "rel_mean_autumn_pday",
+        "rel_mean_winter_pday"
+      ),
+      # Weekly autocorrelations
+      feats_set_9 = c(
+        "ac_day_1", "ac_day_2", "ac_day_3", "ac_day_4", "ac_day_5",
+        "ac_day_6", "ac_day_7", "ac_day_8", "ac_day_9", "ac_day_10",
+        "ac_day_11", "ac_day_12", "ac_day_13", "ac_day_14", "ac_day_15",
+        "ac_day_16", "ac_day_17", "ac_day_18", "ac_day_19", "ac_day_20", 
+        "ac_day_21", "ac_day_22", "ac_day_23", "ac_day_24", "ac_day_25", 
+        "ac_day_26", "ac_day_27", "ac_day_28")
+    )
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.03.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    # Retrieve working data
+    if (dataset != "goi") {
+      feats <- subset(
+        x      = feats,
+        subset = 
+          data_set == dataset & 
+          is_household == 1 & 
+          total_imputed_pct < 2/3, 
+        select = column_subset[[feats_set]]
+      )
+    } else {
+      feats <- subset(
+        x      = feats,
+        subset = 
+          data_set == dataset & 
+          is_household == 1 & 
+          total_imputed_pct < 2/3 &
+          municipality != "", 
+        select = column_subset[[feats_set]]
+      )
+    }
+    # Compose file name
+    fname <- paste(
+      "G:/Mi unidad/WHY/Analyses/analysis_", dataset, "_set", feats_set,
+      "_cc", centers, ".RData", sep = ""
+    )
+    # Load file
+    load(fname)
+    
+    for (cc in 1:centers) {
+      ff <- feats[km$cluster == cc,]
+      
+      # boxplot(ff[,1:24], las=2, ylim=c(0,1))
+      # boxplot(ff, las=2, ylim=c(0,0.3))
+      boxplot(ff, las=2)
+      
+      title(paste("Elements in cluster #", cc, ": ", sum(km$cluster == cc),
+                  sep=""))
+    }
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 33
+  if (script_selection == 33) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 34
+  if (script_selection == 34) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 35
+  if (script_selection == 35) {
     
     return()
   }
