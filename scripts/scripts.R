@@ -1920,29 +1920,37 @@ scripts <- function(script_selection) {
     date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
     aggr_data$date_time <- as.character(date_vect)
     
+    # Starting point
+    sp <- 0
     # Length of the output vector
     lov <- 53*7*24
-    # Create output vector
-    out_df <- data.frame(date_time = rep(NA, lov), x = rep(NA, lov))
-    # Get time triad of initial time
-    ini_week <- as.numeric(strftime(as.Date(date_vect[1]), format = "%V"))
-    ini_wday <- lubridate::wday(date_vect[1], week_start=1)
-    ini_hour <- lubridate::hour(date_vect[1])
-    # Position in the (53 x 7) x 24 vector
-    ini_posv <- (ini_week-1)*7*24 + (ini_wday-1)*24 + (ini_hour+1)
-    # Data pointer
-    pp <- lov - ini_posv + 1
-    # Fill the tail of output vector
-    out_df[ini_posv:lov,] <- aggr_data[1:pp,]
-    # Get time triad of final time
-    fin_week <- as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
-    fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
-    fin_hour <- lubridate::hour(date_vect[pp+1])
-    # Get new data pointers
-    qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
-    rr <- qq + ini_posv - 2
-    # Fill the head of output vector
-    out_df[1:(ini_posv-1),] <- aggr_data[qq:rr,]
+    # Loop
+    while(sp + lov <= length(date_vect)) {
+      # Create output vector
+      out_df <- data.frame(date_time = rep(NA, lov), x = rep(NA, lov))
+      # Get time triad of initial time
+      ini_week <- as.numeric(strftime(as.Date(date_vect[sp+1]), format = "%V"))
+      ini_wday <- lubridate::wday(date_vect[sp+1], week_start=1)
+      ini_hour <- lubridate::hour(date_vect[sp+1])
+      # Position in the (53 x 7) x 24 vector
+      ini_posv <- (ini_week-1)*7*24 + (ini_wday-1)*24 + (ini_hour+1)
+      # Data pointer
+      pp <- sp + lov - ini_posv + 1
+      # Fill the tail of output vector
+      out_df[ini_posv:lov,] <- aggr_data[(sp+1):pp,]
+      # Get time triad of final time
+      fin_week <- as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
+      fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
+      fin_hour <- lubridate::hour(date_vect[pp+1])
+      # Get new data pointers
+      qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
+      rr <- qq + ini_posv - 2
+      # Fill the head of output vector
+      out_df[1:(ini_posv-1),] <- aggr_data[qq:rr,]
+      # Move the starting point
+      browser()
+      sp <- rr
+    }
     
     browser()
     
