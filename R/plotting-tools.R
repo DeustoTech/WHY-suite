@@ -252,3 +252,16 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
     dev.off()
   }
 }
+
+################################################################################
+# Time series heatmap
+################################################################################
+
+# plot_features_library <- function(df) {
+#   # Aggregate by hour
+#   aggr_data <- stats::aggregate(
+#     x   = as.numeric(tseries),
+#     by  = list(date_time = sum_factor),
+#     FUN = sum
+#   )
+# }
