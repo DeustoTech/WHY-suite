@@ -1924,6 +1924,9 @@ scripts <- function(script_selection) {
     sp <- 0
     # Length of the output vector
     lov <- 53*7*24
+    # Output list
+    li <- 0
+    out_list <- list()
     # Loop
     while(sp + lov <= length(date_vect)) {
       # Create output vector
@@ -1947,8 +1950,10 @@ scripts <- function(script_selection) {
       rr <- qq + ini_posv - 2
       # Fill the head of output vector
       out_df[1:(ini_posv-1),] <- aggr_data[qq:rr,]
+      # Output list
+      li <- li + 1
+      out_list[[li]] <- out_df$x
       # Move the starting point
-      browser()
       sp <- rr
     }
     
