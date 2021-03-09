@@ -1918,7 +1918,6 @@ scripts <- function(script_selection) {
     )
     # Vector of dates
     date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
-    aggr_data$date_time <- as.character(date_vect)
     
     # Starting point
     sp <- 0
@@ -1930,7 +1929,7 @@ scripts <- function(script_selection) {
     # Loop
     while(sp + lov <= length(date_vect)) {
       # Create output vector
-      out_df <- data.frame(date_time = rep(NA, lov), x = rep(NA, lov))
+      out_vect <- rep(NA, lov)
       # Get time triad of initial time
       ini_week <- as.numeric(strftime(as.Date(date_vect[sp+1]), format = "%V"))
       ini_wday <- lubridate::wday(date_vect[sp+1], week_start=1)
@@ -1940,7 +1939,7 @@ scripts <- function(script_selection) {
       # Data pointer
       pp <- sp + lov - ini_posv + 1
       # Fill the tail of output vector
-      out_df[ini_posv:lov,] <- aggr_data[(sp+1):pp,]
+      out_vect[ini_posv:lov] <- aggr_data[(sp+1):pp,2]
       # Get time triad of final time
       fin_week <- as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
       fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
@@ -1949,15 +1948,16 @@ scripts <- function(script_selection) {
       qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
       rr <- qq + ini_posv - 2
       # Fill the head of output vector
-      out_df[1:(ini_posv-1),] <- aggr_data[qq:rr,]
+      out_vect[1:(ini_posv-1)] <- aggr_data[qq:rr,2]
       # Output list
       li <- li + 1
-      out_list[[li]] <- out_df$x
+      out_list[[li]] <- out_vect
       # Move the starting point
       sp <- rr
     }
     
     browser()
+
     
     # Locate the latest 23:00
     end_date <- last(date_vect) %m-% hours((hour(last(date_vect)) + 1) %% 24)
