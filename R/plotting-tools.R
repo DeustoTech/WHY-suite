@@ -257,11 +257,99 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 # Time series heatmap
 ################################################################################
 
-# plot_features_library <- function(df) {
-#   # Aggregate by hour
-#   aggr_data <- stats::aggregate(
-#     x   = as.numeric(tseries),
-#     by  = list(date_time = sum_factor),
-#     FUN = sum
-#   )
-# }
+plot_heatmap <- function(fnames) {
+  # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
+  # INPUT: dataframe with pairs dataset-filename
+  align_time_series <- function(fnames) {
+    # Load dataframe
+    path <- paste(
+      "G:/Mi unidad/WHY/Datasets/",
+      fnames[[1]],
+      "-ext/",
+      fnames[[2]],
+      ".RData",
+      sep = ""
+    )
+    load(path)
+    # By hours
+    t_factor <- cut(edf$df$times, breaks = "1 hour")
+    # Aggregate by hour
+    aggr_data <- stats::aggregate(
+      x   = edf$df$values,
+      by  = list(date_time = t_factor),
+      FUN = sum
+    )
+    # Vector of dates
+    date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
+    # Number of years to be taken per time series (if "as much as possible" is
+    # wanted, just set sp <- 0 and uncomment the commented while loop)
+    nyears <- 2
+    # Length of the output vector
+    lov <- 53*7*24
+    # Starting point (is set to catch the central part of the time series
+    # thus avoiding artificially extended ends)
+    # sp <- 0 
+    sp <- floor(length(date_vect)/2) - floor((nyears*lov)/2)
+    # Output list
+    li <- 0
+    out_list <- list()
+    # Loop
+    # while(sp + lov <= length(date_vect)) {
+    while(li < nyears) {
+      # Create output vector
+      out_vect <- rep(NA, lov)
+      # Get time triad of initial time
+      ini_week <-
+        as.numeric(strftime(as.Date(date_vect[sp+1]), format = "%V"))
+      ini_wday <- lubridate::wday(date_vect[sp+1], week_start=1)
+      ini_hour <- lubridate::hour(date_vect[sp+1])
+      # Position in the (53 x 7) x 24 vector
+      ini_posv <- (ini_week-1)*7*24 + (ini_wday-1)*24 + (ini_hour+1)
+      # Data pointer
+      pp <- sp + lov - ini_posv + 1
+      # Fill the tail of output vector
+      out_vect[ini_posv:lov] <- aggr_data[(sp+1):pp,2]
+      # Get time triad of final time
+      fin_week <-
+        as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
+      fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
+      fin_hour <- lubridate::hour(date_vect[pp+1])
+      # Get new data pointers
+      qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
+      rr <- qq + ini_posv - 2
+      # Fill the head of output vector
+      out_vect[1:(ini_posv-1)] <- aggr_data[qq:rr,2]
+      # Output list
+      li <- li + 1
+      out_list[[li]] <- out_vect
+      # Move the starting point
+      sp <- rr
+    }
+    return(out_list)
+  }
+  
+  # Align time series!
+  out_list <- apply(fnames, 1, align_time_series)
+  # Unlist two layers
+  out_list <- do.call(rbind,do.call(rbind,out_list))
+  # Create matrix from means
+  o_mat <- matrix(
+    data = colMeans(out_list),
+    nrow = 24
+  )
+  # Flip matrix
+  o_mat <- o_mat[nrow(o_mat):1,]
+  # Week labels
+  x_labels <- rep(NA, 371)
+  x_labels[seq(1,371, by=7)] <- 1:53
+  # Plot heatmap
+  heatmap(
+    x       = o_mat,
+    Rowv    = NA,
+    Colv    = NA,
+    labRow  = 23:0,
+    labCol  = x_labels,
+    scale   = "none",
+    margins = c(2,0)
+  )
+}
