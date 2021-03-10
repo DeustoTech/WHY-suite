@@ -1907,59 +1907,91 @@ scripts <- function(script_selection) {
     library(lubridate)
     library(data.table)
     
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC004857.RData")
-    #load("G:/Mi unidad/WHY/Datasets/fake-ext/nights.RData")
-    # By hours
-    t_factor <- cut(edf$df$times, breaks = "1 hour")
-    # Aggregate by hour
-    aggr_data <- stats::aggregate(
-      x   = edf$df$values,
-      by  = list(date_time = t_factor),
-      FUN = sum
+    # Dataframe of files to plot
+    fnames <- data.frame(
+      ds = "lcl",
+      fn = c("MAC000182", "MAC000283", "MAC000384", "MAC000485")
     )
-    # Vector of dates
-    date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
     
-    # Starting point
-    sp <- 0
-    # Length of the output vector
-    lov <- 53*7*24
-    # Output list
-    li <- 0
-    out_list <- list()
-    # Loop
-    while(sp + lov <= length(date_vect)) {
-      # Create output vector
-      out_vect <- rep(NA, lov)
-      # Get time triad of initial time
-      ini_week <- as.numeric(strftime(as.Date(date_vect[sp+1]), format = "%V"))
-      ini_wday <- lubridate::wday(date_vect[sp+1], week_start=1)
-      ini_hour <- lubridate::hour(date_vect[sp+1])
-      # Position in the (53 x 7) x 24 vector
-      ini_posv <- (ini_week-1)*7*24 + (ini_wday-1)*24 + (ini_hour+1)
-      # Data pointer
-      pp <- sp + lov - ini_posv + 1
-      # Fill the tail of output vector
-      out_vect[ini_posv:lov] <- aggr_data[(sp+1):pp,2]
-      # Get time triad of final time
-      fin_week <- as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
-      fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
-      fin_hour <- lubridate::hour(date_vect[pp+1])
-      # Get new data pointers
-      qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
-      rr <- qq + ini_posv - 2
-      # Fill the head of output vector
-      out_vect[1:(ini_posv-1)] <- aggr_data[qq:rr,2]
+    # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
+    # INPUT: dataframe with pairs dataset-filename
+    align_time_series <- function(fnames) {
+      # Load dataframe
+      path <- paste(
+        "G:/Mi unidad/WHY/Datasets/",
+        fnames[[1]],
+        "-ext/",
+        fnames[[2]],
+        ".RData",
+        sep = ""
+      )
+      load(path)
+      # By hours
+      t_factor <- cut(edf$df$times, breaks = "1 hour")
+      # Aggregate by hour
+      aggr_data <- stats::aggregate(
+        x   = edf$df$values,
+        by  = list(date_time = t_factor),
+        FUN = sum
+      )
+      # Vector of dates
+      date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
+      # Number of years to be taken per time series (if "as much as possible" is
+      # wanted, just set sp <- 0 and uncomment the commented while loop)
+      nyears <- 2
+      # Length of the output vector
+      lov <- 53*7*24
+      # Starting point (is set to catch the central part of the time series
+      # thus avoiding artificially extended ends)
+      # sp <- 0 
+      sp <- floor(length(date_vect)/2) - floor((nyears*lov)/2)
       # Output list
-      li <- li + 1
-      out_list[[li]] <- out_vect
-      # Move the starting point
-      sp <- rr
+      li <- 0
+      out_list <- list()
+      # Loop
+      # while(sp + lov <= length(date_vect)) {
+      while(li < nyears) {
+        # Create output vector
+        out_vect <- rep(NA, lov)
+        # Get time triad of initial time
+        ini_week <-
+          as.numeric(strftime(as.Date(date_vect[sp+1]), format = "%V"))
+        ini_wday <- lubridate::wday(date_vect[sp+1], week_start=1)
+        ini_hour <- lubridate::hour(date_vect[sp+1])
+        # Position in the (53 x 7) x 24 vector
+        ini_posv <- (ini_week-1)*7*24 + (ini_wday-1)*24 + (ini_hour+1)
+        # Data pointer
+        pp <- sp + lov - ini_posv + 1
+        # Fill the tail of output vector
+        out_vect[ini_posv:lov] <- aggr_data[(sp+1):pp,2]
+        # Get time triad of final time
+        fin_week <-
+          as.numeric(strftime(as.Date(date_vect[pp+1]), format = "%V"))
+        fin_wday <- lubridate::wday(date_vect[pp+1], week_start=1)
+        fin_hour <- lubridate::hour(date_vect[pp+1])
+        # Get new data pointers
+        qq <- pp - (fin_week-1)*7*24 - (fin_wday-1)*24 + 1
+        rr <- qq + ini_posv - 2
+        # Fill the head of output vector
+        out_vect[1:(ini_posv-1)] <- aggr_data[qq:rr,2]
+        # Output list
+        li <- li + 1
+        out_list[[li]] <- out_vect
+        # Move the starting point
+        sp <- rr
+      }
+      return(out_list)
     }
-    # Compute mean of vectors in list by position
-    mm <- colMeans(do.call(rbind,out_list))
+    
+    # Align time series!
+    out_list <- apply(fnames, 1, align_time_series)
+    # Unlist two layers
+    out_list <- do.call(rbind,do.call(rbind,out_list))
     # Create matrix from means
-    o_mat <- matrix(data=mm, nrow = 24)
+    o_mat <- matrix(
+      data = colMeans(out_list),
+      nrow = 24
+    )
     # Flip matrix
     o_mat <- o_mat[nrow(o_mat):1,]
     # Week labels
@@ -1973,7 +2005,7 @@ scripts <- function(script_selection) {
       labRow  = 23:0,
       labCol  = x_labels,
       scale   = "none",
-      margins = c(2,2)
+      margins = c(2,0)
     )
     return()
   }
