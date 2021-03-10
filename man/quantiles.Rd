@@ -10,8 +10,8 @@ quantiles(x)
 \item{x}{Time series of class \code{msts}.}
 }
 \value{
-A list with the minimum, lower quartile, median, upper quartile, maximum and Q3-Q1 range of the time series.
+A list with the minimum, median and maximum, quartiles, deciles, interquartile (Q3 to Q1) range and percentage of outliers.
 }
 \description{
-Compute the minimum, lower quartile, median, upper quartile and maximum of a time series. Also the Q3 to Q1 range.
+Compute the minimum, median and maximum, quartiles, deciles, interquartile (Q3 to Q1) range and percentage of outliers.
 }

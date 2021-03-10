@@ -257,6 +257,17 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 # get_heatmap_matrix
 ################################################################################
 
+#' Get heatmap matrix
+#'
+#' @description
+#' Creation of a matrix valid to be plotted in a heatmap
+#'
+#' @param fnames Two-column dataframe (data_set and file names).
+#'
+#' @return A matrix representing a heatmap.
+#'
+#' @export
+
 get_heatmap_matrix <- function(fnames) {
   # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
   # INPUT: dataframe with pairs dataset-filename
