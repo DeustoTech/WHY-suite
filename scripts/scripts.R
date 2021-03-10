@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 33
+script_selection <- 34
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -1655,13 +1655,13 @@ scripts <- function(script_selection) {
         "ac_day_26", "ac_day_27", "ac_day_28")
     )
     # Set selection
-    for (ss in 1:length(column_subset)) {
+    for (ss in c(3,7)) {
       print(paste("SET", ss, sep=" "))
       # Retrieve working data
       working_data <- subset(
         x      = feats,
         subset =
-          data_set == "iss" & is_household == 1 & total_imputed_pct < 2/3,
+          data_set == "lcl" & is_household == 1 & total_imputed_pct < 2/3,
         select = column_subset[[ss]]
       )
       # Loop for k-means centers
@@ -1676,13 +1676,14 @@ scripts <- function(script_selection) {
           algorithm = "MacQueen"
         )
         # Compute cluster measures
-        cluster_measures <- get_cluster_measures(working_data, km$cluster)
+        cluster_measures <-
+          whyT2.1::get_cluster_measures(working_data, km$cluster)
         # Save variables
         save(
           list = c("km", "cluster_measures"),
           file = paste(
             "G:/Mi unidad/WHY/Analyses/",
-            "analysis_iss_set", ss, "_cc", cc, ".RData",
+            "analysis_lcl_set", ss, "_cc", cc, ".RData",
             sep = "")
         )
       }
@@ -2012,8 +2013,35 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 34
+  # SCRIPT 34 --> PLOT HEATMAPS OF CLUSTERS OBTAINED IN SCRIPT #30
   if (script_selection == 34) {
+    # Inputs & outputs
+    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/analysis_lcl_set3_cc10.RData"
+    feats_file      <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.05.csv"
+    output_folder   <- "G:/Mi unidad/WHY/Analyses/"
+    
+    # Load LCL, set 3, 10 centers
+    load(km_cluster_path)
+    # Load feats
+    feats <- data.table::fread(
+      file   = feats_file,
+      header = TRUE,
+      sep    = ","
+    )
+    # Retrieve working data
+    feats <- subset(
+      x      = feats,
+      subset =
+        data_set == "lcl" & is_household == 1 & total_imputed_pct < 2/3,
+      select = c("data_set", "file")
+    )
+    
+    # Loop
+    for (ii in 1:10) {
+      print(paste("Cluster", ii, sep=" "))
+      m <- whyT2.1::get_heatmap_matrix(feats[km$cluster == ii,])
+      save(m, file = paste(output_folder, "heatmap_", ii, ".RData", sep=""))
+    }
     
     return()
   }
@@ -2022,6 +2050,22 @@ scripts <- function(script_selection) {
   
   # SCRIPT 35
   if (script_selection == 35) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 36
+  if (script_selection == 36) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 37
+  if (script_selection == 37) {
     
     return()
   }

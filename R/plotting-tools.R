@@ -254,10 +254,10 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 }
 
 ################################################################################
-# Time series heatmap
+# get_heatmap_matrix
 ################################################################################
 
-plot_heatmap <- function(fnames) {
+get_heatmap_matrix <- function(fnames) {
   # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
   # INPUT: dataframe with pairs dataset-filename
   align_time_series <- function(fnames) {
@@ -339,17 +339,20 @@ plot_heatmap <- function(fnames) {
   )
   # Flip matrix
   o_mat <- o_mat[nrow(o_mat):1,]
-  # Week labels
-  x_labels <- rep(NA, 371)
-  x_labels[seq(1,371, by=7)] <- 1:53
-  # Plot heatmap
-  heatmap(
-    x       = o_mat,
-    Rowv    = NA,
-    Colv    = NA,
-    labRow  = 23:0,
-    labCol  = x_labels,
-    scale   = "none",
-    margins = c(2,0)
-  )
+  
+  # # Week labels
+  # x_labels <- rep(NA, 371)
+  # x_labels[seq(1,371, by=7)] <- 1:53
+  # # Plot heatmap
+  # h <- heatmap(
+  #   x       = o_mat,
+  #   Rowv    = NA,
+  #   Colv    = NA,
+  #   labRow  = 23:0,
+  #   labCol  = x_labels,
+  #   scale   = "none",
+  #   margins = c(2,0)
+  # )
+  
+  return(o_mat)
 }
