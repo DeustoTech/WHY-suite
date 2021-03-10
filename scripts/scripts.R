@@ -1902,12 +1902,13 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 33 -> 
+  # SCRIPT 33 -> CHOP A TIME SERIES BY PERIODS OF 53 WEEKS AND ALIGN THEM IN A                   WEEKLY FASHION IN ORDER TO PLOT A HEATMAP
   if (script_selection == 33) {
     library(lubridate)
     library(data.table)
     
-    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC003522.RData")
+    load("G:/Mi unidad/WHY/Datasets/lcl-ext/MAC004857.RData")
+    #load("G:/Mi unidad/WHY/Datasets/fake-ext/nights.RData")
     # By hours
     t_factor <- cut(edf$df$times, breaks = "1 hour")
     # Aggregate by hour
@@ -1955,44 +1956,24 @@ scripts <- function(script_selection) {
       # Move the starting point
       sp <- rr
     }
-    
-    browser()
-
-    
-    # Locate the latest 23:00
-    end_date <- last(date_vect) %m-% hours((hour(last(date_vect)) + 1) %% 24)
-    # Select just the last 2 years
-    ini_date <- end_date %m-% years(2) %m+% hours(1)
-    # Different years 
-    uniq_years <- unique(
-      year(date_vect[date_vect >= ini_date & date_vect <= end_date])
-    )
-    
-    # Date indices
-    date_idx <- seq(
-      as.POSIXct("2000-01-01 00:00", tz="GMT"),
-      as.POSIXct("2000-12-31 23:00", tz="GMT"),
-      as.difftime(1, units="hours")
-    )
-    # Create 
-    for (yy in uniq_years) {
-      
-    }
-    
-    m <- matrix(aggr_data$x[1:(length(aggr_data$date_time)-length(aggr_data$date_time) %% 24)], nrow = 24)
-    dev.new()
+    # Compute mean of vectors in list by position
+    mm <- colMeans(do.call(rbind,out_list))
+    # Create matrix from means
+    o_mat <- matrix(data=mm, nrow = 24)
+    # Flip matrix
+    o_mat <- o_mat[nrow(o_mat):1,]
+    # Week labels
+    x_labels <- rep(NA, 371)
+    x_labels[seq(1,371, by=7)] <- 1:53
+    # Plot heatmap
     heatmap(
-      m,
-      Rowv = NA,
-      Colv = NA,
-      labRow = as.POSIXlt(aggr_data$date_time[1:24])$hour,
-      labCol = c("A", rep(NA,798), "B"),
-      scale = "row",
-      RowSideColors = cc,
-      ColSideColors = cc,
-      margins = c(6,6)
-      
-        #unique(as.Date(aggr_data$date_time))[1:dim(m)[2]]
+      x       = o_mat,
+      Rowv    = NA,
+      Colv    = NA,
+      labRow  = 23:0,
+      labCol  = x_labels,
+      scale   = "none",
+      margins = c(2,2)
     )
     return()
   }
