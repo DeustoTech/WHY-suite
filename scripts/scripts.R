@@ -2019,6 +2019,7 @@ scripts <- function(script_selection) {
     km_cluster_path <- "G:/Mi unidad/WHY/Analyses/analysis_lcl_set3_cc10.RData"
     feats_file      <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.05.csv"
     output_folder   <- "G:/Mi unidad/WHY/Analyses/"
+    datasets_folder <- "G:/Mi unidad/WHY/Datasets/"
     
     # Load LCL, set 3, 10 centers
     load(km_cluster_path)
@@ -2038,8 +2039,22 @@ scripts <- function(script_selection) {
     
     # Loop
     for (ii in 1:10) {
+      # Print on screen
       print(paste("Cluster", ii, sep=" "))
-      m <- whyT2.1::get_heatmap_matrix(feats[km$cluster == ii,])
+      # Get cluster list
+      cluster_list <- feats[km$cluster == ii,]
+      # Set vector of paths
+      paths_vector <- paste(
+        datasets_folder,
+        cluster_list$data_set,
+        "-ext/",
+        cluster_list$file,
+        ".RData",
+        sep = ""
+      )
+      # Get heatmap matrix
+      m <- whyT2.1::get_heatmap_matrix(data.frame(paths_vector))
+      # Save heatmap matrix
       save(m, file = paste(output_folder, "heatmap_", ii, ".RData", sep=""))
     }
     

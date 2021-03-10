@@ -271,17 +271,9 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 get_heatmap_matrix <- function(fnames) {
   # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
   # INPUT: dataframe with pairs dataset-filename
-  align_time_series <- function(fnames) {
+  align_time_series <- function(fname) {
     # Load dataframe
-    path <- paste(
-      "G:/Mi unidad/WHY/Datasets/",
-      fnames[[1]],
-      "-ext/",
-      fnames[[2]],
-      ".RData",
-      sep = ""
-    )
-    load(path)
+    load(fname[[1]])
     # By hours
     t_factor <- cut(edf$df$times, breaks = "1 hour")
     # Aggregate by hour
