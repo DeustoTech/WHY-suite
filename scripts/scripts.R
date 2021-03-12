@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 34
+script_selection <- 35
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -2013,10 +2013,10 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 34 --> PLOT HEATMAPS OF CLUSTERS OBTAINED IN SCRIPT #30
+  # SCRIPT 34 --> FILE PASSED TO NIGHTINGALE TO GET THE HEATMAP MATRICES
   if (script_selection == 34) {
     # Inputs & outputs
-    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/analysis_lcl_set3_cc10.RData"
+    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/analysis_goi_set3_cc12.RData"
     feats_file      <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.05.csv"
     output_folder   <- "G:/Mi unidad/WHY/Analyses/"
     datasets_folder <- "G:/Mi unidad/WHY/Datasets/"
@@ -2033,10 +2033,11 @@ scripts <- function(script_selection) {
     feats <- subset(
       x      = feats,
       subset =
-        data_set == "lcl" & is_household == 1 & total_imputed_pct < 2/3,
+        data_set == "goi" & is_household == 1 & total_imputed_pct < 2/3,
       select = c("data_set", "file")
     )
     
+    browser()
     # Loop
     for (ii in 1:10) {
       # Print on screen
@@ -2063,8 +2064,44 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 35
+  # SCRIPT 35 - PLOT HEATMAP MATRICES
   if (script_selection == 35) {
+    # Heatmap folder
+    hm_fold <- "G:/Mi unidad/WHY/Analyses/"
+    # k-means results
+    km_path <- "G:/Mi unidad/WHY/Analyses/analysis_goi_set3_cc12.RData"
+    
+    load(km_path)
+    
+    for (ii in 1:12) {
+      load(paste(hm_fold, "heatmap_", ii, ".RData", sep=""))
+      # Week labels
+      x_labels <- rep(NA, 371)
+      x_labels[seq(1,371, by=7)] <- 1:53
+      # Plot heatmap
+      h <- heatmap(
+        x       = m,
+        Rowv    = NA,
+        Colv    = NA,
+        labRow  = 23:0,
+        labCol  = x_labels,
+        scale   = "none",
+        margins = c(4,0)
+      )
+      title(
+        paste(
+          "Cluster #",
+          ii,
+          " (",
+          sum(km$cluster == ii),
+          " users, ",
+          round(100 * sum(km$cluster == ii) / length(km$cluster), 2),
+          "%)",
+          sep=""
+        ),
+        line = -30
+      )
+    }
     
     return()
   }
