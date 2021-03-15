@@ -2067,27 +2067,39 @@ scripts <- function(script_selection) {
   # SCRIPT 35 - PLOT HEATMAP MATRICES
   if (script_selection == 35) {
     # Heatmap folder
-    hm_fold <- "G:/Mi unidad/WHY/Analyses/"
+    hm_fold <- "G:/Mi unidad/WHY/Analyses/heatmaps/"
     # k-means results
-    km_path <- "G:/Mi unidad/WHY/Analyses/analysis_goi_set3_cc12.RData"
+    km_path <- "G:/Mi unidad/WHY/Analyses/k-means/analysis_goi_set3_cc12.RData"
     
     load(km_path)
     
     for (ii in 1:12) {
-      load(paste(hm_fold, "heatmap_", ii, ".RData", sep=""))
+      load(paste(hm_fold, "heatmap_goi_s3_c12-", ii, ".RData", sep=""))
       # Week labels
-      x_labels <- rep(NA, 371)
-      x_labels[seq(1,371, by=7)] <- 1:53
+      m_labels <- rep(NA, 371)
+      m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <-
+        month.abb[1:12]
+      browser()
       # Plot heatmap
-      h <- heatmap(
-        x       = m,
-        Rowv    = NA,
-        Colv    = NA,
-        labRow  = 23:0,
-        labCol  = x_labels,
-        scale   = "none",
-        margins = c(4,0)
+      image(
+        t(m),
+        useRaster=TRUE,
+        axes=FALSE,
       )
+      axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, lwd=0)
+      axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, lwd=0)
+      
+      # print(quantile(m))
+      # h <- heatmap(
+      #   x       = m,
+      #   Rowv    = NA,
+      #   Colv    = NA,
+      #   labRow  = 23:0,
+      #   labCol  = x_labels,
+      #   scale   = "none",
+      #   margins = c(4,0)
+      # )
+      # legend(x="bottomright", legend=round(c(min(m), max(m)),2))
       title(
         paste(
           "Cluster #",
@@ -2098,9 +2110,9 @@ scripts <- function(script_selection) {
           round(100 * sum(km$cluster == ii) / length(km$cluster), 2),
           "%)",
           sep=""
-        ),
-        line = -30
+        ) #, line = -30
       )
+      browser()
     }
     
     return()
