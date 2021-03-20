@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 35
+script_selection <- 36
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -2037,7 +2037,6 @@ scripts <- function(script_selection) {
       select = c("data_set", "file")
     )
     
-    browser()
     # Loop
     for (ii in 1:10) {
       # Print on screen
@@ -2075,19 +2074,18 @@ scripts <- function(script_selection) {
     
     for (ii in 1:12) {
       load(paste(hm_fold, "heatmap_goi_s3_c12-", ii, ".RData", sep=""))
-      # Week labels
+      # Month labels
       m_labels <- rep(NA, 371)
       m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <-
         month.abb[1:12]
-      browser()
       # Plot heatmap
       image(
         t(m),
         useRaster=TRUE,
         axes=FALSE,
       )
-      axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, lwd=0)
-      axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, lwd=0)
+      axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
+      axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
       
       # print(quantile(m))
       # h <- heatmap(
@@ -2112,7 +2110,6 @@ scripts <- function(script_selection) {
           sep=""
         ) #, line = -30
       )
-      browser()
     }
     
     return()
@@ -2120,16 +2117,116 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 36
+  # SCRIPT 36 -- SOCIOECONOMICAL FACTORS OF CLUSTERS
   if (script_selection == 36) {
+    # Inputs & outputs
+    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/k-means/analysis_lcl_set3_cc10.RData"
+    feats_file      <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.06.csv"
+    output_folder   <- "G:/Mi unidad/WHY/Analyses/"
+    datasets_folder <- "G:/Mi unidad/WHY/Datasets/"
+    # Load LCL, set 3, 10 centers
+    load(km_cluster_path)
+    # Load feats
+    feats <- data.table::fread(
+      file   = feats_file,
+      header = TRUE,
+      sep    = ","
+    )
+    # Retrieve working data
+    feats <- subset(
+      x      = feats,
+      subset =
+        data_set == "lcl" & is_household == 1 & total_imputed_pct < 2/3,
+      select = c("file", "acorn", "acorn_grouped")
+    )
+    browser()
+    # Create data frame
+    df <- data.frame(acorn = feats$acorn, cluster = km$cluster)
+    
+    library(ggplot2)
+    
+    # create a dataset
+    # specie <- c(rep(1,3), rep(2,3), rep(3,3), rep(4,3), rep(5,3), rep(6,3), rep(7,3), rep(8,3), rep(9,3), rep(10,3))
+    # condition <- rep(c("Affluent", "Comfortable", "Adversity") , 10)
+    # value <- km$cluster
+    # data <- data.frame(specie,condition,value)
+    
+    # Grouped
+    p <- ggplot(df, aes(fill = cluster)) + 
+      geom_bar(position="dodge", stat="identity")
+    plot(p)
     
     return()
   }
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 37
+  # SCRIPT 37 -- CORRECTION OF ACORN TYPES IN feats_v1.05 (NEW feats_v1.06)
   if (script_selection == 37) {
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.05.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    # Correction of column "acorn"
+    feats$acorn <- substr(feats$acorn, 7, 7)
+    # Correction of column "acorn_grouped"
+    feats$acorn_grouped <- replace(
+      feats$acorn_grouped,
+      feats$acorn == "A" | feats$acorn == "B" | feats$acorn == "C", 1)
+    feats$acorn_grouped <- replace(
+      feats$acorn_grouped,
+      feats$acorn == "D" | feats$acorn == "E", 2)
+    feats$acorn_grouped <- replace(
+      feats$acorn_grouped,
+      feats$acorn == "F" | feats$acorn == "G" | feats$acorn == "H" |
+      feats$acorn == "I" | feats$acorn == "J", 3)
+    feats$acorn_grouped <- replace(
+      feats$acorn_grouped,
+      feats$acorn == "K" | feats$acorn == "L" | feats$acorn == "M" |
+      feats$acorn == "N", 4)
+    feats$acorn_grouped <- replace(
+      feats$acorn_grouped,
+      feats$acorn == "O" | feats$acorn == "P" | feats$acorn == "Q", 5)
+    feats$acorn_grouped <- replace(feats$acorn_grouped, feats$acorn == "U", NA)
+    # Correction of column "is_household"
+    feats$is_household[feats$acorn == "U"] <- 0
+    
+    # Save
+    data.table::fwrite(
+      x         = feats,
+      file      = "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.06.csv",
+      append    = F,
+      quote     = F,
+      sep       = ",",
+      row.names = F,
+      col.names = T,
+      dateTimeAs = "write.csv"
+    )
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 38
+  if (script_selection == 38) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 39
+  if (script_selection == 39) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 40
+  if (script_selection == 40) {
     
     return()
   }
