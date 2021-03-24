@@ -262,7 +262,7 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 #' @description
 #' Creation of a matrix valid to be plotted in a heatmap
 #'
-#' @param fnames Two-column dataframe (data_set and file names).
+#' @param fnames Two-column dataframe ("data_set" and "file").
 #'
 #' @return A matrix representing a heatmap.
 #'
@@ -333,6 +333,7 @@ get_heatmap_matrix <- function(fnames) {
   
   # Align time series!
   out_list <- apply(fnames, 1, align_time_series)
+
   # Unlist two layers
   out_list <- do.call(rbind,do.call(rbind,out_list))
   # Create matrix from means
@@ -343,19 +344,46 @@ get_heatmap_matrix <- function(fnames) {
   # Flip matrix
   o_mat <- o_mat[nrow(o_mat):1,]
   
-  # # Week labels
-  # x_labels <- rep(NA, 371)
-  # x_labels[seq(1,371, by=7)] <- 1:53
-  # # Plot heatmap
-  # h <- heatmap(
-  #   x       = o_mat,
-  #   Rowv    = NA,
-  #   Colv    = NA,
-  #   labRow  = 23:0,
-  #   labCol  = x_labels,
-  #   scale   = "none",
-  #   margins = c(2,0)
-  # )
-  
   return(o_mat)
+}
+
+################################################################################
+# plot_heatmap_matrix
+################################################################################
+
+#' Plot heatmap matrix
+#'
+#' @description
+#' Plot a heatmap matrix representing a year of enegry consumption
+#'
+#' @param m Matrix to be plotted.
+#'
+#' @return Nothing, just a plot.
+#'
+#' @export
+
+plot_heatmap_matrix <- function(m) {
+  # Month labels
+  m_labels <- rep(NA, 371)
+  m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <-
+    month.abb[1:12]
+  # Plot heatmap
+  image(
+    t(m),
+    useRaster=TRUE,
+    axes=FALSE,
+  )
+  axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
+  axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
+  # title(
+  #   paste0(
+  #     "Cluster #",
+  #     ii,
+  #     " (",
+  #     sum(km$cluster == ii),
+  #     " users, ",
+  #     round(100 * sum(km$cluster == ii) / length(km$cluster), 2),
+  #     "%)"
+  #   )
+  # )
 }

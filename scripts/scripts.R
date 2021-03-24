@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 36
+script_selection <- 35
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -2016,8 +2016,8 @@ scripts <- function(script_selection) {
   # SCRIPT 34 --> FILE PASSED TO NIGHTINGALE TO GET THE HEATMAP MATRICES
   if (script_selection == 34) {
     # Inputs & outputs
-    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/analysis_goi_set3_cc12.RData"
-    feats_file      <- "G:/Mi unidad/WHY/Datasets/@FEATURES/feats_v1.05.csv"
+    km_cluster_path <- "G:/Mi unidad/WHY/Analyses/_old/k-means/analysis_goi_set3_cc12.RData"
+    feats_file      <- "G:/Mi unidad/WHY/Features/feats_v1.08.csv"
     output_folder   <- "G:/Mi unidad/WHY/Analyses/"
     datasets_folder <- "G:/Mi unidad/WHY/Datasets/"
     
@@ -2044,15 +2044,11 @@ scripts <- function(script_selection) {
       # Get cluster list
       cluster_list <- feats[km$cluster == ii,]
       # Set vector of paths
-      paths_vector <- paste(
-        datasets_folder,
-        cluster_list$data_set,
-        "-ext/",
-        cluster_list$file,
-        ".RData",
-        sep = ""
+      paths_vector <- paste0(
+        datasets_folder, cluster_list$data_set, "/ext/", cluster_list$file, ".RData"
       )
       # Get heatmap matrix
+      browser()
       m <- whyT2.1::get_heatmap_matrix(data.frame(paths_vector))
       # Save heatmap matrix
       save(m, file = paste(output_folder, "heatmap_", ii, ".RData", sep=""))
@@ -2066,9 +2062,9 @@ scripts <- function(script_selection) {
   # SCRIPT 35 - PLOT HEATMAP MATRICES
   if (script_selection == 35) {
     # Heatmap folder
-    hm_fold <- "G:/Mi unidad/WHY/Analyses/heatmaps/"
+    hm_fold <- "G:/Mi unidad/WHY/Analyses/_old/heatmaps/"
     # k-means results
-    km_path <- "G:/Mi unidad/WHY/Analyses/k-means/analysis_goi_set3_cc12.RData"
+    km_path <- "G:/Mi unidad/WHY/Analyses/_old/k-means/analysis_goi_set3_cc12.RData"
     
     load(km_path)
     
@@ -2209,8 +2205,38 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 38
+  # SCRIPT 38 -- INCORPORATE NEW COLUMNS TO BIG FILE
   if (script_selection == 38) {
+    # [INPUT] Path to the BIG file
+    big_file_path <- "G:/Mi unidad/WHY/Features/feats_v1.08.csv"
+    # Load feats
+    feats <- data.table::fread(
+      file   = big_file_path,
+      header = TRUE,
+      sep    = ","
+    )
+    # [INPUT] Path to the file with the new columns
+    new_cols_path <- "G:/Mi unidad/WHY/Features/other_files/goi_tariffs_v3.csv"
+    # Load new cols
+    new_cols <- data.table::fread(
+      file   = new_cols_path,
+      header = TRUE,
+      sep    = ","
+    )
+    # [INPUT] List of rows in the BIG file to be incorporated
+    incorp_rows <- feats$data_set == "goi"
+    # [INPUT] List of columns in the new file to be incorporated
+    incorp_cols <- 2:dim(new_cols)[2]
+    
+    # Create NA matrix
+    na_m <- matrix(data = NA, nrow = dim(feats)[1], ncol = length(incorp_cols))
+    
+    # Incorporate rows to NA matrix
+    browser()
+    na_m[incorp_rows,] <- new_cols[, ..incorp_cols]
+    
+    
+    
     
     return()
   }
