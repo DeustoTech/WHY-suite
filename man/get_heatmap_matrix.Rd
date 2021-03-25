@@ -7,7 +7,7 @@
 get_heatmap_matrix(fnames)
 }
 \arguments{
-\item{fnames}{Two-column dataframe (data_set and file names).}
+\item{fnames}{Two-column dataframe ("data_set" and "file").}
 }
 \value{
 A matrix representing a heatmap.
