@@ -15,7 +15,7 @@ plot_heatmap_matrix(
 \arguments{
 \item{m}{Matrix to be plotted.}
 
-\item{format_file}{Format of the output file. It can be \code{png} or \code {pdf}.}
+\item{format_file}{Format of the output file. It can be \code{png} or \code{pdf}.}
 
 \item{file_path}{Path to the output file INCLUDING the extension.}
 

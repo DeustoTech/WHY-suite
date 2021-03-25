@@ -357,7 +357,7 @@ get_heatmap_matrix <- function(fnames) {
 #' Plot a heatmap matrix representing a year of enegry consumption
 #'
 #' @param m Matrix to be plotted.
-#' @param format_file Format of the output file. It can be \code{png} or \code {pdf}.
+#' @param format_file Format of the output file. It can be \code{png} or \code{pdf}.
 #' @param file_path Path to the output file INCLUDING the extension.
 #' @param plot_width Width of the plot in pixels.
 #' @param plot_height Heigh of the plot in pixels.
