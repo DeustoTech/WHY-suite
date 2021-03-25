@@ -18,6 +18,10 @@ plot_heatmap_matrix(
 \item{format_file}{Format of the output file. It can be \code{png} or \code {pdf}.}
 
 \item{file_path}{Path to the output file INCLUDING the extension.}
+
+\item{plot_width}{Width of the plot in pixels.}
+
+\item{plot_height}{Heigh of the plot in pixels.}
 }
 \value{
 Nothing, just a plot.

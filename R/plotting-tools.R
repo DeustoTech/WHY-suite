@@ -359,8 +359,8 @@ get_heatmap_matrix <- function(fnames) {
 #' @param m Matrix to be plotted.
 #' @param format_file Format of the output file. It can be \code{png} or \code {pdf}.
 #' @param file_path Path to the output file INCLUDING the extension.
-#' @plot_width Width of the plot in pixels.
-#' @plot_height Heigh of the plot in pixels.
+#' @param plot_width Width of the plot in pixels.
+#' @param plot_height Heigh of the plot in pixels.
 #'
 #' @return Nothing, just a plot.
 #'
