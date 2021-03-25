@@ -357,16 +357,35 @@ get_heatmap_matrix <- function(fnames) {
 #' Plot a heatmap matrix representing a year of enegry consumption
 #'
 #' @param m Matrix to be plotted.
+#' @param format_file Format of the output file. It can be \code{png} or \code {pdf}.
+#' @param file_path Path to the output file INCLUDING the extension.
+#' @plot_width Width of the plot in pixels.
+#' @plot_height Heigh of the plot in pixels.
 #'
 #' @return Nothing, just a plot.
 #'
 #' @export
 
-plot_heatmap_matrix <- function(m) {
+plot_heatmap_matrix <- function(m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600) {
+  # Format of output files
+  if (format_file == "png") {
+    png(
+      file_path,
+      width = plot_width,
+      height = plot_height
+    )
+  }
+  if (format_file == "pdf") {
+    pdf(
+      file_path,
+      width = plot_width,
+      height = plot_height
+    )
+  }
+  
   # Month labels
   m_labels <- rep(NA, 371)
-  m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <-
-    month.abb[1:12]
+  m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <- month.abb[1:12]
   # Plot heatmap
   image(
     t(m),
@@ -375,15 +394,9 @@ plot_heatmap_matrix <- function(m) {
   )
   axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
   axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
-  # title(
-  #   paste0(
-  #     "Cluster #",
-  #     ii,
-  #     " (",
-  #     sum(km$cluster == ii),
-  #     " users, ",
-  #     round(100 * sum(km$cluster == ii) / length(km$cluster), 2),
-  #     "%)"
-  #   )
-  # )
+  
+  # Format of output files
+  if (format_file == "png" | format_file == "pdf") {
+    dev.off()
+  }
 }
