@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 35
+script_selection <- 39
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -2243,8 +2243,18 @@ scripts <- function(script_selection) {
   
   # ----------------------------------------------------------------------------
   
-  # SCRIPT 39
+  # SCRIPT 39 - TRYING PACKAGE "clValid"
   if (script_selection == 39) {
+    # Load library
+    library(clValid)
+    # Load feats
+    feats <- data.table::fread(
+      file   = "G:/Mi unidad/WHY/Features/feats_v1.08.csv",
+      header = TRUE,
+      sep    = ","
+    )
+    
+    browser()
     
     return()
   }
