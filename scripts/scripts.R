@@ -2247,6 +2247,19 @@ scripts <- function(script_selection) {
   if (script_selection == 39) {
     # Load library
     library(clValid)
+    # Feature set
+    feat_set <- c(
+      "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+      "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+      "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+      "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+      "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+      "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+      "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+      "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+      "rel_mean_weekday_pday"
+    )
+    
     # Load feats
     feats <- data.table::fread(
       file   = "G:/Mi unidad/WHY/Features/feats_v1.08.csv",
@@ -2254,8 +2267,11 @@ scripts <- function(script_selection) {
       sep    = ","
     )
     
-    browser()
+    # Get working features
+    wf <- feats[feats$data_set == "lcl", ..feat_set]
     
+    browser()
+  
     return()
   }
   
@@ -2263,6 +2279,30 @@ scripts <- function(script_selection) {
   
   # SCRIPT 40
   if (script_selection == 40) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 41
+  if (script_selection == 41) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 42
+  if (script_selection == 42) {
+    
+    return()
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 43
+  if (script_selection == 43) {
     
     return()
   }

@@ -336,7 +336,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
     return(list(acorn_tag, acorn, acorn_grouped))
   }
   # Goiener
-  if (dset_key == "goi") {
+  if (dset_key %in% c("goi", "go2")) {
     cups         <- strsplit(filename, ".csv")[[1]]
     start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][1], tz="GMT")
     end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][1], tz="GMT")
@@ -410,9 +410,12 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
       data.table::fread,
       header     = TRUE,
       sep        = ",",
-      na.strings = ""
+      na.strings = "",
+      encoding   = "UTF-8"
     )
   }
+  
+  browser()
   
   # Setup parallel backend to use many processors
   cl <- parallel::makeCluster(parallel::detectCores() - 1)
