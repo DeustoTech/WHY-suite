@@ -209,16 +209,21 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
 impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="interpolation", long_algorithm="locf") {
   # Time series pending imputation
   not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
-  # Imputed time series
-  imp_ts <- imputeTS::na_seasplit(not_imp_ts,
-                                  algorithm = short_algorithm,
-                                  maxgap = short_gap)
-  imp_ts <- imputeTS::na_seasplit(imp_ts,
-                                  algorithm = long_algorithm)
-  # Imputed dataframe
-  cdf$df <- data.frame(times   = cdf$df[,1],
-                       values  = as.double(imp_ts),
-                       imputed = as.integer(is.na(not_imp_ts)))
+  if (sum(!is.na(not_imp_ts)) < 2) {
+    cdf <- NULL
+  } 
+  else {
+    # Imputed time series
+    imp_ts <- imputeTS::na_seasplit(not_imp_ts,
+                                    algorithm = short_algorithm,
+                                    maxgap = short_gap)
+    imp_ts <- imputeTS::na_seasplit(imp_ts,
+                                    algorithm = long_algorithm)
+    # Imputed dataframe
+    cdf$df <- data.frame(times   = cdf$df[,1],
+                         values  = as.double(imp_ts),
+                         imputed = as.integer(is.na(not_imp_ts)))
+  }
   return(cdf)
 }
 
@@ -472,17 +477,20 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
           season    = cdf$seasonal_periods[1] * 7, 
           short_gap = cdf$seasonal_periods[1] / 3
         )
-        # Expand if needed
-        edf <- extend_imputed_dataframe(
-          idf              = idf,
-          wanted_days      = wanted_days,
-          extend_after_end = extend_after_end
-        )
-        if (!is.null(edf)) {
-          # Save dataframe in output folder
-          path <- 
-            paste0(output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData")
-          save(edf, file=path)
+        if (!is.null(idf)) {
+          # Expand if needed
+          edf <- extend_imputed_dataframe(
+            idf              = idf,
+            wanted_days      = wanted_days,
+            extend_after_end = extend_after_end
+          )
+          if (!is.null(edf)) {
+            # Save dataframe in output folder
+            path <- paste0(
+              output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData"
+            )
+            save(edf, file=path)
+          }
         }
       }
     }
