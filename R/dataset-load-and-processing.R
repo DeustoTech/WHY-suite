@@ -431,12 +431,12 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   
   # Setup parallel backend to use many processors
   cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores)
+  cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  #foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
-  for(x in 1:length(dset_filenames)) {
+  foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
+  #for(x in 1:length(dset_filenames)) {
     print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
