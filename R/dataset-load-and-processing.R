@@ -209,21 +209,26 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
 impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="interpolation", long_algorithm="locf") {
   # Time series pending imputation
   not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
+  
   if (sum(!is.na(not_imp_ts)) < 2) {
-    cdf <- NULL
+    return(NULL)
   } 
-  else {
-    # Imputed time series
-    imp_ts <- imputeTS::na_seasplit(not_imp_ts,
-                                    algorithm = short_algorithm,
-                                    maxgap = short_gap)
-    imp_ts <- imputeTS::na_seasplit(imp_ts,
-                                    algorithm = long_algorithm)
-    # Imputed dataframe
-    cdf$df <- data.frame(times   = cdf$df[,1],
-                         values  = as.double(imp_ts),
-                         imputed = as.integer(is.na(not_imp_ts)))
-  }
+  
+  # Imputed time series
+  imp_ts <- imputeTS::na_seasplit(not_imp_ts,
+                                  algorithm = short_algorithm,
+                                  maxgap = short_gap)
+  
+  if (sum(!is.na(imp_ts)) < 2) {
+    return(NULL)
+  } 
+  
+  imp_ts <- imputeTS::na_seasplit(imp_ts,
+                                  algorithm = long_algorithm)
+  # Imputed dataframe
+  cdf$df <- data.frame(times   = cdf$df[,1],
+                       values  = as.double(imp_ts),
+                       imputed = as.integer(is.na(not_imp_ts)))
   return(cdf)
 }
 
@@ -281,6 +286,9 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   extr_times  <- sum(new_val_idx)
   
   ##### IMPUTE #####
+  if (sum(!is.na(imp_ts)) < 2) {
+    return(NULL)
+  } 
   imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
   
   # Extend AFTER the end of the time series
