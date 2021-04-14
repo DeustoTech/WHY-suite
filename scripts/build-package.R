@@ -12,5 +12,5 @@ setwd("..")
 
 devtools::load_all()
 
-# setwd("scripts")
+setwd("scripts")
 library(whyT2.1)

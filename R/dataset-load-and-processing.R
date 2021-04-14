@@ -21,7 +21,6 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
     sep = ",",
     na.strings = ""
   )
-  
   # Times
   times <- as.POSIXct(data$V1, tz="GMT")
   # Values
@@ -72,7 +71,7 @@ get_dataframe <- get_raw_dataframe_from_dataset
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  samples_per_day <- list(lcl = 48, goi = 24, ref = 24, iss = 48)
+  samples_per_day <- list(lcl = 48, goi = 24, go2 = 24, ref = 24, iss = 48)
   # Selection
   spd <- samples_per_day[[dset_key]]
   
@@ -107,11 +106,21 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   # Create time sequence
   time_seq <- seq(from_date, to_date, period_in_secs)
+
+  # Bin by corresponding periods
+  break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
+  cut_seq <- cut(raw_df$times, breaks = break_in_mins)
+  # Aggregate data (sum) according to the bins
+  sum_aggr_ts  <- stats::aggregate(
+    x   = raw_df$values,
+    by  = list(date_time = cut_seq),
+    FUN = sum)
+
   # Find matches in dataframe (this completes missing samples with NA values
   # and removes extra samples out of the sampling period)
-  mm <- match(time_seq, raw_df$times)
+  mm <- match(time_seq, as.POSIXct(sum_aggr_ts$date_time, tz="GMT"))
   # Output
-  cooked_df <- data.frame(times = time_seq, values = raw_df$values[mm])
+  cooked_df <- data.frame(times = time_seq, values = sum_aggr_ts$x[mm])
   
   # Get seasonal periods
   seasonal_periods <- NULL
@@ -150,7 +159,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
       acorn_grouped = metadata[[3]]
     )
   }
-  if (dset_key == "goi") {
+  if (dset_key %in% c("goi", "go2")) {
     dset_list <- list(
       cups         = metadata[[1]],      start_date   = metadata[[2]],
       end_date     = metadata[[3]],      tariff       = metadata[[4]],
@@ -337,18 +346,22 @@ extract_metadata <- function(dfs, dset_key, filename) {
   }
   # Goiener
   if (dset_key %in% c("goi", "go2")) {
-    cups         <- strsplit(filename, ".csv")[[1]]
-    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][1], tz="GMT")
-    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][1], tz="GMT")
-    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][1]
-    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][1])
-    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][1])
-    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][1])
-    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][1]
-    province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][1]
-    municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][1]
-    zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][1])
-    cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][1])
+    # Identify current user
+    cups <- strsplit(filename, ".csv")[[1]]
+    # There may be several entries for a cups: get index (highest date)
+    idx <- which.max(as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2]))
+    # Get all data
+    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][idx], tz="GMT")
+    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][idx], tz="GMT")
+    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][idx]
+    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][idx])
+    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][idx])
+    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][idx])
+    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][idx]
+    province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][idx]
+    municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][idx]
+    zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][idx])
+    cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][idx])
     
     return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
                 self_consump, province, municipality, zip_code, cnae))
@@ -394,6 +407,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
 #' @export
 
 extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last", extend_after_end=TRUE) {
+  
   # Check for correct date precedence
   if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
     if (from_date >= to_date) {
@@ -415,14 +429,14 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
     )
   }
   
-  browser()
-  
   # Setup parallel backend to use many processors
-  cl <- parallel::makeCluster(parallel::detectCores() - 1)
+  cores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
   foreach::foreach (x = 1:length(dset_filenames)) %dopar% {
+  #for(x in 1:length(dset_filenames)) {
     # File name selection
     dset_filename <- dset_filenames[x]
     # Extract metadata
@@ -434,7 +448,7 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
       )
     }
     # Load raw dataframe from dataset and impute
-    file_path <- paste(input_folder, dset_filename, sep="")
+    file_path <- paste0(input_folder, dset_filename)
     rdf <- get_raw_dataframe_from_dataset(file_path)
     cdf <- cook_raw_dataframe(
       raw_df    = rdf,
@@ -465,16 +479,13 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
         )
         if (!is.null(edf)) {
           # Save dataframe in output folder
-          path <- paste(
-            output_folder,
-            strsplit(dset_filename, ".csv")[[1]],
-            ".RData",
-            sep=""
-          )
+          path <- 
+            paste0(output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData")
           save(edf, file=path)
         }
       }
     }
   }
+  # Stop parallelization
   parallel::stopCluster(cl)
 }

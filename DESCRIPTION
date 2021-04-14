@@ -14,6 +14,7 @@ Imports:
   data.table,
   dbscan,
   doParallel,
+  dplyr,
   factoextra,
   foreach,
   forecast,
@@ -23,7 +24,9 @@ Imports:
   moments,
   parallel,
   Rfast,
+  stats,
   tidyverse,
-  tsfeatures
+  tsfeatures,
+  utils
 Depends:
 RoxygenNote: 7.1.1
