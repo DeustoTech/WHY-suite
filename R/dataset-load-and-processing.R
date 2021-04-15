@@ -207,28 +207,23 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
 #' @export
 
 impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="interpolation", long_algorithm="locf") {
-  tryCatch(
-    {
-      # Time series pending imputation
-      not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
-      
-      # Imputed time series
-      imp_ts <- imputeTS::na_seasplit(
-        not_imp_ts, algorithm = short_algorithm, maxgap = short_gap
-      )
-      imp_ts <- imputeTS::na_seasplit(
-        imp_ts, algorithm = long_algorithm
-      )
-      # Imputed dataframe
-      cdf$df <- data.frame(
-        times   = cdf$df[,1],
-        values  = as.double(imp_ts),
-        imputed = as.integer(is.na(not_imp_ts))
-      )
-      return(cdf)
-    },
-    error = function(c) return(NULL)
-  )
+    # Time series pending imputation
+    not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
+    
+    # Imputed time series
+    imp_ts <- imputeTS::na_seasplit(
+      not_imp_ts, algorithm = short_algorithm, maxgap = short_gap
+    )
+    imp_ts <- imputeTS::na_seasplit(
+      imp_ts, algorithm = long_algorithm
+    )
+    # Imputed dataframe
+    cdf$df <- data.frame(
+      times   = cdf$df[,1],
+      values  = as.double(imp_ts),
+      imputed = as.integer(is.na(not_imp_ts))
+    )
+    return(cdf)
 }
 
 ################################################################################
@@ -445,7 +440,7 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  foreach::foreach (x = 1:length(dset_filenames)) %do% {
+  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg, .errorhandling = 'remove') %dopar% {
  #for(x in 1:length(dset_filenames)) {
     print(dset_filenames[x])
     # File name selection
