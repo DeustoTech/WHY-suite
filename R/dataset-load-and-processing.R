@@ -209,25 +209,46 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
 impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="interpolation", long_algorithm="locf") {
   # Time series pending imputation
   not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
-
-  tryCatch(
+  
+  imp_ts <- tryCatch(
     # Imputed time series
     {
       imp_ts <- imputeTS::na_seasplit(
-        not_imp_ts, algorithm = short_algorithm, maxgap = short_gap)
+        not_imp_ts, algorithm = short_algorithm, maxgap = short_gap
+      )
     },
     # In case of error
-    error = return(NULL)
+    error = return(NULL),
+    # In case all OK
+    finally = {
+      imp_ts <- imputeTS::na_seasplit(
+        not_imp_ts, algorithm = short_algorithm, maxgap = short_gap
+      )
+      return(imp_ts)
+    }
   )
+  
+  if(is.null(imp_ts)) {
+    return(NULL)
+  }
 
-  tryCatch(
+  imp_ts <- tryCatch(
     # Imputed time series
     {
       imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm = long_algorithm)
     },
     # In case of error
-    error = return(NULL)
+    error = return(NULL),
+    # In case all OK
+    finally = {
+      imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm = long_algorithm)
+      return(imp_ts)
+    }
   )
+  
+  if(is.null(imp_ts)) {
+    return(NULL)
+  }
   
   # Imputed dataframe
   cdf$df <- data.frame(
@@ -292,14 +313,23 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   extr_times  <- sum(new_val_idx)
   
   ##### IMPUTE #####
-  tryCatch(
+  imp_ts <- tryCatch(
     # Imputed time series
     {
       imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
     },
     # In case of error
-    error = return(NULL)
+    error = return(NULL),
+    # In case all OK
+    finally = {
+      imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
+      return(imp_ts)
+    }
   )
+  
+  if(is.null(imp_ts)) {
+    return(NULL)
+  }
   
   # Extend AFTER the end of the time series
   if (extend_after_end) {
@@ -458,8 +488,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  foreach::foreach (x = 1:length(dset_filenames), .packages = c("imputeTS", "data.table", "stats", "utils", "dplyr")) %dopar% {
- #for(x in 1:length(dset_filenames)) {
+  # foreach::foreach (x = 1:length(dset_filenames), .packages = c("imputeTS", "data.table", "stats", "utils", "dplyr")) %dopar% {
+ for(x in 1:length(dset_filenames)) {
     print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
