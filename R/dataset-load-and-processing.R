@@ -488,8 +488,13 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
+<<<<<<< HEAD
   # foreach::foreach (x = 1:length(dset_filenames), .packages = c("imputeTS", "data.table", "stats", "utils", "dplyr")) %dopar% {
  for(x in 1:length(dset_filenames)) {
+=======
+  foreach::foreach (x = 1:length(dset_filenames), .packages = c("imputeTS", "data.table", "stats", "utils", "dplyr")) %dopar% {
+  #for(x in 1:length(dset_filenames)) {
+>>>>>>> parent of 45532e2 (Update dataset-load-and-processing.R)
     print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
