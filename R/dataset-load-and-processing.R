@@ -210,7 +210,7 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
   # Time series pending imputation
   not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
   
-  if (sum(!is.na(not_imp_ts)) < 2) {
+  if (sum(!is.na(not_imp_ts)) < 5) {
     return(NULL)
   } 
   
@@ -219,7 +219,7 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
                                   algorithm = short_algorithm,
                                   maxgap = short_gap)
   
-  if (sum(!is.na(imp_ts)) < 2) {
+  if (sum(!is.na(imp_ts)) < 5) {
     return(NULL)
   } 
   
@@ -286,9 +286,10 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
   extr_times  <- sum(new_val_idx)
   
   ##### IMPUTE #####
-  if (sum(!is.na(imp_ts)) < 2) {
+  if (sum(!is.na(imp_ts)) < 5) {
     return(NULL)
-  } 
+  }
+  
   imp_ts <- imputeTS::na_seasplit(imp_ts, algorithm  = "locf")
   
   # Extend AFTER the end of the time series
