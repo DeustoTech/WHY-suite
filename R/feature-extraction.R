@@ -279,10 +279,9 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #'
 #' @param input_folder Absolute path to the dataset folder.
 #' @param output_folder Absolute path where the results are wanted.
-#' @param type_of_analysis A string indicating the type of analysis: either \code{basic} or \code{extra}.
+#' @param type_of_analysis A string indicating the type of analysis: \code{basic}, \code{extra} or \code{custom}.
 #' @param list_of_functions If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.
 #' @param If \code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.
-#' @param resume_from_file A string indicating the name of the file to start the analysis.
 #'
 #' @return File containing the features
 #'
@@ -317,7 +316,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         quote     = FALSE,
         append    = TRUE,
         col.names = col_names,
-        row.names = FALSE
+        row.names = FALSE,
+        
       )
     } 
   }
