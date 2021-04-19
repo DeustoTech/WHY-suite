@@ -1,4 +1,4 @@
-analysis_v10P <- function(analysis_type) {
+get_cluster_analysis <- function(analysis_type) {
   
   ##############################################################################
   ##  ANALYSIS USING THE clValid PACKAGE
@@ -551,7 +551,7 @@ library(clValid)
 library(mclust)
 
 # Setup parallel backend to use many processors
-cores <- 20 #parallel::detectCores() - 1
+cores <- 4 #parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
@@ -561,7 +561,7 @@ foreach::foreach(
   .errorhandling = "remove",
   .packages      = c("clValid", "mclust")
 ) %dopar% {
-  analysis_v10P(ii)
+  get_cluster_analysis(ii)
 }
 
 # Stop parallelization
