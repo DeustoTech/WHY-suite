@@ -551,12 +551,12 @@ library(clValid)
 library(mclust)
 
 # Setup parallel backend to use many processors
-cores <- 4 #parallel::detectCores() - 1
+cores <- 3 #parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
 foreach::foreach(
-  ii             = c(11:19, 21:29, 31:39, 41:49),
+  ii             = c(45, 47, 48), #c(11:19, 21:29, 31:39, 41:49),
   .inorder       = FALSE,
   .errorhandling = "remove",
   .packages      = c("clValid", "mclust")
