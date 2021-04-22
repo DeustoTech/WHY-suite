@@ -1,0 +1,176 @@
+---
+title: "Data set analyses"
+author: "Carlos Quesada"
+date: "16/3/2021"
+output:
+  html_document: 
+    toc: true
+    toc_depth: 5
+    theme: united
+---
+
+```{r, include=FALSE}
+\library(here)
+
+# Load libraries and excluding their warning messages
+output_dir <- "G:/Mi unidad/WHY/Analyses/clValid/"
+
+# Datasets
+dataset_list <- c(
+  "Dataset: Goiener (only households)",
+  "Dataset: Low Carbon London dataset",
+  "Dataset: ISSDA",
+  "Dataset: Goiener (all)"
+)
+# Set of features
+feature_set_list <- c(
+  "Set of features: seasonal aggregates",
+  "Set of features: peaks and off-peaks",
+  "Set of features: strengths and ACs",
+  "Set of features: Catch-22"
+)
+# Clustering
+clustering_list <- c(
+  "Clustering: Hierarchical ",
+  "Clustering: k-means",
+  "Clustering: DIANA",
+  "Clustering: FANNY",
+  "Clustering: SOM",
+  "Clustering: PAM",
+  "Clustering: SOTA",
+  "Clustering: CLARA",
+  "Clustering: Model-based"
+)
+# Validation
+validation_list <- list(
+  c(
+    "Internal measures: Connectivity",
+    "Internal measures: Dunn index",
+    "Internal measures: Silhouette",
+  ),
+  c(
+    "Stability measures: APN",
+    "Stability measures: AD",
+    "Stability measures: ADM",
+    "Stability measures: FOM",
+  )
+)
+```
+
+
+```{r, results='asis', echo=FALSE}
+
+
+# Keys
+key_list <- c("goiH", "issH", "lclH", "goiA")
+keys <- c(
+  "Goiener (households)",
+  "ISSDA (households)",
+  "Low Carbon London (households)",
+  "Goiener (all)"
+)
+
+# Feature sets
+feat_sets <- c(
+  "Seasonal aggregates",
+  "Peaks and off-peaks",
+  "Strengths and autocorrelations",
+  "Catch-22 features"
+)
+
+# Clustering methods
+clust_meths <- c(
+  "*k*-means"
+)
+
+# No file by DEFAULT
+no_file <- paste0("![](", here::here("no-file.png"), "){width=33%} ")
+
+# Loops
+kk_loop <- 3:4
+ss_loop <- 1:2
+mm_loop <- 1:1
+cc_loop <- 2:30
+
+# Loop of keys
+for (kk in kk_loop) {
+  cat("# ", keys[kk], "\n\n", sep="")
+  
+  # Loop of feature sets
+  for (ss in ss_loop) {
+    cat("## Feature set #", ss, ": ", feat_sets[ss], "\n\n", sep="")
+
+    # Loop of clustering methods
+    for (mm in mm_loop) {
+      cat("### ", clust_meths[mm], "\n\n", sep="")
+      
+      # Plot elbow curve
+      elbow_name <- paste0("elb_", key_list[kk], "_s", ss, ".png")
+      if (file.exists(here::here(key_list[kk], "elb", elbow_name))) {
+        cat(paste0("![](", here::here(key_list[kk], "elb", elbow_name), "){width=100%} \n\n"))
+      } else {
+        cat(paste0(no_file, "\n\n"))
+      }
+      
+      # Loop of number of clusters
+      for (cc in cc_loop) {
+        cat("#### ", cc, " clusters\n\n", sep="")
+        
+        # Cluster evaluation
+        cat("**Cluster evaluation**\n\n", sep="")
+        cmepng_clust_name <- paste0("cmepng_", key_list[kk], "_s", ss, "_c", cc, ".png")
+        
+        if (file.exists(here::here(key_list[kk], "cmepng", cmepng_clust_name))) {
+          cat(paste0("![](", here::here(key_list[kk], "cmepng", cmepng_clust_name), "){width=100%} \n\n"))
+        } else {
+          cat(paste0(no_file, "\n\n"))
+        }
+        
+        # Load results
+        cme_clust_name <- paste0("cme_", key_list[kk], "_s", ss, "_c", cc, ".RData")
+        if (file.exists(here::here(key_list[kk], "cme", cme_clust_name))) {
+          load(here::here(key_list[kk], "cme", cme_clust_name))
+          # Print results
+          cat("* Davies-Bouldin index: ", cme$db_index$DB, "\n", sep="")
+          cat("* Elbow: ", cme$elbow, "\n\n", sep="")
+        } else {
+          cat(paste0(no_file, "\n\n"))
+        }
+        
+        # Loop of cluster indices
+        clust_str <- ""
+        for (ii in 1:cc) {
+          clust_id <- paste0("**Cluster #", ii, "** \n\n")
+          # Plot heatmaps
+          hm_clust_name <- paste0("hmpng_", key_list[kk], "_s", ss, "_c", cc, "-", ii, ".png")
+          sta_clust_name <- paste0("sta_", key_list[kk], "_s", ss, "_c", cc, "-", ii, ".png")
+          sei_clust_name <- paste0("sei_", key_list[kk], "_s", ss, "_c", cc, "-", ii, ".png")
+          
+          if (file.exists(here::here(key_list[kk], "hmpng", hm_clust_name))) {
+            clust_hm <- paste0("![](", here::here(key_list[kk], "hmpng", hm_clust_name), "){width=33%} ")
+          } else {
+            clust_hm <- no_file
+          }
+          
+          if (file.exists(here::here(key_list[kk], "sta", sta_clust_name))) {
+            clust_sta <- paste0("![](", here::here(key_list[kk], "sta", sta_clust_name), "){width=33%} ")
+          } else {
+            clust_sta <- no_file
+          }
+          
+          if (file.exists(here::here(key_list[kk], "sei", sei_clust_name))) {
+            clust_sei <- paste0("![](", here::here(key_list[kk], "sei", sei_clust_name), "){width=33%} ")
+          } else {
+            clust_sei <- no_file
+          }
+          
+          clust_str <- paste0(clust_str, clust_id, clust_hm, clust_sta, clust_sei)
+        }
+        cat(paste0(clust_str, "\n\n"))
+      }
+    }
+  }
+}
+
+
+```

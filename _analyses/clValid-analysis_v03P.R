@@ -2,7 +2,7 @@ library(foreach)
 library(clValid)
 library(mclust)
 
-feats_vs = "v1.11"
+feats_vers = "v1.11"
 
 get_cluster_analysis <- function(analysis_type) {
   
@@ -10,6 +10,8 @@ get_cluster_analysis <- function(analysis_type) {
   ##  ANALYSIS USING THE clValid PACKAGE
   ##  R file with the analysis functions of the Rmd file
   ##############################################################################
+  
+  print(analysis_type)
   
   ##############################################################################
   ##  Constants
@@ -39,12 +41,12 @@ get_cluster_analysis <- function(analysis_type) {
   )
   
   # SET CASE OF ANALYSIS
-  feats_set  <- feats_set[[extr_digits[1]]]
+  ft_set     <- feats_set[[extr_digits[1]]]
   dsets      <- dset_keys[[extr_digits[2]]]$keys
   imp_na_pct <- dset_keys[[extr_digits[2]]]$imp_na_pct
   is_hhold   <- dset_keys[[extr_digits[2]]]$is_hhold
   clMethods  <- cluster_methods[[extr_digits[3]]]
-  validation <- validation[[extr_digits[4]]]
+  valid      <- validation[[extr_digits[4]]]
   nClust     <- cluster_set[[extr_digits[5]]]
   
   ##############################################################################
@@ -67,14 +69,14 @@ get_cluster_analysis <- function(analysis_type) {
   row.names(feats) <- paste0(feats$data_set, "_", feats$file)
   feats <- feats[row_conditions,]
   # feats <- feats[1:50,]
-  feats <- subset(feats, select = get_feats_set(feats_set))
+  feats <- subset(feats, select = ft_set)
   feats <- as.matrix(feats)
   
   o <- clValid::clValid(
     obj        = feats,
     nClust     = nClust,
     clMethods  = clMethods,
-    validation = validation,
+    validation = valid,
     maxitems   = nrow(feats) + 1
   )
   
@@ -171,12 +173,12 @@ cluster_set <- list(
 ################################################################################
 
 # Setup parallel backend to use many processors
-cores <- 3 #parallel::detectCores() - 1
+cores <- 9 #parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
 foreach::foreach(
-  ii             = c(14721, 14821), #c(45, 47, 48), #c(11:19, 21:29, 31:39, 41:49),
+  ii             = c(11:19, 21:29, 31:39, 41:49) * 100 + 10011,
   .inorder       = FALSE,
   .errorhandling = "remove",
   .packages      = c("clValid", "mclust")
