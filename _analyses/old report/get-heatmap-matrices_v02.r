@@ -1,6 +1,5 @@
 library(foreach)
 
-get_heatmap_matrices_v02 <- function() {
   ##############################################################################
   ##  PATHS
   ##############################################################################
@@ -10,10 +9,11 @@ get_heatmap_matrices_v02 <- function() {
     feats_path  <- "G:/Mi unidad/WHY/Features/feats_v1.11.csv"
     clValid_dir <- "G:/Mi unidad/WHY/Analyses/clValid/data/"
     dataset_dir <- "G:/Mi unidad/WHY/Datasets/"
+    output_dir  <- "G:/Mi unidad/WHY/Analyses/clValid/heatmap_mat/"
   }
   if (.Platform$OS.type == "unix") {
     feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.11.csv"
-    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid/"
+    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid/clValid_files/"
     dataset_dir <- "/home/ubuntu/carlos.quesada/disk/"
     output_dir  <- "/home/ubuntu/carlos.quesada/analyses/clValid/heatmap_mat/"
   }
@@ -125,11 +125,11 @@ get_heatmap_matrices_v02 <- function() {
   
   # Setup parallel backend to use many processors
   cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores)
+  cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
   
   # Dataset loop
-  foreach::foreach(dd = 1:4) %do% {
+  foreach::foreach(dd = 1:4) %dopar% {
     # Rows
     row_conditions <- 
       feats$data_set %in% dset_keys[[dd]]$keys &
@@ -141,7 +141,7 @@ get_heatmap_matrices_v02 <- function() {
     # w_feats <- subset(w_feats, select = feats_set[[1]])
     
     # Method loop
-    foreach::foreach(mm = c(1:3,5:9)) %do% {
+    foreach::foreach(mm = c(2,5:9,1,3)) %dopar% {
       # Filename 
       w_fname <- paste0(
         "o_", feats_set_idx, dd, mm, validation_set_idx, cluster_set_idx, ".clValid"
@@ -198,7 +198,8 @@ get_heatmap_matrices_v02 <- function() {
       }
       
       # Cluster loop
-      foreach::foreach (cc = 1:cluster_number, .inorder = FALSE) %dopar% {
+      foreach::foreach (cc = cluster_number:1, .inorder = FALSE) %dopar% {
+        print(paste(dd, mm, cc))
         # Get cluster indices
         idx <- cluster_list == cc
         # Set vector of paths
@@ -213,22 +214,12 @@ get_heatmap_matrices_v02 <- function() {
         m <- whyT2.1::get_heatmap_matrix(data.frame(paths_vector))
         # Save heatmap matrix
         o_fname <- paste0(
-          output_folder,
-          "hmm_",
-          feats_set_idx,
-          dd,
-          mm,
-          "x",
-          cluster_set_idx,
-          ".RData"
+          output_dir, "hmm_", feats_set_idx, dd, mm, "_", cc, ".RData"
         )
-        save(m, file = o_fname) 
+        save(m, file = o_fname)
       }
     }
   }
   
   # Stop parallelization
   parallel::stopCluster(cl)
-}
-
-get_heatmap_matrices_v02()
