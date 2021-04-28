@@ -87,15 +87,26 @@ for (ff in ff_loop) {
         hmp_fname <- paste0("hmp_", ff, dd, mm, "_", cc, ".png")
         hmp_path  <- paste0(clValid_dir, "hmp/", hmp_fname)
         
-        # Generate code
+        # Generate HMP code
         if (file.exists(hmp_path)) {
-          img <- paste0("![](", hmp_path, "){width=33%} ")
+          hmp_str <- paste0("![](", hmp_path, "){width=33%} ")
         } else {
-          img <- no_file
+          hmp_str <- no_file
+        }
+        
+        # GRAPH1 filename formation
+        graph1_fname <- paste0("graph_", ff, dd, mm, "_", cc, "_1.png")
+        graph1_path  <- paste0(clValid_dir, "graph/", graph1_fname)
+        
+        # Generate GRAPH1 code
+        if (file.exists(graph1_path)) {
+          graph1_str <- paste0("![](", graph1_path, "){width=33%} ")
+        } else {
+          graph1_str <- no_file
         }
         
         # Write code
-        cat(img, "\n\n")
+        cat(hmp_str, graph1_str, "\n\n")
       }
     }
   }
