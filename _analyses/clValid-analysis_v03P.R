@@ -2,7 +2,7 @@ library(foreach)
 library(clValid)
 library(mclust)
 
-feats_vers = "v1.11"
+feats_vers <- "v1.11"
 
 get_cluster_analysis <- function(analysis_type) {
   
