@@ -95,9 +95,9 @@ cluster_methods <- c(
 # 4th DIGIT: VALIDATION --------------------------------------------------------
 validation <- list(
   # TYPE 1
-  i = "internal", 
+  i = "internal",
   # TYPE 2
-  s = "stability", 
+  s = "stability",
   # TYPE 3
   b = "biological"
 )
@@ -119,7 +119,7 @@ clMethods  <- cluster_methods[[extr_digits[3]]]
 valid      <- validation[[extr_digits[4]]]
 nClust     <- cluster_set[[extr_digits[5]]]
 
-row_conditions <- 
+row_conditions <-
   feats$data_set %in% dsets &
   feats$imputed_na_pct < imp_na_pct &
   feats$is_household %in% is_hhold
@@ -145,9 +145,9 @@ k <- kmeans(
 kclusters_k <- sapply(
   1:24,
   function(x) sum(k$cluster == x)
-) 
+)
 
-clv1 <- clValid::clValid(
+clv1 <- clValid2::clValid(
   obj = feats,
   nClust = 24,
   clMethods = "kmeans",
@@ -162,9 +162,9 @@ clv1 <- clValid::clValid(
 kclusters_clv1 <- sapply(
   1:24,
   function(x) sum(clv1@clusterObjs$kmeans$`24`$cluster == x)
-) 
+)
 
-clv2 <- clValid::clValid(
+clv2 <- clValid2::clValid(
   obj = feats,
   nClust = 24,
   clMethods = "kmeans",
