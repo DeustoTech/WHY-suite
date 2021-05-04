@@ -4,4 +4,5 @@
 3. ``clValid-validation-report_v01.Rmd``: Write validation report.
 4. ``get-heatmap-matrices_v03.r``: Generate heatmap matrices.
 5. ``clValid-heatmap-plots_v01.R``: Plot heatmap matrices.
-6. ``clValid-clustering-report_v01.Rmd``: Write clustering report.
+6. ``get-graphs_v01.R``: Plot features and socioeconomical graphs.
+7. ``clValid-clustering-report_v01.Rmd``: Write clustering report.
