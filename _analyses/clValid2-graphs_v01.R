@@ -1,6 +1,3 @@
-library(foreach)
-source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
-
 ##############################################################################
 ##  PATHS
 ##############################################################################
@@ -9,10 +6,12 @@ source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
 if (.Platform$OS.type == "windows") {
   feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.12.csv"
   root_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/"
+  source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
 }
 if (.Platform$OS.type == "unix") {
   feats_path <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.12.csv"
   root_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/"
+  source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R")
 }
 
 ##############################################################################
@@ -34,22 +33,29 @@ get_feature_graphs <- function() {
   )
   # FEATURE SET 1
   if (n1 == 1) {
+    # Colors
+    boxplots_colors <- c(
+      rep("darkolivegreen1", 6),
+      rep("darkgoldenrod1" , 6),
+      rep("burlywood"      , 6),
+      rep("cadetblue1"     , 6)
+    )
     # Plot cluster contents (features 1 to 24)
     par(fig=c(0,0.9,0,1))
     par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
     column_names <- feats_set[[n1]][1:24]
     short_labels <- substr(column_names, 10, 18)
-    cluster_elems <- w_feats[cluster_idx, ..column_names]
-    boxplot(cluster_elems, las=1, names=short_labels,
-            col=c(rep("darkolivegreen1",6), rep("darkgoldenrod1",6),
-                  rep("burlywood", 6), rep("cadetblue1", 6)))
+    cluster_elems <- w_feats[cluster_idx,]
+    cluster_elems <- subset(cluster_elems, select = column_names)
+    boxplot(cluster_elems, las=2, names=short_labels, col=boxplots_colors)
     # Plot cluster contents (feature 25)
     par(fig=c(0.9,1,0,1), new=TRUE)
     par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
     column_names <- feats_set[[n1]][25]
     short_labels <- substr(column_names, 10, 16)
-    cluster_elems <- w_feats[cluster_idx, ..column_names]
-    boxplot(cluster_elems, las=1, names=short_labels)
+    cluster_elems <- w_feats[cluster_idx,]
+    cluster_elems <- subset(cluster_elems, select = column_names)
+    boxplot(cluster_elems, las=2, names=short_labels)
   }
   # REST OF FEATURE SETS
   if (n1 != 1) {
@@ -82,17 +88,18 @@ number_of_clusters <- 24
 ################################################################################
 fnames <- list.files(path = paste0(root_dir, "data/"), pattern = "*.clValid2")
 
-# Setup parallel backend to use many processors
-cores <- parallel::detectCores() - 1
-cl <- parallel::makeCluster(cores, outfile = "")
-doParallel::registerDoParallel(cl)
+# # Setup parallel backend to use many processors
+# cores <- parallel::detectCores() - 1
+# cl <- parallel::makeCluster(cores, outfile = "")
+# doParallel::registerDoParallel(cl)
 
 # Dataset loop
-foreach::foreach(ff = 1:length(fnames)) %:%
-  foreach::foreach(cc = 1:number_of_clusters, .inorder = FALSE, errorhandling = "remove") %do% {
+# Da muchos problemas si se paraleliza porque los png() y los dev.off() se 
+# entremezclan!
+for (ff in 1:length(fnames)) {
+  for (cc in 1:number_of_clusters) {
   
     w_fname <- fnames[ff]
-    
     print(paste0(w_fname, " - ", cc))
     
     # Extract data from filename
@@ -173,7 +180,8 @@ foreach::foreach(ff = 1:length(fnames)) %:%
       # }
       
     }
+  }
 }
 
-# Stop parallelization
-parallel::stopCluster(cl)
+# # Stop parallelization
+# parallel::stopCluster(cl)
