@@ -5,14 +5,17 @@
 # User defined variables
 if (.Platform$OS.type == "windows") {
   feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.12.csv"
-  root_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/"
+  root_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/"
   source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
 }
 if (.Platform$OS.type == "unix") {
   feats_path <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.12.csv"
-  root_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/"
+  root_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.05_3-cl-methods/"
   source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R")
 }
+
+number_of_clusters <- 24
+skip_xxx2x <- TRUE
 
 ##############################################################################
 ##  get_feature_graphs()
@@ -25,16 +28,16 @@ get_feature_graphs <- function() {
   }
   # Name of the file to create
   ft_fname <- paste0("graph_", n1, n2, n3, "_", cc, "-", number_of_clusters, ".png")
-  # Save as PNG
-  png(
-    paste0(root_dir, "graph/", ft_fname),
-    width = 1200,
-    height = 900
-  )
   # FEATURE SET 1
   if (n1 == 1) {
+    # Save as PNG
+    png(
+      paste0(root_dir, "graph/", ft_fname),
+      width = 1200,
+      height = 900
+    )
     # Colors
-    boxplots_colors <- c(
+    boxplot_colors <- c(
       rep("darkolivegreen1", 6),
       rep("darkgoldenrod1" , 6),
       rep("burlywood"      , 6),
@@ -47,7 +50,7 @@ get_feature_graphs <- function() {
     short_labels <- substr(column_names, 10, 18)
     cluster_elems <- w_feats[cluster_idx,]
     cluster_elems <- subset(cluster_elems, select = column_names)
-    boxplot(cluster_elems, las=2, names=short_labels, col=boxplots_colors)
+    boxplot(cluster_elems, las=2, names=short_labels, col=boxplot_colors)
     # Plot cluster contents (feature 25)
     par(fig=c(0.9,1,0,1), new=TRUE)
     par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
@@ -56,18 +59,26 @@ get_feature_graphs <- function() {
     cluster_elems <- w_feats[cluster_idx,]
     cluster_elems <- subset(cluster_elems, select = column_names)
     boxplot(cluster_elems, las=2, names=short_labels)
+    # Save file
+    dev.off()
   }
   # REST OF FEATURE SETS
   if (n1 != 1) {
+    # Save as PNG
+    png(
+      paste0(root_dir, "graph/", ft_fname),
+      width = 1200,
+      height = 900
+    )
     # Plot cluster contents (features 1 to 7)
     par(fig=c(0,1,0,1))
     par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
     cluster_elems <- w_feats[km$cluster == ii,]
     # short_labels <- substr(names(cluster_elems), 10, 18)
     boxplot(cluster_elems, las=2)
+    # Save file
+    dev.off()
   }
-  # Save file
-  dev.off()
 }
 
 ################################################################################
@@ -80,8 +91,6 @@ feats <- data.table::fread(
   header = TRUE,
   sep    = ","
 )
-
-number_of_clusters <- 24
 
 ################################################################################
 ##  LOOP

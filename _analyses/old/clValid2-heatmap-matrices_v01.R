@@ -1,0 +1,149 @@
+library(foreach)
+
+  ##############################################################################
+  ##  PATHS
+  ##############################################################################
+  
+  # User defined variables
+  if (.Platform$OS.type == "windows") {
+    feats_path  <- "G:/Mi unidad/WHY/Features/feats_v1.12.csv"
+    clValid_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/data/"
+    dataset_dir <- "G:/Mi unidad/WHY/Datasets/"
+    hmm_dir     <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/hmm/"
+    hmp_dir     <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/hmp/"
+    source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
+  }
+  if (.Platform$OS.type == "unix") {
+    feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.12.csv"
+    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.05_3-cl-methods/data/"
+    dataset_dir <- "/home/ubuntu/carlos.quesada/disk/"
+    output_dir  <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.05_3-cl-methods/heatmaps/"
+    source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R")
+  }
+  
+  ################################################################################
+  ##  LOAD FEATURES
+  ################################################################################
+  
+  # Load feats
+  feats <- data.table::fread(
+    file   = feats_path,
+    header = TRUE,
+    sep    = ",",
+    select = c("data_set", "file", "imputed_na_pct", "is_household", "sum_per_day")
+  )
+  
+  number_of_clusters <- 24
+  
+  ################################################################################
+  ##  LOOP
+  ################################################################################
+  fnames <- list.files(path = clValid_dir, pattern = "*.clValid2")
+  
+  # Setup parallel backend to use many processors
+  cores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(cores, outfile = "")
+  doParallel::registerDoParallel(cl)
+  
+  o <- foreach::foreach(ff = 1:length(fnames)) %:%
+    foreach::foreach(cc = number_of_clusters:1, .inorder = FALSE) %do% {
+      
+      w_fname <- fnames[ff]
+      
+      # Extract data from filename
+      n1 <- as.numeric(substr(w_fname, 3, 3)) # features
+      n2 <- as.numeric(substr(w_fname, 4, 4)) # datasets
+      n3 <- as.numeric(substr(w_fname, 5, 5)) # cluster method
+      n4 <- as.numeric(substr(w_fname, 6, 6)) # validation method
+      n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
+      
+      # Rows
+      row_conditions <- 
+        feats$data_set %in% dset_keys[[n2]]$keys &
+        feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
+        feats$is_household %in% dset_keys[[n2]]$is_hhold &
+        feats$sum_per_day > dset_keys[[n2]]$sum_pday
+      
+      w_feats <- feats[row_conditions,]
+      w_fpath <- paste0(clValid_dir, w_fname)
+      
+      load(w_fpath)
+      
+      ### Get the clustering 
+      # HIERARCHICAL
+      if (n3 == 1) {
+        cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
+      }
+      # K-MEANS
+      if (n3 == 2) {
+        cluster_list <- o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
+      }
+      # DIANA
+      if (n3 == 3) {
+        cluster_list <- cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
+      }
+      # FANNY
+      if (n3 == 4) {
+        cluster_list <- o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # SOM
+      if (n3 == 5) {
+        cluster_list <- o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
+      }
+      # PAM
+      if (n3 == 6) {
+        cluster_list <- o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # SOTA
+      if (n3 == 7) {
+        cluster_list <- o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
+      }
+      # CLARA
+      if (n3 == 8) {
+        cluster_list <- o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # MODEL-BASED
+      if (n3 == 9) {
+        cluster_list <- o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
+      }
+      
+      # Cluster loop
+      print(paste0(w_fname, " - ", cc))
+      
+      # Get cluster indices
+      idx <- cluster_list == cc
+      # Set vector of paths
+      paths_vector <- paste0(
+        dataset_dir,
+        w_feats$data_set[idx],
+        "/ext/",
+        w_feats$file[idx],
+        ".RData"
+      )
+      
+      # Get heatmap matrix
+      m <- whyT2.1::get_heatmap_matrix(data.frame(paths_vector))
+      # Save heatmap matrix
+      o_fname <- paste0(
+        output_dir, "hmm_", n1, n2, n3, n4, n5, "_", cc, ".RData"
+      )
+      save(m, file = o_fname)
+      
+      # Heatmap plot map
+      hmp_path <- paste0(
+        output_dir, "hmp_", n1, n2, n3, n4, n5, "_", cc, ".png"
+      )
+      # Generate heatmaps
+      whyT2.1::plot_heatmap_matrix(
+        m           = m,
+        format_file = "png",
+        file_path   = hmp_path,
+        plot_width  = 1200,
+        plot_height = 900
+      )
+      
+      browser()
+  }
+
+  # Stop parallelization
+  parallel::stopCluster(cl)
