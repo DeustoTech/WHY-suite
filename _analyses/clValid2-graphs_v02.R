@@ -1,4 +1,5 @@
 library(foreach)
+library(stringr)
 
 ##############################################################################
 ##  PATHS
@@ -20,6 +21,156 @@ number_of_clusters <- 24
 skip_xxx2x <- TRUE
 
 ##############################################################################
+##  COLORS
+##############################################################################
+
+boxplot_colors <- c(
+  rep("darkolivegreen1", 6),
+  rep("darkgoldenrod1" , 6),
+  rep("burlywood"      , 6),
+  rep("cadetblue1"     , 6)
+)
+
+acorn_colors <- c(
+  rep("cornflowerblue", 3),
+  rep("darkorchid1", 2),
+  rep("darkolivegreen3", 5),
+  rep("darkgoldenrod1", 4),
+  rep("aquamarine", 3)
+)
+
+##############################################################################
+##  get_lcl_graphs()
+##############################################################################
+get_lcl_graphs <- function() {
+  # Create dir if it does not exist
+  if (!dir.exists(paste0(root_dir, "lcl/"))) {
+    dir.create(paste0(root_dir, "lcl/"))
+  }
+  
+  # Retrieve ACORN values
+  acorn <- subset(
+    x      = feats,
+    subset = row_conditions,
+    select = "acorn"
+  ) 
+  
+  # Count letters
+  acorn_codes <- LETTERS[1:17]
+  acorn_all <- c()
+  acorn_cluster <- c()
+  for (ii in 1:length(acorn_codes)) {
+    acorn_all[ii] <- sum(acorn == acorn_codes[ii])
+    acorn_cluster[ii] <- sum(acorn[cluster_list == cc] == acorn_codes[ii])
+  }
+  
+  # Get percentages of acorn representation
+  pc_acorn <- acorn_cluster / acorn_all
+  names(pc_acorn) <- acorn_codes
+  
+  # Name of the file to create
+  ft_fname <- paste0("lcl_", n1, n2, n3, "_", cc, "-", number_of_clusters, ".png")
+  # Open png file
+  png(
+    paste0(root_dir, "lcl/", ft_fname),
+    width = 1200,
+    height = 900
+  )
+  # Plot cluster contents (features 1 to 24)
+  par(fig=c(0,1,0,1))
+  par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
+  barplot(pc_acorn, col=acorn_colors, ylim=c(0,1))
+  
+  # Save file
+  dev.off()
+}
+
+##############################################################################
+##  get_go2_graphs()
+##############################################################################
+get_go2_graphs <- function() {
+  # Create dir if it does not exist
+  if (!dir.exists(paste0(root_dir, "goi/"))) {
+    dir.create(paste0(root_dir, "goi/"))
+  }
+  
+  # Retrieve ACORN values
+  go2_feats <- subset(
+    x      = feats,
+    subset = row_conditions,
+    select = c("administrative_division", "municipality", "zip_code", "cnae")
+  ) 
+  
+  #################
+  ##  PROVINCES  ##
+  #################
+  
+  # Count provinces
+  provinces <- sort(unique(go2_feats$administrative_division))
+  # prov_all <- c()
+  prov_cluster <- c()
+  for (ii in 1:length(provinces)) {
+    # prov_all[ii] <- sum(go2_feats$administrative_division == provinces[ii])
+    prov_cluster[ii] <- sum(go2_feats$administrative_division[cluster_list == cc] == provinces[ii])
+  }
+  
+  # Get percentages of acorn representation
+  pc_prov <- prov_cluster #/ prov_all
+  names(pc_prov) <- provinces
+  
+  # Name of the file to create
+  prov_fname <- paste0("goi_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_1.png")
+  
+  # Open png file
+  png(
+    paste0(root_dir, "goi/", prov_fname),
+    width = 1200,
+    height = 900
+  )
+  # Plot cluster contents (features 1 to 24)
+  par(fig=c(0,1,0,1))
+  par(cex=1.0, mai=c(0.8,0.5,0.05,0.05))
+  barplot(sort(pc_prov[pc_prov != 0], decreasing = TRUE)[1:50], las=2)
+  
+  # Save file
+  dev.off()
+  
+  ############
+  ##  CNAE  ##
+  ############
+  
+  # Count cnae's
+  cnae <- sort(unique(go2_feats$cnae))
+  # cnae_all <- c()
+  cnae_cluster <- c()
+  for (ii in 1:length(cnae)) {
+    # cnae_all[ii] <- sum(go2_feats$cnae == cnae[ii])
+    cnae_cluster[ii] <- sum(go2_feats$cnae[cluster_list == cc] == cnae[ii])
+  }
+  
+  # Get percentages of acorn representation
+  pc_cnae <- cnae_cluster #/ cnae_all
+  names(pc_cnae) <- stringr::str_pad(cnae, 4, pad="0")
+  
+  # Name of the file to create
+  cnae_fname <- paste0("goi_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_2.png")
+  
+  # Open png file
+  png(
+    paste0(root_dir, "goi/", cnae_fname),
+    width = 1200,
+    height = 900
+  )
+  # Plot cluster contents (features 1 to 24)
+  par(fig=c(0,1,0,1))
+  par(cex=1.0, mai= c(0.8,0.5,0.05,0.05))
+  barplot(sort(pc_cnae[pc_cnae != 0], decreasing = TRUE)[1:50], las=2)
+  
+  # Save file
+  dev.off()
+}
+
+##############################################################################
 ##  get_feature_graphs()
 ##############################################################################
 
@@ -37,13 +188,6 @@ get_feature_graphs <- function() {
       paste0(root_dir, "graph/", ft_fname),
       width = 1200,
       height = 900
-    )
-    # Colors
-    boxplot_colors <- c(
-      rep("darkolivegreen1", 6),
-      rep("darkgoldenrod1" , 6),
-      rep("burlywood"      , 6),
-      rep("cadetblue1"     , 6)
     )
     # Plot cluster contents (features 1 to 24)
     par(fig=c(0,0.9,0,1))
@@ -74,7 +218,7 @@ get_feature_graphs <- function() {
     )
     # Plot cluster contents (features 1 to 7)
     par(fig=c(0,1,0,1))
-    par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
+    par(cex=0.9, mai=c(0.8,0.5,0.05,0.05))
     cluster_elems <- w_feats[km$cluster == ii,]
     # short_labels <- substr(names(cluster_elems), 10, 18)
     boxplot(cluster_elems, las=2)
@@ -119,6 +263,9 @@ o <- foreach::foreach (ff = 1:length(fnames)) %:%
     n3 <- as.numeric(substr(w_fname, 5, 5)) # cluster method
     n4 <- as.numeric(substr(w_fname, 6, 6)) # validation method
     n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
+    
+    ### REMOVE THIS
+    if (n2 != 4) next
     
     # Rows
     row_conditions <- 
@@ -178,13 +325,15 @@ o <- foreach::foreach (ff = 1:length(fnames)) %:%
       ##################
       ##  Get graphs  ##
       ##################
-      get_feature_graphs()
+      # get_feature_graphs()
       
       # GOI & MEG
       if (n2 == 1 | n2 == 4) {
+        get_go2_graphs()
       }
       # LCL
       if (n2 == 2) {
+        get_lcl_graphs()
       }
       # ISS
       if (n2 == 3) {
