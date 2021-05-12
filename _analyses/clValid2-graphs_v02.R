@@ -7,7 +7,7 @@ library(stringr)
 
 # User defined variables
 if (.Platform$OS.type == "windows") {
-  feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.12.csv"
+  feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.15.csv"
   root_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/"
   source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R")
 }
@@ -86,6 +86,170 @@ get_lcl_graphs <- function() {
 }
 
 ##############################################################################
+##  get_iss_graphs()
+##############################################################################
+get_iss_graphs <- function() {
+  # Create dir if it does not exist
+  if (!dir.exists(paste0(root_dir, "iss/"))) {
+    dir.create(paste0(root_dir, "iss/"))
+  }
+  
+  # Retrieve ACORN values
+  iss_feats <- subset(
+    x      = feats,
+    subset = row_conditions,
+    select = c(
+      "q_200", "q_410", "q_420", "q_430", "q_4321", "q_4321.1", "q_4321.2", "q_4321.3",	"q_43521", "q_450", "q_452", "q_453", "q_4531", "q_6103", "q_61031", "q_470", "q_470.1", "q_470.2", 	"q_470.3", "q_470.4", "q_470.5", "q_470.6", "q_47001", "q_4701", "q_4701.1", "q_4701.2", "q_4701.3", "q_4701.4", "q_4701.5", "q_4701.6", "q_4701.7", "q_47011", "q_4801", "q_471", "q_472", "q_472.1", "q_472.2", "q_472.3", "q_473", "q_455", "q_4551", "q_5418",	"q_4021", "q_403", "q_404")
+  )
+  # QUESTION 6103 - FLOOR AREA
+  floor_area <- iss_feats$q_6103
+  floor_area[floor_area > 1E6] <- NA
+  idx <- iss_feats$q_61031 == 2
+  idx[is.na(idx)] <- FALSE
+  floor_area[idx] <- floor_area[idx] * 0.09290304
+  
+  # QUESTION 453 - YEAR HOUSE BUILT
+  w_year <- as.numeric(iss_feats$q_453)
+  idx <- w_year > 9000 | w_year < 100
+  idx[is.na(idx)] <- FALSE
+  w_year[idx] <- NA
+  
+  browser()
+  
+  ### GRAPH 1 ###
+  iss_name <- paste0("iss_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_1.png")
+  # Open png file
+  png(
+    paste0(root_dir, "iss/", iss_name),
+    width = 1200,
+    height = 900
+  )
+  # Plot 1
+  par(fig=c(1/23*0,1/23*8,0,1), cex=1.0)
+  boxplot(iss_feats$q_200[cluster_list == cc], iss_feats$q_47001[cluster_list == cc], iss_feats$q_47011[cluster_list == cc], iss_feats$q_4801[cluster_list == cc], iss_feats$q_471[cluster_list == cc], iss_feats$q_473[cluster_list == cc], las=2, names= c(200, 47001, 47011, 4801, 471, 473))
+  # Plot 2
+  par(fig=c(1/23*8,1/23*13,0,1), cex=1.0, new=TRUE)
+  boxplot(iss_feats$q_420[cluster_list == cc], iss_feats$q_430[cluster_list == cc], iss_feats$q_4551[cluster_list == cc], las=2, names= c(420, 430, 4551))
+  # Plot 3
+  par(fig=c(1/23*13,1/23*17,0,1), cex=1.0, new=TRUE)
+  boxplot(iss_feats$q_43521[cluster_list == cc], iss_feats$q_4531[cluster_list == cc], las=2, names= c(43521, 4531))
+  # Plot 4
+  par(fig=c(1/23*17,1/23*20,0,1), cex=1.0, new=TRUE)
+  boxplot(w_year[cluster_list == cc], las=2, xlab= c(453))
+  # Plot 5
+  par(fig=c(1/23*20,1/23*23,0,1), cex=1.0, new=TRUE)
+  boxplot(floor_area[cluster_list == cc], las=2, xlab= c(6103))
+  # Save file
+  dev.off()
+  
+  ### GRAPH 2 ###
+  iss_name <- paste0("iss_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_2.png")
+  
+  # Open png file
+  png(
+    paste0(root_dir, "iss/", iss_name),
+    width = 1200,
+    height = 900
+  )
+  # Plot 1
+  par(fig=c(0,0.12,0,1), cex=1.0)
+  res_410 <- c(sum(iss_feats$q_410[cluster_list == cc] == 1, na.rm = T),
+               sum(iss_feats$q_410[cluster_list == cc] == 2, na.rm = T),
+               sum(iss_feats$q_410[cluster_list == cc] == 3, na.rm = T))
+  barplot(res_410, names= 1:3, xlab=410)
+  # Plot 2
+  par(fig=c(0.12,0.28,0,1), cex=1.0, new=TRUE)
+  res_4321 <- c(sum(iss_feats$q_4321[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_4321.1[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_4321.2[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_4321.3[cluster_list == cc], na.rm = T))
+  barplot(res_4321, names= 1:4, xlab=4321)
+  # Plot 3
+  par(fig=c(0.28,0.52,0,1), cex=1.0, new=TRUE)
+  res_450 <- c(sum(iss_feats$q_450[cluster_list == cc] == 1, na.rm = T),
+               sum(iss_feats$q_450[cluster_list == cc] == 2, na.rm = T),
+               sum(iss_feats$q_450[cluster_list == cc] == 3, na.rm = T),
+               sum(iss_feats$q_450[cluster_list == cc] == 4, na.rm = T),
+               sum(iss_feats$q_450[cluster_list == cc] == 5, na.rm = T),
+               sum(iss_feats$q_450[cluster_list == cc] == 6, na.rm = T))
+  barplot(res_450, names= 1:6, xlab=450)
+  # Plot 4
+  par(fig=c(0.52,0.72,0,1), cex=1.0, new=TRUE)
+  res_452 <- c(sum(iss_feats$q_452[cluster_list == cc] == 1, na.rm = T),
+               sum(iss_feats$q_452[cluster_list == cc] == 2, na.rm = T),
+               sum(iss_feats$q_452[cluster_list == cc] == 3, na.rm = T),
+               sum(iss_feats$q_452[cluster_list == cc] == 4, na.rm = T),
+               sum(iss_feats$q_452[cluster_list == cc] == 5, na.rm = T))
+  barplot(res_452, names= 1:5, xlab=452)
+  # Plot 5
+  par(fig=c(0.72,1.0,0,1), cex=1.0, new=TRUE)
+  res_470 <- c(sum(iss_feats$q_470[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.1[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.2[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.3[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.4[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.5[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_470.6[cluster_list == cc], na.rm = T))
+  barplot(res_470, names= 1:7, xlab=470)
+  #Save file
+  dev.off()
+  
+  ### GRAPH 3 ###
+  iss_name <- paste0("iss_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_3.png")
+  
+  # Open png file
+  png(
+    paste0(root_dir, "iss/", iss_name),
+    width = 1200,
+    height = 900
+  )
+  # Plot 1
+  par(fig=c(1/42*0,1/42*11,0,1), cex=1.0)
+  res_4701 <- c(sum(iss_feats$q_4701[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.1[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.2[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.3[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.4[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.5[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.6[cluster_list == cc], na.rm = T),
+               sum(iss_feats$q_4701.7[cluster_list == cc], na.rm = T))
+  barplot(res_4701, names= 1:8, xlab=4701)
+  # Plot 2
+  par(fig=c(1/42*11,1/42*18,0,1), cex=1.0, new=TRUE)
+  res_472 <- c(sum(iss_feats$q_472[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_472.1[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_472.2[cluster_list == cc], na.rm = T),
+                sum(iss_feats$q_472.3[cluster_list == cc], na.rm = T))
+  barplot(res_472, names= 1:4, xlab=472)
+  # Plot 3
+  par(fig=c(1/42*18,1/42*24,0,1), cex=1.0, new=TRUE)
+  res_455 <- c(sum(iss_feats$q_455[cluster_list == cc] == 1, na.rm = T),
+               sum(iss_feats$q_455[cluster_list == cc] == 2, na.rm = T),
+               sum(iss_feats$q_455[cluster_list == cc] == 3, na.rm = T))
+  barplot(res_455, names= 1:3, xlab=455)
+  # Plot 4
+  par(fig=c(1/42*24,1/42*33,0,1), cex=1.0, new=TRUE)
+  res_5418 <- c(sum(iss_feats$q_5418[cluster_list == cc] == 1, na.rm = T),
+                sum(iss_feats$q_5418[cluster_list == cc] == 2, na.rm = T),
+                sum(iss_feats$q_5418[cluster_list == cc] == 3, na.rm = T),
+                sum(iss_feats$q_5418[cluster_list == cc] == 4, na.rm = T),
+                sum(iss_feats$q_5418[cluster_list == cc] == 5, na.rm = T),
+                sum(iss_feats$q_5418[cluster_list == cc] == 6, na.rm = T))
+  barplot(res_5418, names= 1:6, xlab=5418)
+  # Plot 5
+  par(fig=c(1/42*33,1/42*42,0,1), cex=1.0, new=TRUE)
+  res_4021 <- c(sum(iss_feats$q_4021[cluster_list == cc] == 1, na.rm = T),
+                sum(iss_feats$q_4021[cluster_list == cc] == 2, na.rm = T),
+                sum(iss_feats$q_4021[cluster_list == cc] == 3, na.rm = T),
+                sum(iss_feats$q_4021[cluster_list == cc] == 4, na.rm = T),
+                sum(iss_feats$q_4021[cluster_list == cc] == 5, na.rm = T),
+                sum(iss_feats$q_4021[cluster_list == cc] == 6, na.rm = T))
+  barplot(res_4021, names= 1:6, xlab=4021)
+  #Save file
+  dev.off()
+}
+
+##############################################################################
 ##  get_go2_graphs()
 ##############################################################################
 get_go2_graphs <- function() {
@@ -130,7 +294,8 @@ get_go2_graphs <- function() {
   # Plot cluster contents (features 1 to 24)
   par(fig=c(0,1,0,1))
   par(cex=1.0, mai=c(0.8,0.5,0.05,0.05))
-  barplot(sort(pc_prov[pc_prov != 0], decreasing = TRUE)[1:50], las=2)
+  plot_data <- sort(pc_prov[pc_prov != 0], decreasing = TRUE)[1:50]
+  barplot(plot_data[!is.na(plot_data)], las=2)
   
   # Save file
   dev.off()
@@ -164,10 +329,15 @@ get_go2_graphs <- function() {
   # Plot cluster contents (features 1 to 24)
   par(fig=c(0,1,0,1))
   par(cex=1.0, mai= c(0.8,0.5,0.05,0.05))
-  barplot(sort(pc_cnae[pc_cnae != 0], decreasing = TRUE)[1:50], las=2)
+  plot_data <- sort(pc_cnae[pc_cnae != 0], decreasing = TRUE)[1:50]
+  barplot(plot_data[!is.na(plot_data)], las=2)
   
   # Save file
   dev.off()
+  
+  ###############
+  ##  TARIFFS  ##
+  ###############
 }
 
 ##############################################################################
@@ -243,6 +413,8 @@ feats <- data.table::fread(
 ################################################################################
 fnames <- list.files(path = paste0(root_dir, "data/"), pattern = "*.clValid2")
 
+numel_df <- data.frame()
+
 # Setup parallel backend to use many processors
 cores <- parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
@@ -252,7 +424,7 @@ doParallel::registerDoParallel(cl)
 # Da muchos problemas si se paraleliza porque los png() y los dev.off() se 
 # entremezclan!
 o <- foreach::foreach (ff = 1:length(fnames)) %:%
-  foreach::foreach (cc = 1:number_of_clusters) %dopar% {
+  foreach::foreach (cc = 1:number_of_clusters) %do% {
   
     w_fname <- fnames[ff]
     print(paste0(w_fname, " - ", cc))
@@ -265,7 +437,7 @@ o <- foreach::foreach (ff = 1:length(fnames)) %:%
     n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
     
     ### REMOVE THIS
-    if (n2 != 4) next
+    # if (n2 != 1) next
     
     # Rows
     row_conditions <- 
@@ -329,18 +501,39 @@ o <- foreach::foreach (ff = 1:length(fnames)) %:%
       
       # GOI & MEG
       if (n2 == 1 | n2 == 4) {
-        get_go2_graphs()
+        # get_go2_graphs()
       }
       # LCL
       if (n2 == 2) {
-        get_lcl_graphs()
+        # get_lcl_graphs()
       }
       # ISS
       if (n2 == 3) {
+        # get_iss_graphs()
       }
       
+      numel_df <- rbind(numel_df, data.frame(
+        n1 = n1,
+        n2 = n2,
+        n3 = n3,
+        cc = cc,
+        numel = sum(cluster_idx),
+        pctel = sum(cluster_idx) / sum(row_conditions)
+      ))
     }
 }
+
+# Save
+data.table::fwrite(
+  x         = numel_df,
+  file      = paste0(root_dir, "numel_df.RData"),
+  append    = F,
+  quote     = F,
+  sep       = ",",
+  row.names = F,
+  col.names = T,
+  dateTimeAs = "write.csv"
+)
 
 
 # Stop parallelization
