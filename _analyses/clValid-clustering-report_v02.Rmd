@@ -1,7 +1,7 @@
 ---
-title: "Clusters"
-author: "Carlos Quesada"
-date: "12/05/2021"
+title: "Cluster Report v1.0"
+author: "Universidad de Deusto (carlos.quesada@deusto.es)"
+date: "May 12, 2021"
 output:
   html_document: 
     toc: true
@@ -12,12 +12,14 @@ output:
 ```{r, include=FALSE}
 ################################################################################
 ##  TO GENERATE AN HTML OUTPUT                                                ##
-##  rmarkdown::render("clValid_analysis_report_v01.html")                     ##
+##  rmarkdown::render("clValid-clustering-report_v02.Rmd")                     ##
 ################################################################################
 
 # Load libraries and excluding their warning messages
 clValid_dir  <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.05_3-cl-methods/"
 no.file_path <- "G:/Mi unidad/WHY/Github/why-T2.1/_analyses/no-file.png"
+# Number of clusters
+nc <- 24
 
 # Load numel_df.RData
 numel_df <- data.table::fread(
@@ -28,39 +30,39 @@ numel_df <- data.table::fread(
 
 # Datasets
 dataset_list <- c(
-  "Dataset: Goiener (only households)",
-  "Dataset: Low Carbon London dataset",
-  "Dataset: ISSDA",
-  "Dataset: Goiener (all)"
+  "Goiener (households)",
+  "Low Carbon London dataset",
+  "ISSDA",
+  "Goiener (all)"
 )
 # Set of features
 feature_set_list <- c(
-  "Set of features: seasonal aggregates",
-  "Set of features: peaks and off-peaks",
-  "Set of features: strengths and ACs",
-  "Set of features: Catch-22"
+  "Seasonal aggregates",
+  "Peaks and off-peaks",
+  "Strengths and ACs",
+  "Catch-22"
 )
 # Clustering
 clust_methods_list <- c(
-  "Clustering method: Hierarchical ",
-  "Clustering method: k-means",
-  "Clustering method: DIANA",
-  "Clustering method: FANNY",
-  "Clustering method: SOM",
-  "Clustering method: PAM",
-  "Clustering method: SOTA",
-  "Clustering method: CLARA",
-  "Clustering method: Model-based"
+  "Hierarchical",
+  "*k*-means",
+  "DIANA",
+  "FANNY",
+  "SOM",
+  "PAM",
+  "SOTA",
+  "CLARA",
+  "Model-based"
 )
 # Validation
 validation_list <- c(
-  "Internal measures: Connectivity (min)",
-  "Internal measures: Dunn index (max)",
-  "Internal measures: Silhouette (max)",
-  "Stability measures: APN (min)",
-  "Stability measures: AD (min)",
-  "Stability measures: ADM (min)",
-  "Stability measures: FOM (min)"
+  "Connectivity (min)",
+  "Dunn index (max)",
+  "Silhouette (max)",
+  "APN (min)",
+  "AD (min)",
+  "ADM (min)",
+  "FOM (min)"
 )
 ```
 
@@ -76,22 +78,31 @@ dd_loop <- 1:4
 # Methods loop
 mm_loop <- c(1,2,5)
 # Clusters loop
-cc_loop <- 1:24
+cc_loop <- 1:nc
 
 for (ff in ff_loop) {
-  cat("# ", feature_set_list[ff], "\n\n", sep="")
-  
+  cat("# Set of features: ", feature_set_list[ff], "\n\n", sep="")
+
   for (dd in dd_loop) {
-    cat("## ", dataset_list[dd], "\n\n", sep="")
+    cat("## Dataset: ", dataset_list[dd], "\n\n", sep="")
 
     for (mm in mm_loop) {
-      cat("### ", clust_methods_list[mm], "\n\n", sep="")
+      cat("### Clustering method: ", clust_methods_list[mm], "\n\n", sep="")
       
       for (cc in cc_loop) {
-        cat("#### Cluster #", cc, "\n\n", sep="")
+        cat("#### ", feature_set_list[ff], "/", dataset_list[dd], "/",
+            clust_methods_list[mm], "/**Cluster #", cc, "**\n\n", sep="")
+        
+        # Information about the number of elements per cluster
+        idx <- numel_df$n1 == ff & numel_df$n2 == dd & numel_df$n3 == mm &
+               numel_df$cc == cc
+        pct_value <- round(100*numel_df[idx]$pctel, 1)
+        if (pct_value == 0) pct_value <- "~0"
+        cat("Number of elements in cluster: ", numel_df[idx]$numel, " (",
+            pct_value, "%)\n\n", sep="")
         
         # HMP filename formation
-        hmp_fname <- paste0("hmp_", ff, dd, mm, "_", cc, ".png")
+        hmp_fname <- paste0("hmp_", ff, dd, mm, "_", cc, "-", nc, ".png")
         hmp_path  <- paste0(clValid_dir, "hmp/", hmp_fname)
         
         # Generate HMP code
@@ -101,19 +112,48 @@ for (ff in ff_loop) {
           hmp_str <- no_file
         }
         
-        # GRAPH1 filename formation
-        graph1_fname <- paste0("graph_", ff, dd, mm, "_", cc, "_1.png")
-        graph1_path  <- paste0(clValid_dir, "graph/", graph1_fname)
+        # GRAPH filename formation
+        graph_fname <- paste0("graph_", ff, dd, mm, "_", cc, "-", nc, ".png")
+        graph_path  <- paste0(clValid_dir, "graph/", graph_fname)
         
-        # Generate GRAPH1 code
-        if (file.exists(graph1_path)) {
-          graph1_str <- paste0("![](", graph1_path, "){width=33%} ")
+        # Generate GRAPH code
+        if (file.exists(graph_path)) {
+          graph_str <- paste0("![](", graph_path, "){width=33%} ")
         } else {
-          graph1_str <- no_file
+          graph_str <- no_file
         }
         
+        # SPECIFIC FILES OF GOIENER
+        if (dd == 1 | dd == 4) {
+          # GOI filename formation
+          goi1_fname <- paste0("goi_", ff, dd, mm, "_", cc, "-", nc, "_1.png")
+          goi2_fname <- paste0("goi_", ff, dd, mm, "_", cc, "-", nc, "_2.png")
+          goi1_path  <- paste0(clValid_dir, "goi/", goi1_fname)
+          goi2_path  <- paste0(clValid_dir, "goi/", goi2_fname)
+          
+          # Generate GOI code
+          if (file.exists(goi1_path)) {
+            goi1_str <- paste0("![](", goi1_path, "){width=33%} ")
+          } else {
+            goi1_str <- no_file
+          }
+          
+          # Generate GOI code
+          if (file.exists(goi2_path)) {
+            goi2_str <- paste0("![](", goi2_path, "){width=33%} ")
+          } else {
+            goi2_str <- no_file
+          }
+          
+          # Put GOI together
+          dataset_str <- paste0(goi1_str, goi2_str)
+        }
+        else{
+          dataset_str <- ""
+        }
+
         # Write code
-        cat(hmp_str, graph1_str, "\n\n")
+        cat(hmp_str, graph_str, dataset_str, "\n\n")
       }
     }
   }

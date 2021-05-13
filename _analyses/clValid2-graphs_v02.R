@@ -114,8 +114,6 @@ get_iss_graphs <- function() {
   idx[is.na(idx)] <- FALSE
   w_year[idx] <- NA
   
-  browser()
-  
   ### GRAPH 1 ###
   iss_name <- paste0("iss_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_1.png")
   # Open png file
@@ -416,15 +414,17 @@ fnames <- list.files(path = paste0(root_dir, "data/"), pattern = "*.clValid2")
 numel_df <- data.frame()
 
 # Setup parallel backend to use many processors
-cores <- parallel::detectCores() - 1
-cl <- parallel::makeCluster(cores, outfile = "")
-doParallel::registerDoParallel(cl)
+# cores <- parallel::detectCores() - 1
+# cl <- parallel::makeCluster(cores, outfile = "")
+# doParallel::registerDoParallel(cl)
 
 # Dataset loop
 # Da muchos problemas si se paraleliza porque los png() y los dev.off() se 
 # entremezclan!
-o <- foreach::foreach (ff = 1:length(fnames)) %:%
-  foreach::foreach (cc = 1:number_of_clusters) %do% {
+# o <- foreach::foreach (ff = 1:length(fnames)) %:%
+#   foreach::foreach (cc = 1:number_of_clusters) %do% {
+for (ff in 1:length(fnames)) {
+  for (cc in 1:number_of_clusters) {
   
     w_fname <- fnames[ff]
     print(paste0(w_fname, " - ", cc))
@@ -436,91 +436,93 @@ o <- foreach::foreach (ff = 1:length(fnames)) %:%
     n4 <- as.numeric(substr(w_fname, 6, 6)) # validation method
     n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
     
-    ### REMOVE THIS
-    # if (n2 != 1) next
-    
-    # Rows
-    row_conditions <- 
-      feats$data_set %in% dset_keys[[n2]]$keys &
-      feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
-      feats$is_household %in% dset_keys[[n2]]$is_hhold &
-      feats$sum_per_day > dset_keys[[n2]]$sum_pday
-    
-    # Working features
-    w_feats <- feats[row_conditions,]
-    w_fpath <- paste0(root_dir, "data/", w_fname)
-    
-    if (file.exists(w_fpath)) {
-      load(w_fpath)
-      ### Get the clustering 
-      # HIERARCHICAL
-      if (n3 == 1) {
-        cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
-      }
-      # K-MEANS
-      if (n3 == 2) {
-        cluster_list <- o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
-      }
-      # DIANA
-      if (n3 == 3) {
-        cluster_list <- cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
-      }
-      # FANNY
-      if (n3 == 4) {
-        cluster_list <- o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
-      }
-      # SOM
-      if (n3 == 5) {
-        cluster_list <- o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
-      }
-      # PAM
-      if (n3 == 6) {
-        cluster_list <- o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
-      }
-      # SOTA
-      if (n3 == 7) {
-        cluster_list <- o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
-      }
-      # CLARA
-      if (n3 == 8) {
-        cluster_list <- o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
-      }
-      # MODEL-BASED
-      if (n3 == 9) {
-        cluster_list <- o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
-      }
-      ###########################
-      ##  Get cluster indices  ##
-      ###########################
-      cluster_idx <- cluster_list == cc
+    if (n4 == 1) {
+      # Rows
+      row_conditions <- 
+        feats$data_set %in% dset_keys[[n2]]$keys &
+        feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
+        feats$is_household %in% dset_keys[[n2]]$is_hhold &
+        feats$sum_per_day > dset_keys[[n2]]$sum_pday
       
-      ##################
-      ##  Get graphs  ##
-      ##################
-      # get_feature_graphs()
+      # Working features
+      w_feats <- feats[row_conditions,]
+      w_fpath <- paste0(root_dir, "data/", w_fname)
       
-      # GOI & MEG
-      if (n2 == 1 | n2 == 4) {
-        # get_go2_graphs()
+      if (file.exists(w_fpath)) {
+        load(w_fpath)
+        ### Get the clustering 
+        # HIERARCHICAL
+        if (n3 == 1) {
+          cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
+        }
+        # K-MEANS
+        if (n3 == 2) {
+          cluster_list <- o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
+        }
+        # DIANA
+        if (n3 == 3) {
+          cluster_list <- cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
+        }
+        # FANNY
+        if (n3 == 4) {
+          cluster_list <- o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
+        }
+        # SOM
+        if (n3 == 5) {
+          cluster_list <- o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
+        }
+        # PAM
+        if (n3 == 6) {
+          cluster_list <- o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
+        }
+        # SOTA
+        if (n3 == 7) {
+          cluster_list <- o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
+        }
+        # CLARA
+        if (n3 == 8) {
+          cluster_list <- o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
+        }
+        # MODEL-BASED
+        if (n3 == 9) {
+          cluster_list <- o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
+        }
+        ###########################
+        ##  Get cluster indices  ##
+        ###########################
+        cluster_idx <- cluster_list == cc
+        
+        ##################
+        ##  Get graphs  ##
+        ##################
+        get_feature_graphs()
+        
+        # GOI & MEG
+        if (n2 == 1 | n2 == 4) {
+          get_go2_graphs()
+        }
+        # LCL
+        if (n2 == 2) {
+          get_lcl_graphs()
+        }
+        # ISS
+        if (n2 == 3) {
+          get_iss_graphs()
+        }
+  
+        # Number of elements per cluster
+        new_df <- data.frame(
+          n1    = n1,
+          n2    = n2,
+          n3    = n3,
+          cc    = cc,
+          numel = sum(cluster_idx),
+          pctel = sum(cluster_idx) / sum(row_conditions)
+        )
+        numel_df <- rbind(numel_df, new_df)
       }
-      # LCL
-      if (n2 == 2) {
-        # get_lcl_graphs()
-      }
-      # ISS
-      if (n2 == 3) {
-        # get_iss_graphs()
-      }
-      
-      numel_df <- rbind(numel_df, data.frame(
-        n1 = n1,
-        n2 = n2,
-        n3 = n3,
-        cc = cc,
-        numel = sum(cluster_idx),
-        pctel = sum(cluster_idx) / sum(row_conditions)
-      ))
     }
+  }
 }
 
 # Save
@@ -537,4 +539,4 @@ data.table::fwrite(
 
 
 # Stop parallelization
-parallel::stopCluster(cl)
+# parallel::stopCluster(cl)
