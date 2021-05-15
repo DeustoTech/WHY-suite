@@ -268,7 +268,7 @@ plot_features_library <- function(sampling_period, feats_folder, feats_to_plot) 
 #'
 #' @export
 
-get_heatmap_matrix <- function(fnames) {
+get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # FUNCTION FOR ALIGNING ANY TIME SERIES BY ISO WEEKS (1 TO 53)
   # INPUT: dataframe with pairs dataset-filename
   align_time_series <- function(fname) {
@@ -277,11 +277,19 @@ get_heatmap_matrix <- function(fnames) {
     # By hours
     t_factor <- cut(edf$df$times, breaks = "1 hour")
     # Aggregate by hour
-    aggr_data <- stats::aggregate(
-      x   = edf$df$values,
-      by  = list(date_time = t_factor),
-      FUN = sum
-    )
+    if (.scale) {
+      aggr_data <- stats::aggregate(
+        x   = scale(edf$df$values),
+        by  = list(date_time = t_factor),
+        FUN = sum
+      )
+    } else {
+      aggr_data <- stats::aggregate(
+        x   = edf$df$values,
+        by  = list(date_time = t_factor),
+        FUN = sum
+      )
+    }
     # Vector of dates
     date_vect <- as.POSIXct(aggr_data$date_time, tz="GMT")
     # Number of years to be taken per time series (if "as much as possible" is
