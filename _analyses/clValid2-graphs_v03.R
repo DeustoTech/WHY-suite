@@ -39,8 +39,7 @@ get_lcl_graphs <- function() {
     height = 900
   )
   # Plot cluster contents (features 1 to 24)
-  par(fig=c(0,1,0,1))
-  par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
+  par(fig=c(0,1,0,1), cex=1)
   barplot(pc_acorn, col=acorn_colors, ylim=c(0,1))
   
   # Save file
@@ -56,22 +55,15 @@ get_iss_graphs <- function() {
     dir.create(paste0(root_dir, "iss/"))
   }
   
-  # Retrieve ACORN values
-  iss_feats <- subset(
-    x      = feats,
-    subset = row_conditions,
-    select = c(
-      "q_200", "q_410", "q_420", "q_430", "q_4321", "q_4321.1", "q_4321.2", "q_4321.3",	"q_43521", "q_450", "q_452", "q_453", "q_4531", "q_6103", "q_61031", "q_470", "q_470.1", "q_470.2", 	"q_470.3", "q_470.4", "q_470.5", "q_470.6", "q_47001", "q_4701", "q_4701.1", "q_4701.2", "q_4701.3", "q_4701.4", "q_4701.5", "q_4701.6", "q_4701.7", "q_47011", "q_4801", "q_471", "q_472", "q_472.1", "q_472.2", "q_472.3", "q_473", "q_455", "q_4551", "q_5418",	"q_4021", "q_403", "q_404")
-  )
   # QUESTION 6103 - FLOOR AREA
-  floor_area <- iss_feats$q_6103
+  floor_area <- feats$q_6103
   floor_area[floor_area > 1E6] <- NA
-  idx <- iss_feats$q_61031 == 2
+  idx <- feats$q_61031 == 2
   idx[is.na(idx)] <- FALSE
   floor_area[idx] <- floor_area[idx] * 0.09290304
   
   # QUESTION 453 - YEAR HOUSE BUILT
-  w_year <- as.numeric(iss_feats$q_453)
+  w_year <- as.numeric(feats$q_453)
   idx <- w_year > 9000 | w_year < 100
   idx[is.na(idx)] <- FALSE
   w_year[idx] <- NA
@@ -86,13 +78,13 @@ get_iss_graphs <- function() {
   )
     # Plot 1
     par(fig=c(1/23*0,1/23*8,0,1), cex=1.0)
-    try(boxplot(iss_feats$q_200[cluster_list == cc], iss_feats$q_47001[cluster_list == cc], iss_feats$q_47011[cluster_list == cc], iss_feats$q_4801[cluster_list == cc], iss_feats$q_471[cluster_list == cc], iss_feats$q_473[cluster_list == cc], las=2, names= c(200, 47001, 47011, 4801, 471, 473)))
+    try(boxplot(feats$q_200[cluster_list == cc], feats$q_47001[cluster_list == cc], feats$q_47011[cluster_list == cc], feats$q_4801[cluster_list == cc], feats$q_471[cluster_list == cc], feats$q_473[cluster_list == cc], las=2, names= c(200, 47001, 47011, 4801, 471, 473)))
     # Plot 2
     par(fig=c(1/23*8,1/23*13,0,1), cex=1.0, new=TRUE)
-    try(boxplot(iss_feats$q_420[cluster_list == cc], iss_feats$q_430[cluster_list == cc], iss_feats$q_4551[cluster_list == cc], las=2, names= c(420, 430, 4551)))
+    try(boxplot(feats$q_420[cluster_list == cc], replace(feats$q_430[cluster_list == cc], feats$q_430[cluster_list == cc] == 8, 0), feats$q_4551[cluster_list == cc], las=2, names= c(420, 430, 4551)))
     # Plot 3
     par(fig=c(1/23*13,1/23*17,0,1), cex=1.0, new=TRUE)
-    try(boxplot(iss_feats$q_43521[cluster_list == cc], iss_feats$q_4531[cluster_list == cc], las=2, names= c(43521, 4531)))
+    try(boxplot(feats$q_43521[cluster_list == cc], feats$q_4531[cluster_list == cc], las=2, names= c(43521, 4531)))
     # Plot 4
     par(fig=c(1/23*17,1/23*20,0,1), cex=1.0, new=TRUE)
     try(boxplot(w_year[cluster_list == cc], las=2, xlab= c(453)))
@@ -112,44 +104,44 @@ get_iss_graphs <- function() {
     height = 900
   )
   # Plot 1
-  par(fig=c(0,0.12,0,1), cex=1.0)
-  res_410 <- c(sum(iss_feats$q_410[cluster_list == cc] == 1, na.rm = T),
-               sum(iss_feats$q_410[cluster_list == cc] == 2, na.rm = T),
-               sum(iss_feats$q_410[cluster_list == cc] == 3, na.rm = T))
+  par(fig=c(1/40*0,1/40*6,0,1), cex=1.0)
+  res_410 <- c(sum(feats$q_410[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_410[cluster_list == cc] == 2, na.rm = T),
+               sum(feats$q_410[cluster_list == cc] == 3, na.rm = T))
   try(barplot(res_410, names= 1:3, xlab=410))
   # Plot 2
-  par(fig=c(0.12,0.28,0,1), cex=1.0, new=TRUE)
-  res_4321 <- c(sum(iss_feats$q_4321[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_4321.1[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_4321.2[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_4321.3[cluster_list == cc], na.rm = T))
+  par(fig=c(1/40*6,1/40*13,0,1), cex=1.0, new=TRUE)
+  res_4321 <- c(sum(feats$q_4321[cluster_list == cc], na.rm = T),
+                sum(feats$q_4321.1[cluster_list == cc], na.rm = T),
+                sum(feats$q_4321.2[cluster_list == cc], na.rm = T),
+                sum(feats$q_4321.3[cluster_list == cc], na.rm = T))
   try(barplot(res_4321, names= 1:4, xlab=4321))
   # Plot 3
-  par(fig=c(0.28,0.52,0,1), cex=1.0, new=TRUE)
-  res_450 <- c(sum(iss_feats$q_450[cluster_list == cc] == 1, na.rm = T),
-               sum(iss_feats$q_450[cluster_list == cc] == 2, na.rm = T),
-               sum(iss_feats$q_450[cluster_list == cc] == 3, na.rm = T),
-               sum(iss_feats$q_450[cluster_list == cc] == 4, na.rm = T),
-               sum(iss_feats$q_450[cluster_list == cc] == 5, na.rm = T),
-               sum(iss_feats$q_450[cluster_list == cc] == 6, na.rm = T))
+  par(fig=c(1/40*13,1/40*22,0,1), cex=1.0, new=TRUE)
+  res_450 <- c(sum(feats$q_450[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_450[cluster_list == cc] == 2, na.rm = T),
+               sum(feats$q_450[cluster_list == cc] == 3, na.rm = T),
+               sum(feats$q_450[cluster_list == cc] == 4, na.rm = T),
+               sum(feats$q_450[cluster_list == cc] == 5, na.rm = T),
+               sum(feats$q_450[cluster_list == cc] == 6, na.rm = T))
   try(barplot(res_450, names= 1:6, xlab=450))
   # Plot 4
-  par(fig=c(0.52,0.72,0,1), cex=1.0, new=TRUE)
-  res_452 <- c(sum(iss_feats$q_452[cluster_list == cc] == 1, na.rm = T),
-               sum(iss_feats$q_452[cluster_list == cc] == 2, na.rm = T),
-               sum(iss_feats$q_452[cluster_list == cc] == 3, na.rm = T),
-               sum(iss_feats$q_452[cluster_list == cc] == 4, na.rm = T),
-               sum(iss_feats$q_452[cluster_list == cc] == 5, na.rm = T))
+  par(fig=c(1/40*22,1/40*30,0,1), cex=1.0, new=TRUE)
+  res_452 <- c(sum(feats$q_452[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_452[cluster_list == cc] == 2, na.rm = T),
+               sum(feats$q_452[cluster_list == cc] == 3, na.rm = T),
+               sum(feats$q_452[cluster_list == cc] == 4, na.rm = T),
+               sum(feats$q_452[cluster_list == cc] == 5, na.rm = T))
   try(barplot(res_452, names= 1:5, xlab=452))
   # Plot 5
-  par(fig=c(0.72,1.0,0,1), cex=1.0, new=TRUE)
-  res_470 <- c(sum(iss_feats$q_470[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.1[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.2[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.3[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.4[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.5[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_470.6[cluster_list == cc], na.rm = T))
+  par(fig=c(1/40*30,1/40*40,0,1), cex=1.0, new=TRUE)
+  res_470 <- c(sum(feats$q_470[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.1[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.2[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.3[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.4[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.5[cluster_list == cc], na.rm = T),
+                sum(feats$q_470.6[cluster_list == cc], na.rm = T))
   try(barplot(res_470, names= 1:7, xlab=470))
   #Save file
   dev.off()
@@ -164,46 +156,46 @@ get_iss_graphs <- function() {
     height = 900
   )
   # Plot 1
-  par(fig=c(1/42*0,1/42*11,0,1), cex=1.0)
-  res_4701 <- c(sum(iss_feats$q_4701[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.1[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.2[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.3[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.4[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.5[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.6[cluster_list == cc], na.rm = T),
-               sum(iss_feats$q_4701.7[cluster_list == cc], na.rm = T))
+  par(fig=c(0,11/42,0,1), cex=1.0)
+  res_4701 <- c(sum(feats$q_4701[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.1[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.2[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.3[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.4[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.5[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.6[cluster_list == cc], na.rm = T),
+               sum(feats$q_4701.7[cluster_list == cc], na.rm = T))
   try(barplot(res_4701, names= 1:8, xlab=4701))
   # Plot 2
-  par(fig=c(1/42*11,1/42*18,0,1), cex=1.0, new=TRUE)
-  res_472 <- c(sum(iss_feats$q_472[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_472.1[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_472.2[cluster_list == cc], na.rm = T),
-                sum(iss_feats$q_472.3[cluster_list == cc], na.rm = T))
+  par(fig=c(11/42,18/42,0,1), cex=1.0, new=TRUE)
+  res_472 <- c(sum(feats$q_472[cluster_list == cc], na.rm = T),
+                sum(feats$q_472.1[cluster_list == cc], na.rm = T),
+                sum(feats$q_472.2[cluster_list == cc], na.rm = T),
+                sum(feats$q_472.3[cluster_list == cc], na.rm = T))
   try(barplot(res_472, names= 1:4, xlab=472))
   # Plot 3
-  par(fig=c(1/42*18,1/42*24,0,1), cex=1.0, new=TRUE)
-  res_455 <- c(sum(iss_feats$q_455[cluster_list == cc] == 1, na.rm = T),
-               sum(iss_feats$q_455[cluster_list == cc] == 2, na.rm = T),
-               sum(iss_feats$q_455[cluster_list == cc] == 3, na.rm = T))
+  par(fig=c(18/42,24/42,0,1), cex=1.0, new=TRUE)
+  res_455 <- c(sum(feats$q_455[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_455[cluster_list == cc] == 2, na.rm = T),
+               sum(feats$q_455[cluster_list == cc] == 3, na.rm = T))
   try(barplot(res_455, names= 1:3, xlab=455))
   # Plot 4
-  par(fig=c(1/42*24,1/42*33,0,1), cex=1.0, new=TRUE)
-  res_5418 <- c(sum(iss_feats$q_5418[cluster_list == cc] == 1, na.rm = T),
-                sum(iss_feats$q_5418[cluster_list == cc] == 2, na.rm = T),
-                sum(iss_feats$q_5418[cluster_list == cc] == 3, na.rm = T),
-                sum(iss_feats$q_5418[cluster_list == cc] == 4, na.rm = T),
-                sum(iss_feats$q_5418[cluster_list == cc] == 5, na.rm = T),
-                sum(iss_feats$q_5418[cluster_list == cc] == 6, na.rm = T))
+  par(fig=c(24/42,33/42,0,1), cex=1.0, new=TRUE)
+  res_5418 <- c(sum(feats$q_5418[cluster_list == cc] == 1, na.rm = T),
+                sum(feats$q_5418[cluster_list == cc] == 2, na.rm = T),
+                sum(feats$q_5418[cluster_list == cc] == 3, na.rm = T),
+                sum(feats$q_5418[cluster_list == cc] == 4, na.rm = T),
+                sum(feats$q_5418[cluster_list == cc] == 5, na.rm = T),
+                sum(feats$q_5418[cluster_list == cc] == 6, na.rm = T))
   try(barplot(res_5418, names= 1:6, xlab=5418))
   # Plot 5
-  par(fig=c(1/42*33,1/42*42,0,1), cex=1.0, new=TRUE)
-  res_4021 <- c(sum(iss_feats$q_4021[cluster_list == cc] == 1, na.rm = T),
-                sum(iss_feats$q_4021[cluster_list == cc] == 2, na.rm = T),
-                sum(iss_feats$q_4021[cluster_list == cc] == 3, na.rm = T),
-                sum(iss_feats$q_4021[cluster_list == cc] == 4, na.rm = T),
-                sum(iss_feats$q_4021[cluster_list == cc] == 5, na.rm = T),
-                sum(iss_feats$q_4021[cluster_list == cc] == 6, na.rm = T))
+  par(fig=c(33/42,1,0,1), cex=1.0, new=TRUE)
+  res_4021 <- c(sum(feats$q_4021[cluster_list == cc] == 1, na.rm = T),
+                sum(feats$q_4021[cluster_list == cc] == 2, na.rm = T),
+                sum(feats$q_4021[cluster_list == cc] == 3, na.rm = T),
+                sum(feats$q_4021[cluster_list == cc] == 4, na.rm = T),
+                sum(feats$q_4021[cluster_list == cc] == 5, na.rm = T),
+                sum(feats$q_4021[cluster_list == cc] == 6, na.rm = T))
   try(barplot(res_4021, names= 1:6, xlab=4021))
   #Save file
   dev.off()
@@ -231,15 +223,13 @@ get_go2_graphs <- function() {
   
   # Count provinces
   provinces <- sort(unique(go2_feats$administrative_division))
-  # prov_all <- c()
   prov_cluster <- c()
   for (ii in 1:length(provinces)) {
-    # prov_all[ii] <- sum(go2_feats$administrative_division == provinces[ii])
     prov_cluster[ii] <- sum(go2_feats$administrative_division[cluster_list == cc] == provinces[ii])
   }
   
   # Get percentages of acorn representation
-  pc_prov <- prov_cluster #/ prov_all
+  pc_prov <- prov_cluster
   names(pc_prov) <- provinces
   
   # Name of the file to create
@@ -252,8 +242,7 @@ get_go2_graphs <- function() {
     height = 900
   )
   # Plot cluster contents (features 1 to 24)
-  par(fig=c(0,1,0,1))
-  par(cex=1.0, mai=c(0.8,0.5,0.05,0.05))
+  par(fig=c(0,1,0,1), cex=1.0)
   plot_data <- sort(pc_prov[pc_prov != 0], decreasing = TRUE)[1:50]
   barplot(plot_data[!is.na(plot_data)], las=2)
   
@@ -269,12 +258,11 @@ get_go2_graphs <- function() {
   # cnae_all <- c()
   cnae_cluster <- c()
   for (ii in 1:length(cnae)) {
-    # cnae_all[ii] <- sum(go2_feats$cnae == cnae[ii])
     cnae_cluster[ii] <- sum(go2_feats$cnae[cluster_list == cc] == cnae[ii])
   }
   
   # Get percentages of acorn representation
-  pc_cnae <- cnae_cluster #/ cnae_all
+  pc_cnae <- cnae_cluster
   names(pc_cnae) <- stringr::str_pad(cnae, 4, pad="0")
   
   # Name of the file to create
@@ -287,8 +275,7 @@ get_go2_graphs <- function() {
     height = 900
   )
   # Plot cluster contents (features 1 to 24)
-  par(fig=c(0,1,0,1))
-  par(cex=1.0, mai= c(0.8,0.5,0.05,0.05))
+  par(fig=c(0,1,0,1), cex=1.0)
   plot_data <- sort(pc_cnae[pc_cnae != 0], decreasing = TRUE)[1:50]
   barplot(plot_data[!is.na(plot_data)], las=2)
   
@@ -298,6 +285,34 @@ get_go2_graphs <- function() {
   ###############
   ##  TARIFFS  ##
   ###############
+
+  tariff_names <- paste0("goi_", n1, n2, n3, "_", cc, "-", number_of_clusters, "_3.png")
+  
+  # Open png file
+  png(
+    paste0(root_dir, "goi/", tariff_names),
+    width = 1200,
+    height = 900
+  )
+  # Plot 1
+  par(fig=c(0,11/17,0,1), cex=1.0)
+  tariffs <-c(sum(feats$tariff[cluster_list == cc] == "2.0A",   na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "2.0DHA", na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "2.0DHS", na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "2.1A"  , na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "2.1DHA", na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "2.1DHS", na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "3.0A",   na.rm = T),
+              sum(feats$tariff[cluster_list == cc] == "3.1A",   na.rm = T))
+  try(barplot(tariffs, names= c("2.0A", "2.0DHA", "2.0DHS", "2.1A", "2.1DHA", "2.1DHS", "3.0A", "3.1A")))
+  # Plot 2
+  par(fig=c(11/17,1,0,1), cex=1.0, new=TRUE)
+  try(boxplot(feats$p1_kw[cluster_list == cc], 
+              feats$p2_kw[cluster_list == cc], 
+              feats$p3_kw[cluster_list == cc],
+              names= c("p1_kw", "p2_kw", "p3_kw")))
+  #Save file
+  dev.off()
 }
 
 ##############################################################################
@@ -320,21 +335,19 @@ get_feature_graphs <- function() {
       height = 900
     )
     # Plot cluster contents (features 1 to 24)
-    par(fig=c(0,0.9,0,1))
-    par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
+    par(fig=c(0,27/31,0,1), cex=1)
     column_names <- feats_set[[n1]][1:24]
     short_labels <- substr(column_names, 10, 18)
     cluster_elems <- w_feats[cluster_idx,]
     cluster_elems <- subset(cluster_elems, select = column_names)
     boxplot(cluster_elems, las=2, names=short_labels, col=boxplot_colors)
     # Plot cluster contents (feature 25)
-    par(fig=c(0.9,1,0,1), new=TRUE)
-    par(cex=0.7, mai=c(0.8,0.5,0.05,0.05))
+    par(fig=c(27/31,1,0,1), cex=1, new=TRUE)
     column_names <- feats_set[[n1]][25]
     short_labels <- substr(column_names, 10, 16)
     cluster_elems <- w_feats[cluster_idx,]
     cluster_elems <- subset(cluster_elems, select = column_names)
-    boxplot(cluster_elems, las=2, names=short_labels)
+    boxplot(cluster_elems, las=2, xlab=short_labels, col="darksalmon")
     # Save file
     dev.off()
   }
@@ -482,27 +495,27 @@ for (ff in 1:length(fnames)) {
         
         # GOI & MEG
         if (n2 == 1 | n2 == 4) {
-          get_go2_graphs()
+          # get_go2_graphs()
         }
         # LCL
         if (n2 == 2) {
-          get_lcl_graphs()
+          # get_lcl_graphs()
         }
         # ISS
         if (n2 == 3) {
-          get_iss_graphs()
+          # get_iss_graphs()
         }
   
-        # Number of elements per cluster
-        new_df <- data.frame(
-          n1    = n1,
-          n2    = n2,
-          n3    = n3,
-          cc    = cc,
-          numel = sum(cluster_idx),
-          pctel = sum(cluster_idx) / sum(row_conditions)
-        )
-        numel_df <- rbind(numel_df, new_df)
+        # # Number of elements per cluster
+        # new_df <- data.frame(
+        #   n1    = n1,
+        #   n2    = n2,
+        #   n3    = n3,
+        #   cc    = cc,
+        #   numel = sum(cluster_idx),
+        #   pctel = sum(cluster_idx) / sum(row_conditions)
+        # )
+        # numel_df <- rbind(numel_df, new_df)
       }
     }
   }
