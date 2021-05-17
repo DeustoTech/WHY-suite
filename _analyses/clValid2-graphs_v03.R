@@ -554,7 +554,7 @@ for (ff in 1:length(fnames)) {
 # Save
 data.table::fwrite(
   x         = numel_df,
-  file      = paste0(root_dir, "numel_df.RData"),
+  file      = paste0(root_dir, "numel_df.csv"),
   append    = F,
   quote     = F,
   sep       = ",",

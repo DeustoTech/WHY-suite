@@ -18,10 +18,36 @@ output:
 </style>
 
 # Introduction
-This report contains the results of applying three clustering methods to four datasets of energy consumption at household level. For each dataset, clustering method and resulting cluster, a set of graphs is displayed, the meaning of which is explained in the following sections.
+This report contains the results of applying three clustering methods to four datasets of energy consumption at the residential level. For each dataset, clustering method and resulting cluster, a series of graphs is displayed, the meaning of which is explained in the following sections.
 
-## Datasets
-The datasets consist of time series of at least two years' duration representing energy consumption in kWh at the residential level.
+**Datasets**
+
+The datasets consist of time series of at least two years' duration representing energy consumption in kWh in households. The four datasets considered are:
+
+1. **Goiener & Megara (households)**: Contains 10,413 time series from Spain, mainly the Basque Country and Navarre (2016-2020, prior to COVID-19 lockdown). This dataset only contains time series whose CNAE code belongs under the heading "*activities of households as producers of goods/services for own use*" (98xx).
+2. **Low Carbon London**: Contains 5,210 publicly available time series from households in Greater London (2011-2014).
+3. **Irish Social Science Data Archive (ISSDA)**: Contains 4,225 publicly available time series from households in Ireland (2009-2011).
+4. **Goiener & Megara (all)**: The same as dataset #1 but including all time series regardless their CNAE codes. Contains 11,840 time series.
+
+The time series above meet the following criteria:
+
+* The percentage of imputed samples in the original time series is less than 10%.
+* The average energy consumed in a day is greater than 0.1 kWh (non-empty houses).
+
+**Feature extraction**
+
+Since each time series consists of tens of thousands of samples, a machine learning technique known as *feature extraction* has been used to reduce its dimensionality to just a few values. In this report, a set of 25 features related to **seasonal aggregation** has been computed to characterize each time series. These features are:
+
+* ``rel_mean_XXhYYhZZZ``, where ``XX`` may be ``00``, ``04``, ``08``, ``12``, ``16`` or ``20``; ``YY`` is ``XX`` + 4 (with 24 being expressed as ``00``); and ``ZZZ`` may be ``spr`` (spring), ``sum`` (summer), ``aut`` (autumn) or ``win`` (winter): There are 24 features following this pattern. Each of them represents the average energy consumption between hours ``XX`` and ``YY`` **and** in the meteorological season ``ZZZ``, computed over the entire time series. The value is expressed as a percentage with respect to the sum of the 24 features.
+* ``rel_mean_weekday_pday``: This feature represents the average energy consumption **per day** during the weekdays (from Monday to Friday) computed over the entire time series. The value is expressed as a percentage with respect to the sum of ``rel_mean_weekday_pday`` and ``rel_mean_weekend_pday``, the latter being the equivalent feature for the weekends (Saturday and Sunday).
+
+In this report, at the beginning of each dataset subsection, the density of features for that dataset (i.e. the distribution of values for that feature and dataset) is shown.
+
+**Clustering methods**
+
+**Validation methods**
+
+**Graphs per cluster**
 
 
 ```{r, include=FALSE}
@@ -39,7 +65,7 @@ nc <- 24
 
 # Load numel_df.RData
 numel_df <- data.table::fread(
-  file   = paste0(clValid_dir, "numel_df.RData"),
+  file   = paste0(clValid_dir, "numel_df.csv"),
   header = TRUE,
   sep    = ","
 )
