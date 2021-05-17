@@ -27,7 +27,7 @@ The datasets consist of time series of at least two years' duration representing
 1. **Goiener & Megara (households)**: Contains 10,413 time series from Spain, mainly the Basque Country and Navarre (2016-2020, prior to COVID-19 lockdown). This dataset only contains time series whose CNAE code belongs under the heading "*activities of households as producers of goods/services for own use*" (98xx).
 2. **Low Carbon London**: Contains 5,210 publicly available time series from households in Greater London (2011-2014).
 3. **Irish Social Science Data Archive (ISSDA)**: Contains 4,225 publicly available time series from households in Ireland (2009-2011).
-4. **Goiener & Megara (all)**: The same as dataset #1 but including all time series regardless their CNAE codes. Contains 11,840 time series.
+4. **Goiener & Megara (all)**: The same as dataset #1 but including all time series regardless their CNAE codes. Contains 11,840 time series, which most likely include companies, offices, public institutions, etc.
 
 The time series above meet the following criteria:
 
@@ -41,7 +41,7 @@ Since each time series consists of tens of thousands of samples, a machine learn
 * ``rel_mean_XXhYYhZZZ``, where ``XX`` may be ``00``, ``04``, ``08``, ``12``, ``16`` or ``20``; ``YY`` is ``XX`` + 4 (with 24 being expressed as ``00``); and ``ZZZ`` may be ``spr`` (spring), ``sum`` (summer), ``aut`` (autumn) or ``win`` (winter): There are 24 features following this pattern. Each of them represents the average energy consumption between hours ``XX`` and ``YY`` **and** in the meteorological season ``ZZZ``, computed over the entire time series. The value is expressed as a percentage with respect to the sum of the 24 features.
 * ``rel_mean_weekday_pday``: This feature represents the average energy consumption **per day** during the weekdays (from Monday to Friday) computed over the entire time series. The value is expressed as a percentage with respect to the sum of ``rel_mean_weekday_pday`` and ``rel_mean_weekend_pday``, the latter being the equivalent feature for the weekends (Saturday and Sunday).
 
-In this report, at the beginning of each dataset subsection, the density of features for that dataset (i.e. the distribution of values for that feature and dataset) is shown.
+In this report, at the beginning of each dataset subsection, the feature distribution per dataset is provided for each feature.
 
 **Clustering methods**
 
@@ -178,7 +178,7 @@ for (ff in ff_loop) {
     cat("## Dataset: ", dataset_list[dd], "\n\n", sep="")
     
     # Density of features
-    cat("**Density of features**\n\n")
+    cat("**Feature distribution per dataset**\n\n")
     if (ff == 1) {
       for (row_r in 1:5) {
         txt_list <- list(img = rep("", 5), cap = rep("", 5))
@@ -269,7 +269,7 @@ for (ff in ff_loop) {
         } else {
           txt_list$img[2] <- no_file
         }
-        txt_list$cap[2] <- "Feature distribution"
+        txt_list$cap[2] <- "Feature distribution per cluster"
         
         ### SPECIFIC FILES OF GOIENER ###
         if (dd == 1 | dd == 4) {
