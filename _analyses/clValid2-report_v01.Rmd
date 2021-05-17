@@ -22,17 +22,20 @@ This report contains the results of applying three clustering methods to four da
 
 **Datasets**
 
-The datasets consist of time series of at least two years' duration representing energy consumption in kWh in households. The four datasets considered are:
+The datasets consist of time series of at least 800 days of duration representing energy consumption in kWh in households. The four datasets considered are:
 
-1. **Goiener & Megara (households)**: Contains 10,413 time series from Spain, mainly the Basque Country and Navarre (2016-2020, prior to COVID-19 lockdown). This dataset only contains time series whose CNAE code belongs under the heading "*activities of households as producers of goods/services for own use*" (98xx).
+1. **Goiener & Megara (households)**: Contains 10,413 time series from Spain, mainly the Basque Country and Navarre (2016-2020, prior to COVID-19 lockdown). This dataset only contains time series whose CNAE code belongs under the heading "*activities of households as producers of goods/services for own use*" (code 98xx).
 2. **Low Carbon London**: Contains 5,210 publicly available time series from households in Greater London (2011-2014).
 3. **Irish Social Science Data Archive (ISSDA)**: Contains 4,225 publicly available time series from households in Ireland (2009-2011).
 4. **Goiener & Megara (all)**: The same as dataset #1 but including all time series regardless their CNAE codes. Contains 11,840 time series, which most likely include companies, offices, public institutions, etc.
 
 The time series above meet the following criteria:
 
+<!--* The original time series is longer than 364 days (52 weeks).-->
 * The percentage of imputed samples in the original time series is less than 10%.
 * The average energy consumed in a day is greater than 0.1 kWh (non-empty houses).
+
+<!--All time series originally longer than 364 days but shorter than 800 days have been expanded to 800 days (approx. 2 years and 2 months) by repetition, always taking into account the weekly pattern.-->
 
 **Feature extraction**
 
