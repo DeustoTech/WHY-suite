@@ -76,21 +76,51 @@ get_iss_graphs <- function() {
     width = 1200,
     height = 900
   )
-    # Plot 1
-    par(fig=c(1/23*0,1/23*8,0,1), cex=1.0)
-    try(boxplot(feats$q_200[cluster_list == cc], feats$q_47001[cluster_list == cc], feats$q_47011[cluster_list == cc], feats$q_4801[cluster_list == cc], feats$q_471[cluster_list == cc], feats$q_473[cluster_list == cc], las=2, names= c(200, 47001, 47011, 4801, 471, 473)))
-    # Plot 2
-    par(fig=c(1/23*8,1/23*13,0,1), cex=1.0, new=TRUE)
-    try(boxplot(feats$q_420[cluster_list == cc], replace(feats$q_430[cluster_list == cc], feats$q_430[cluster_list == cc] == 8, 0), feats$q_4551[cluster_list == cc], las=2, names= c(420, 430, 4551)))
-    # Plot 3
-    par(fig=c(1/23*13,1/23*17,0,1), cex=1.0, new=TRUE)
-    try(boxplot(feats$q_43521[cluster_list == cc], feats$q_4531[cluster_list == cc], las=2, names= c(43521, 4531)))
-    # Plot 4
-    par(fig=c(1/23*17,1/23*20,0,1), cex=1.0, new=TRUE)
-    try(boxplot(w_year[cluster_list == cc], las=2, xlab= c(453)))
-    # Plot 5
-    par(fig=c(1/23*20,1/23*23,0,1), cex=1.0, new=TRUE)
-    try(boxplot(floor_area[cluster_list == cc], las=2, xlab= c(6103)))
+  yes_no_col <- c("darkgreen", "darkred")
+  yes_no_mar <- c(4.0,4.1,2.0,2.1)
+  # Plot 1.1
+  par(fig=c(0,8/23,5/6,1), cex=1.0, mar=yes_no_mar)
+  res_200 <- c(sum(feats$q_200[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_200[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_200, names= c("m", "f"), xlab=200, horiz=T, las=2))
+  # Plot 1.2
+  par(fig=c(0,8/23,4/6,5/6), cex=1.0, mar=yes_no_mar, new=TRUE)
+  res_47001 <- c(sum(feats$q_47001[cluster_list == cc] == 1, na.rm = T),
+                 sum(feats$q_47001[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_47001, names= c("y", "n"), xlab=47001, horiz=T, las=2, col=yes_no_col))
+  # Plot 1.3
+  par(fig=c(0,8/23,3/6,4/6), cex=1.0, mar=yes_no_mar, new=TRUE)
+  res_47011 <- c(sum(feats$q_47011[cluster_list == cc] == 1, na.rm = T),
+                 sum(feats$q_47011[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_47011, names= c("y", "n"), xlab=47011, horiz=T, las=2, col=yes_no_col))
+  # Plot 1.4
+  par(fig=c(0,8/23,2/6,3/6), cex=1.0, mar=yes_no_mar, new=TRUE)
+  res_4801 <- c(sum(feats$q_4801[cluster_list == cc] == 1, na.rm = T),
+                sum(feats$q_4801[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_4801, names= c("y", "n"), xlab=4801, horiz=T, las=2, col=yes_no_col))
+  # Plot 1.5
+  par(fig=c(0,8/23,1/6,2/6), cex=1.0, mar=yes_no_mar, new=TRUE)
+  res_471 <- c(sum(feats$q_471[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_471[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_471, names= c("y", "n"), xlab=471, horiz=T, las=2, col=yes_no_col))
+  # Plot 1.6
+  par(fig=c(0,8/23,0,1/6), cex=1.0, mar=yes_no_mar, new=TRUE)
+  res_473 <- c(sum(feats$q_473[cluster_list == cc] == 1, na.rm = T),
+               sum(feats$q_473[cluster_list == cc] == 2, na.rm = T))
+  try(barplot(res_473, names= c("y", "n"), xlab=473, horiz=T, las=2, col=yes_no_col))
+  
+  # Plot 2
+  par(fig=c(1/23*8,1/23*13,0,1), cex=1.0, new=TRUE)
+  try(boxplot(feats$q_420[cluster_list == cc], replace(feats$q_430[cluster_list == cc], feats$q_430[cluster_list == cc] == 8, 0), feats$q_4551[cluster_list == cc], las=2, names= c(420, 430, 4551)))
+  # Plot 3
+  par(fig=c(1/23*13,1/23*17,0,1), cex=1.0, new=TRUE)
+  try(boxplot(feats$q_43521[cluster_list == cc], feats$q_4531[cluster_list == cc], las=2, names= c(43521, 4531)))
+  # Plot 4
+  par(fig=c(1/23*17,1/23*20,0,1), cex=1.0, new=TRUE)
+  try(boxplot(w_year[cluster_list == cc], las=2, xlab= c(453)))
+  # Plot 5
+  par(fig=c(1/23*20,1/23*23,0,1), cex=1.0, new=TRUE)
+  try(boxplot(floor_area[cluster_list == cc], las=2, xlab= c(6103)))
   # Save file
   dev.off()
   
@@ -491,7 +521,7 @@ for (ff in 1:length(fnames)) {
         ##################
         ##  Get graphs  ##
         ##################
-        get_feature_graphs()
+        # get_feature_graphs()
         
         # GOI & MEG
         if (n2 == 1 | n2 == 4) {
@@ -506,16 +536,16 @@ for (ff in 1:length(fnames)) {
           # get_iss_graphs()
         }
   
-        # # Number of elements per cluster
-        # new_df <- data.frame(
-        #   n1    = n1,
-        #   n2    = n2,
-        #   n3    = n3,
-        #   cc    = cc,
-        #   numel = sum(cluster_idx),
-        #   pctel = sum(cluster_idx) / sum(row_conditions)
-        # )
-        # numel_df <- rbind(numel_df, new_df)
+        # Number of elements per cluster
+        new_df <- data.frame(
+          n1    = n1,
+          n2    = n2,
+          n3    = n3,
+          cc    = cc,
+          numel = sum(cluster_idx),
+          pctel = sum(cluster_idx) / sum(row_conditions)
+        )
+        numel_df <- rbind(numel_df, new_df)
       }
     }
   }

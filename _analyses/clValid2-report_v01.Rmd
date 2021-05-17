@@ -1,0 +1,339 @@
+---
+title: "Cluster Report (Seasonal aggregates) v1.0"
+author: "Universidad de Deusto (carlos.quesada@deusto.es)"
+date: "May 17, 2021"
+output:
+  html_document: 
+    toc: true
+    toc_depth: 3
+    theme: united
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+# Introduction
+This report contains the results of applying three clustering methods to four datasets of energy consumption at household level. For each dataset, clustering method and resulting cluster, a set of graphs is displayed, the meaning of which is explained in the following sections.
+
+## Datasets
+The datasets consist of time series of at least two years' duration representing energy consumption in kWh at the residential level.
+
+
+```{r, include=FALSE}
+################################################################################
+##  TO GENERATE AN HTML OUTPUT                                                ##
+##  rmarkdown::render("clValid2-report_v01.Rmd")                              ##
+################################################################################
+
+# File paths
+clValid_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/"
+no.file_path  <- "G:/Mi unidad/WHY/Github/why-T2.1/_analyses/no-file.png"
+feat_hist_dir <- "G:/Mi unidad/WHY/Features/histograms_v1.11/"
+# Number of clusters
+nc <- 24
+
+# Load numel_df.RData
+numel_df <- data.table::fread(
+  file   = paste0(clValid_dir, "numel_df.RData"),
+  header = TRUE,
+  sep    = ","
+)
+
+# Datasets
+dataset_list <- c(
+  "Goiener & Megara (households)",
+  "Low Carbon London",
+  "ISSDA",
+  "Goiener & Megara (all)"
+)
+# Set of features
+feature_set_list <- c(
+  "Seasonal aggregates",
+  "Peaks and off-peaks",
+  "Strengths and ACs",
+  "Catch-22"
+)
+# Clustering
+clust_methods_list <- c(
+  "Hierarchical",
+  "*k*-means",
+  "DIANA",
+  "FANNY",
+  "SOM",
+  "PAM",
+  "SOTA",
+  "CLARA",
+  "Model-based"
+)
+# Validation
+internal_val_list <- c(
+  "Connectivity (min)",
+  "Dunn index (max)",
+  "Silhouette (max)"
+)
+stability_val_list <- c(
+  "APN (min)",
+  "AD (min)",
+  "ADM (min)",
+  "FOM (min)"
+)
+# Feature names set #1
+feat_names_1 <- c(
+    "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+    "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+    "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+    "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+    "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+    "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+    "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+    "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+    "rel_mean_weekday_pday"
+)
+feat_codes_1 <- c(seq(378,470,4), 236)
+
+############################################
+##  FUNCTION TO GENERATE A ROW OF IMAGES  ##
+############################################
+
+img_row <- function(txt_list) {
+  o <- paste0(
+    '<table border="0">
+    <tr>
+    <td width="20%">', txt_list$img[1], '</td>
+    <td width="20%">', txt_list$img[2], '</td>
+    <td width="20%">', txt_list$img[3], '</td>
+    <td width="20%">', txt_list$img[4], '</td>
+    <td width="20%">', txt_list$img[5], '</td>
+    </tr>
+    <tr>
+    <td><center>', txt_list$cap[1], '</center></td>
+    <td><center>', txt_list$cap[2], '</center></td>
+    <td><center>', txt_list$cap[3], '</center></td>
+    <td><center>', txt_list$cap[4], '</center></td>
+    <td><center>', txt_list$cap[5], '</center></td>
+    </tr>
+    </table>\n\n'
+  )
+  return(o)
+}
+
+```
+
+
+```{r, results='asis', echo=FALSE}
+# No file by DEFAULT
+no_file <- paste0("![](", no.file_path, ")")
+
+# Features loop
+ff_loop <- 1
+# Dataset loop
+dd_loop <- 1:4
+# Methods loop
+mm_loop <- c(1,2,5)
+# Clusters loop
+cc_loop <- 1:nc
+
+####################
+##  FEATURE LOOP  ##
+####################
+for (ff in ff_loop) {
+  # cat("# Set of features: ", feature_set_list[ff], "\n\n", sep="")
+  cat("# Results\n\n", sep="")
+  
+  ####################
+  ##  DATASET LOOP  ##
+  ####################
+  for (dd in dd_loop) {
+    cat("## Dataset: ", dataset_list[dd], "\n\n", sep="")
+    
+    # Density of features
+    cat("**Density of features**\n\n")
+    if (ff == 1) {
+      for (row_r in 1:5) {
+        txt_list <- list(img = rep("", 5), cap = rep("", 5))
+        for (col_c in 1:5) {
+          val_fname <- paste0(feat_codes_1[col_c + 5*(row_r-1)], "_", dd, ".png")
+          val_path  <- paste0(feat_hist_dir, val_fname)
+          txt_list$img[col_c] <- paste0("![](", val_path, ")")
+          txt_list$cap[col_c] <- feat_names_1[col_c + 5*(row_r-1)]
+        }
+        cat(img_row(txt_list))
+      }
+    }
+
+    ###################
+    ##  METHOD LOOP  ##
+    ###################
+    for (mm in mm_loop) {
+      cat("### Clustering method: ", clust_methods_list[mm], "\n\n", sep="")
+      
+      ### Internal validation ###
+      cat("**Internal validation**\n\n")
+      txt_list <- list(img = rep("", 5), cap = rep("", 5))
+      # val filename formation
+      for (ii in 1:3) {
+        val_fname <- paste0("meas_", ff, dd, mm, "11_", ii, ".png")
+        val_path  <- paste0(clValid_dir, "meas/", val_fname)
+        txt_list$img[ii] <- paste0("![](", val_path, ")")
+        txt_list$cap[ii] <- internal_val_list[ii]
+      }
+      cat(img_row(txt_list))
+      
+      ### Stability validation ###
+      cat("**Stability validation**\n\n")
+      txt_list <- list(img = rep("", 5), cap = rep("", 5))
+      # val filename formation
+      for (ii in 1:4) {
+        val_fname <- paste0("meas_", ff, dd, mm, "21_", ii, ".png")
+        val_path  <- paste0(clValid_dir, "meas/", val_fname)
+        txt_list$img[ii] <- paste0("![](", val_path, ")")
+        txt_list$cap[ii] <- stability_val_list[ii]
+      }
+      cat(img_row(txt_list))
+      
+      ####################
+      ##  CLUSTER LOOP  ##
+      ####################
+      for (cc in cc_loop) {
+        cat("#### ", feature_set_list[ff], " > ", dataset_list[dd], " > ",
+            clust_methods_list[mm], " > **Cluster #", cc, "**\n\n", sep="")
+        
+        # Initialization of image codes and caption texts
+        txt_list <- list(img = rep("", 5), cap = rep("", 5))
+        
+        # Sort by cluster size
+        idx <- numel_df$n1 == ff & numel_df$n2 == dd & numel_df$n3 == mm
+        list_of_elements <- numel_df$numel[idx]
+        ss <- sort(list_of_elements, index.return = TRUE, decreasing = T)
+        # The good ordered cc index
+        c2 <- ss$ix[cc]
+        
+        # Information about the number of elements per cluster
+        idx <- numel_df$n1 == ff & numel_df$n2 == dd & numel_df$n3 == mm &
+               numel_df$cc == c2
+        pct_value <- round(100*numel_df[idx]$pctel, 1)
+        if (pct_value == 0) pct_value <- "~0"
+        cat("Number of elements in cluster: ", numel_df[idx]$numel, " (",
+            pct_value, "%)\n\n", sep="")
+        
+        # HMP filename formation
+        hmp_fname <- paste0("hmp_", ff, dd, mm, "_", c2, "-", nc, ".png")
+        hmp_path  <- paste0(clValid_dir, "hmp/", hmp_fname)
+        
+        # Generate HMP code
+        if (file.exists(hmp_path)) {
+          txt_list$img[1] <- paste0("![](", hmp_path, ")")
+        } else {
+          txt_list$img[1] <- no_file
+        }
+        txt_list$cap[1] <- "Average yearly consumption"
+        
+        # GRAPH filename formation
+        graph_fname <- paste0("graph_", ff, dd, mm, "_", c2, "-", nc, ".png")
+        graph_path  <- paste0(clValid_dir, "graph/", graph_fname)
+        
+        # Generate GRAPH code
+        if (file.exists(graph_path)) {
+          txt_list$img[2] <- paste0("![](", graph_path, ")")
+        } else {
+          txt_list$img[2] <- no_file
+        }
+        txt_list$cap[2] <- "Feature distribution"
+        
+        ### SPECIFIC FILES OF GOIENER ###
+        if (dd == 1 | dd == 4) {
+          # GOI filename formation
+          goi1_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_1.png")
+          goi2_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_2.png")
+          goi3_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_3.png")
+          goi1_path  <- paste0(clValid_dir, "goi/", goi1_fname)
+          goi2_path  <- paste0(clValid_dir, "goi/", goi2_fname)
+          goi3_path  <- paste0(clValid_dir, "goi/", goi3_fname)
+          
+          # Generate GOI code
+          if (file.exists(goi1_path)) {
+            txt_list$img[3] <- paste0("![](", goi1_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "Provinces"
+          
+          # Generate GOI code
+          if (file.exists(goi2_path)) {
+            txt_list$img[4] <- paste0("![](", goi2_path, ")")
+          } else {
+            txt_list$img[4] <- no_file
+          }
+          txt_list$cap[4] <- "CNAE codes"
+          
+          # Generate GOI code
+          if (file.exists(goi3_path)) {
+            txt_list$img[5] <- paste0("![](", goi3_path, ")")
+          } else {
+            txt_list$img[5] <- no_file
+          }
+          txt_list$cap[5] <- "Tariffs and contracted power"
+        }
+        
+        ### SPECIFIC FILES OF LCL ###
+        if (dd == 2) {
+          # GOI filename formation
+          lcl_fname <- paste0("lcl_", ff, dd, mm, "_", c2, "-", nc, ".png")
+          lcl_path  <- paste0(clValid_dir, "lcl/", lcl_fname)
+          
+          # Generate LCL code
+          if (file.exists(lcl_path)) {
+            txt_list$img[3] <- paste0("![](", lcl_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "ACORN segmentation"
+        }
+        
+        ### SPECIFIC FILES OF ISSDA ###
+        if (dd == 3) {
+          # ISS filename formation
+          iss1_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_1.png")
+          iss2_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_2.png")
+          iss3_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_3.png")
+          iss1_path  <- paste0(clValid_dir, "iss/", iss1_fname)
+          iss2_path  <- paste0(clValid_dir, "iss/", iss2_fname)
+          iss3_path  <- paste0(clValid_dir, "iss/", iss3_fname)
+          
+          # Generate ISS code
+          if (file.exists(iss1_path)) {
+            txt_list$img[3] <- paste0("![](", iss1_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "Survey answers #1"
+          
+          # Generate ISS code
+          if (file.exists(iss2_path)) {
+            txt_list$img[4] <- paste0("![](", iss2_path, ")")
+          } else {
+            txt_list$img[4] <- no_file
+          }
+          txt_list$cap[4] <- "Survey answers #2"
+          
+          # Generate ISS code
+          if (file.exists(iss3_path)) {
+            txt_list$img[5] <- paste0("![](", iss3_path, ")")
+          } else {
+            txt_list$img[5] <- no_file
+          }
+          txt_list$cap[5] <- "Survey answers #3"
+        }
+
+        # Write code
+        cat(img_row(txt_list))
+      }
+    }
+  }
+}
+```
