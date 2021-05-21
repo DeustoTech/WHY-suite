@@ -1,0 +1,110 @@
+---
+title: "Clustering and validation"
+author: "Carlos Quesada"
+date: "22/04/2021"
+output:
+  html_document: 
+    toc: true
+    toc_depth: 5
+    theme: united
+---
+
+```{r, include=FALSE}
+################################################################################
+##  TO GENERATE AN HTML OUTPUT                                                ##
+##  rmarkdown::render("clValid_analysis_report_v01.html")                     ##
+################################################################################
+
+# Load libraries and excluding their warning messages
+img_dir <- "G:/Mi unidad/WHY/Analyses/clValid/meas/"
+no.file_path <- "G:/Mi unidad/WHY/Github/why-T2.1/_analyses/no-file.png"
+
+# Datasets
+dataset_list <- c(
+  "Dataset: Goiener (only households)",
+  "Dataset: Low Carbon London dataset",
+  "Dataset: ISSDA",
+  "Dataset: Goiener (all)"
+)
+# Set of features
+feature_set_list <- c(
+  "Set of features: seasonal aggregates",
+  "Set of features: peaks and off-peaks",
+  "Set of features: strengths and ACs",
+  "Set of features: Catch-22"
+)
+# Clustering
+clustering_list <- c(
+  "Clustering: Hierarchical ",
+  "Clustering: k-means",
+  "Clustering: DIANA",
+  "Clustering: FANNY",
+  "Clustering: SOM",
+  "Clustering: PAM",
+  "Clustering: SOTA",
+  "Clustering: CLARA",
+  "Clustering: Model-based"
+)
+# Validation
+validation_list <- c(
+  "Internal measures: Connectivity (min)",
+  "Internal measures: Dunn index (max)",
+  "Internal measures: Silhouette (max)",
+  "Stability measures: APN (min)",
+  "Stability measures: AD (min)",
+  "Stability measures: ADM (min)",
+  "Stability measures: FOM (min)"
+)
+```
+
+
+```{r, results='asis', echo=FALSE}
+# No file by DEFAULT
+no_file <- paste0("![](", no.file_path, "){width=33%} ")
+
+# Dataset loop
+dd_loop <- 1:4
+# Features loop
+ff_loop <- 1:1
+# Clustering loop
+cc_loop <- 1:9
+# Validation loop
+vv_loop <- 1:7
+
+# Loop of datasets
+for (dd in dd_loop) {
+  cat("# ", dataset_list[dd], "\n\n", sep="")
+  
+  for (ff in ff_loop) {
+    cat("## ", feature_set_list[ff], "\n\n", sep="")
+
+    for (cc in cc_loop) {
+      cat("### ", clustering_list[cc], "\n\n", sep="")
+      
+      for (vv in vv_loop) {
+        cat("#### ", validation_list[vv], "\n\n", sep="")
+       
+        if (vv < 4) {
+          v1 <- 1
+          v2 <- vv
+        } else {
+          v1 <- 2
+          v2 <- vv - 3
+        }
+        
+        # File name formation
+        fname <- paste0("meas_", ff, dd, cc, v1, 1, "_", v2, ".png")
+        fpath <- paste0(img_dir, fname)
+        
+        if (file.exists(fpath)) {
+          img <- paste0("![](", fpath, "){width=100%} ")
+        } else {
+          img <- no_file
+        }
+        
+        cat(paste0("File: ", fname, "\n\n", img, "\n\n"))
+      }
+    }
+  }
+}
+```

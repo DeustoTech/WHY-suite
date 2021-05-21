@@ -1,7 +1,7 @@
 ---
-title: "Cluster Report (Seasonal aggregates) v1.0"
+title: "Cluster Report (Seasonal aggregates) v1.1"
 author: "Universidad de Deusto (carlos.quesada@deusto.es)"
-date: "May 17, 2021"
+date: "May 18, 2021"
 output:
   html_document: 
     toc: true
@@ -88,7 +88,7 @@ Between 3 and 5 graphs have been plotted for each cluster. Two of the graphs are
 The graphs common to all datasets are:
 
 * **Average yearly consumption**: a heatmap showing the average time series of a cluster. The vertical axis represents the hours of the day, while the horizontal axis shows the days of the year. The days are organized using the ISO week date system, which consists of 53 weeks (instead of the 52.14 weeks of an actual year), so the labels for the months are rather indicative. The different color intensities of the heatmap indicate the average energy consumption values of that cluster, with red representing high values and yellow low values.
-* **Feature distribution per cluster**: a sequence of boxplots representing the distribution of values of the 25 features in the cluster.
+* **Feature distribution per cluster**: a sequence of boxplots representing the distribution of values of the 25 features in the cluster. An extra feature, indicating the distribution of energy consumption (kWh/year), has also been added.
 
 For the **Goiener & Megara** dataset:
 

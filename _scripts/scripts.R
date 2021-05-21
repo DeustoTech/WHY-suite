@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 39
+script_selection <- 41
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -2280,6 +2280,10 @@ scripts <- function(script_selection) {
   # SCRIPT 40
   if (script_selection == 40) {
     
+    load("G:/Mi unidad/WHY/Datasets/goi/ext/0000d197570d03dc77b629884c75dc90.RData")
+    df <- edf$df
+    browser()
+    
     return()
   }
   
@@ -2287,6 +2291,25 @@ scripts <- function(script_selection) {
   
   # SCRIPT 41
   if (script_selection == 41) {
+    
+    library(png)
+    
+    png_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/hmp/"
+    thumb_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/thumb/"
+    # Get list of dir names in dataset folder
+    fnames <- list.files(png_dir)
+    
+    for (ff in fnames) {
+      img <- readPNG(paste0(png_dir, ff))
+      png(paste0(thumb_dir, ff), width=100, height=75)
+      browser()
+      image(
+        img,
+        useRaster=TRUE,
+        axes=FALSE,
+      )
+      dev.off()
+    }
     
     return()
   }

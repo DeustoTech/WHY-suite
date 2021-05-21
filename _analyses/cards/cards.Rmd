@@ -1,0 +1,147 @@
+---
+title: "&nbsp;"
+output: html_document
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+<!--
+rmarkdown::render("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/cards.Rmd") 
+-->
+
+```{r, include=FALSE}
+
+# Path to hmp graphs
+hmp_path <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/hmp/"
+
+# No file by DEFAULT
+no.file_path  <- "G:/Mi unidad/WHY/Github/why-T2.1/_analyses/no-file.png"
+no_file <- paste0("![](", no.file_path, ")")
+
+# Table of cards
+table_of_cards <- function(txt_list) {
+  o <- paste0(
+    '<table border="0">
+    <tr>
+    <td width="25%">', txt_list$img[1], '</td>
+    <td width="25%">', txt_list$img[2], '</td>
+    <td width="25%">', txt_list$img[3], '</td>
+    <td width="25%">', txt_list$img[4], '</td>
+    </tr>
+    <tr>
+    <td><center><small>', txt_list$cap[1], '</small></center></td>
+    <td><center><small>', txt_list$cap[2], '</small></center></td>
+    <td><center><small>', txt_list$cap[3], '</small></center></td>
+    <td><center><small>', txt_list$cap[4], '</small></center></td>
+    </tr>
+    <tr>
+    <td>', txt_list$img[5], '</td>
+    <td>', txt_list$img[6], '</td>
+    <td>', txt_list$img[7], '</td>
+    <td>', txt_list$img[8], '</td>
+    </tr>
+    <tr>
+    <td><center><small>', txt_list$cap[5], '</small></center></td>
+    <td><center><small>', txt_list$cap[6], '</small></center></td>
+    <td><center><small>', txt_list$cap[7], '</small></center></td>
+    <td><center><small>', txt_list$cap[8], '</small></center></td>
+    </tr>
+    <tr>
+    <td>', txt_list$img[9], '</td>
+    <td>', txt_list$img[10], '</td>
+    <td>', txt_list$img[11], '</td>
+    <td>', txt_list$img[12], '</td>
+    </tr>
+    <tr>
+    <td><center><small>', txt_list$cap[9], '</small></center></td>
+    <td><center><small>', txt_list$cap[10], '</small></center></td>
+    <td><center><small>', txt_list$cap[11], '</small></center></td>
+    <td><center><small>', txt_list$cap[12], '</small></center></td>
+    </tr>
+    </table>\n\n'
+  )
+  return(o)
+}
+
+# Set of features
+feature_list <- c(
+  "Seas. aggr.",
+  "Peaks and off-peaks",
+  "Strengths and ACs",
+  "Catch-22"
+)
+# Datasets
+dataset_list <- c(
+  "Goiener (hh)",
+  "LCL",
+  "ISSDA",
+  "Goiener (all)"
+)
+# Clustering
+method_list <- c(
+  "Hierarch.",
+  "*k*-means",
+  "DIANA",
+  "FANNY",
+  "SOM",
+  "PAM",
+  "SOTA",
+  "CLARA",
+  "Model-based"
+)
+
+```
+
+```{r, results='asis', echo=FALSE}
+
+# Features loop
+ff_loop <- 1
+# Dataset loop
+dd_loop <- 1:4
+# Methods loop
+mm_loop <- c(1,2,5)
+# Clusters loop
+cc_loop <- 1:24
+
+# FEATURE LOOP
+for (ff in ff_loop) {
+  # DATASET LOOP
+  for (dd in dd_loop) {
+    # METHOD LOOP
+    for (mm in mm_loop) {
+      # Initialization of txt_list
+      txt_list <- list(img = rep("", 12), cap = rep("", 12))
+      # CLUSTER LOOP
+      for (cc in cc_loop) {
+        # Get index
+        cc_idx <- (cc - 1) %% 12 + 1
+        # Path to file
+        card_path <- paste0(hmp_path, "hmp_", ff, dd, mm, "_", cc, "-24.png")
+        # Complete txt_list
+        if (file.exists(card_path)) {
+          txt_list$img[cc_idx] <- paste0("![](", card_path, ")")
+        } else {
+          txt_list$img[cc_idx] <- no_file
+        }
+        txt_list$cap[cc_idx] <- paste0(
+          feature_list[ff], " > ", 
+          dataset_list[dd], " > ", 
+          method_list[mm], " > ", 
+          "cl. #", cc, "\n\n"
+        )
+        # Print HTML table
+        if (cc_idx == 12) {
+          cat(table_of_cards(txt_list))
+        }
+      }
+    }
+  }
+}
+
+```
