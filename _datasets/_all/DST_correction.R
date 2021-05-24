@@ -43,6 +43,7 @@ o_ <- foreach::foreach(
   ff       = 1:length(in_path_list),
   .inorder = FALSE
 ) %dopar% {
+  print(in_path_list[ff])
   load(in_path_list[ff])
   
   df_1 <- edf$df
