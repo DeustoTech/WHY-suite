@@ -4,15 +4,15 @@ library(foreach)
 
 # INPUT FOLDERS
 input_dirs <- c(
-  "/home/ubuntu/carlos.quesada/disk/go2/",
-  "/home/ubuntu/carlos.quesada/disk/meg/",
-  "/home/ubuntu/carlos.quesada/disk/lcl/"
+  "/home/ubuntu/carlos.quesada/disk/go2/ext/",
+  "/home/ubuntu/carlos.quesada/disk/meg/ext/",
+  "/home/ubuntu/carlos.quesada/disk/lcl/ext/"
 )
 # OUTPUT FOLDERS
 output_dirs <- c(
-  "/home/ubuntu/carlos.quesada/disk/go2_dst/",
-  "/home/ubuntu/carlos.quesada/disk/meg_dst/",
-  "/home/ubuntu/carlos.quesada/disk/lcl_dst/"
+  "/home/ubuntu/carlos.quesada/disk/go2/ext_dst/",
+  "/home/ubuntu/carlos.quesada/disk/meg/ext_dst/",
+  "/home/ubuntu/carlos.quesada/disk/lcl/ext_dst/"
 )
 
 in_path_list <- c()
