@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 40
+script_selection <- 1.1
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -56,6 +56,25 @@ scripts <- function(script_selection) {
       wanted_days = 800,
       dset_key = "lcl",
       metadata_files = metadata_file
+    )
+    
+    return(NULL)
+  }
+  
+  # ----------------------------------------------------------------------------
+  
+  # SCRIPT 1.1 - FROM RAW TO EXT IN POR DATASET
+  if (script_selection == 1.1) {
+    # User parameters
+    input_folder  <- "G:/Mi unidad/WHY/Datasets/por/raw/"
+    output_folder <- "G:/Mi unidad/WHY/Datasets/por/ext/"
+    
+    # Function call
+    whyT2.1::extend_dataset(
+      input_folder, 
+      output_folder, 
+      wanted_days = 800,
+      dset_key = "por"
     )
     
     return(NULL)

@@ -71,7 +71,7 @@ get_dataframe <- get_raw_dataframe_from_dataset
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  samples_per_day <- list(lcl = 48, goi = 24, go2 = 24, ref = 24, iss = 48)
+  samples_per_day <- list(lcl = 48, goi = 24, go2 = 24, ref = 24, iss = 48, por = 96)
   # Selection
   spd <- samples_per_day[[dset_key]]
   
@@ -381,7 +381,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
     return(list(id, code, res_stimul, res_tariff, sme_alloc))
   }
   # REFIT
-  if (dset_key == "ref") {
+  if (dset_key == "ref" | dset_key == "por") {
     return(NULL)
   }
 }
