@@ -177,7 +177,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
       res_tariff = metadata[[5]]
     )
   }
-  if (dset_key == "ref") {
+  if (dset_key %in% c("ref", "por")) {
     dset_list <- list()
   }
   
@@ -440,7 +440,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg, .errorhandling = 'remove') %dopar% {
+  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg #, .errorhandling = 'remove'
+                    ) %dopar% {
  #for(x in 1:length(dset_filenames)) {
     print(dset_filenames[x])
     # File name selection
