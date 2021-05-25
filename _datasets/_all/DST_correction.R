@@ -4,21 +4,23 @@ library(foreach)
 
 # INPUT FOLDERS
 input_dirs <- c(
-  "/home/ubuntu/carlos.quesada/disk/go2/ext/",
-  "/home/ubuntu/carlos.quesada/disk/meg/ext/",
+  # "/home/ubuntu/carlos.quesada/disk/go2/ext/",
+  # "/home/ubuntu/carlos.quesada/disk/meg/ext/",
   "/home/ubuntu/carlos.quesada/disk/lcl/ext/"
+  # "G:/Mi unidad/WHY/Datasets/lcl/ext/"
 )
 # OUTPUT FOLDERS
 output_dirs <- c(
-  "/home/ubuntu/carlos.quesada/disk/go2/ext_dst/",
-  "/home/ubuntu/carlos.quesada/disk/meg/ext_dst/",
+  # "/home/ubuntu/carlos.quesada/disk/go2/ext_dst/",
+  # "/home/ubuntu/carlos.quesada/disk/meg/ext_dst/",
   "/home/ubuntu/carlos.quesada/disk/lcl/ext_dst/"
+  # "G:/Mi unidad/WHY/Datasets/lcl/ext_dst/"
 )
 
 in_path_list <- c()
 out_path_list <- c()
 
-for (ii in 1:3) {
+for (ii in 1:length(input_dirs)) {
   input_dir <- input_dirs[ii]
   output_dir <- output_dirs[ii]
   
@@ -43,6 +45,8 @@ o_ <- foreach::foreach(
   ff       = 1:length(in_path_list),
   .inorder = FALSE
 ) %dopar% {
+  
+  browser()
   print(in_path_list[ff])
   load(in_path_list[ff])
   
@@ -65,18 +69,25 @@ o_ <- foreach::foreach(
   minpos <- which(times_df$time_diffs == +1)
   minneg <- which(times_df$time_diffs == -1)
   
+  # SAMPLES PER HOUR
+  sph <- edf$seasonal_periods[1] / 24
+  
   # PAD WITH AN EXTRA ROW IN THE BEGINNING IF WE START IN SUMMER TIME
   if (minneg[1] < minpos[1]) {
-    times_df <- rbind(
-      times_df[1,],
-      times_df
-    )
-    times_df$imputed[1] <- 1
+    for (jj in 1:sph) {
+      times_df <- rbind(
+        times_df[1,],
+        times_df
+      )
+      times_df$imputed[1] <- 1
+    }
   }
   
   # REMOVE AN EXTRA ROW IN THE END IF WE FINNISH IN SUMMER TIME
   if (minpos[length(minpos)] > minneg[length(minneg)]) {
-    times_df <- times_df[1:(nrow(times_df)-1),]
+    for (jj in 1:sph) {
+      times_df <- times_df[1:(nrow(times_df)-1),]
+    }
   }
   
   # ADD EXTRA HOURS
@@ -91,21 +102,25 @@ o_ <- foreach::foreach(
       imputed = 1
     )
     times_df$time_diffs[idx+1] <- 0
-    times_df <- rbind(
-      times_df[1:idx,],
-      new_row,
-      times_df[(idx+1):nrow(times_df),]
-    )
+    for (jj in 1:sph) {
+      times_df <- rbind(
+        times_df[1:idx,],
+        new_row,
+        times_df[(idx+1):nrow(times_df),]
+      )
+    }
   }
   
   # REMOVE EXTRA HOURS
   while(TRUE) {
     idx <- (which(times_df$time_diffs == -1) - 1)[1]
     if (is.na(idx)) break
-    times_df <- rbind(
-      times_df[1:idx,],
-      times_df[(idx+2):nrow(times_df),]
-    )
+    for (jj in 1:sph) {
+      times_df <- rbind(
+        times_df[1:idx,],
+        times_df[(idx+2):nrow(times_df),]
+      )
+    }
   }
   
   edf$df <- data.frame(
