@@ -267,7 +267,7 @@ get_bins <- function(t, type) {
 #' 
 #' @param tseries Time series of class \code{msts}.
 #' 
-#' @return List of lists with the mean values and standard deviations.
+#' @return List of Catch-22 features.
 #' 
 #' @export
 
