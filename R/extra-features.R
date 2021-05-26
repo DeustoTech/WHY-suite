@@ -258,6 +258,36 @@ get_bins <- function(t, type) {
 }
 
 ################################################################################
+# catch22_features
+################################################################################
+#' Catch-22 features from time series
+#' 
+#' @description 
+#' Get the Catch-22 features from a time series of class \code{msts}.
+#' 
+#' @param tseries Time series of class \code{msts}.
+#' 
+#' @return List of lists with the mean values and standard deviations.
+#' 
+#' @export
+
+catch22_features <- function(tseries) {
+  library(catch22)
+  # Aggregate tseries hourly
+  browser()
+  samples_per_day <- attr(tseries, "msts")[1]
+  date_by <- as.difftime(24 / samples_per_day, units = "hours")
+  ini_date <- get_extrema_dates_from_timeseries(tseries)
+  t <- seq(from = ini_date, length.out = length(tseries), by = date_by)
+  sum_factor <- cut(t, breaks = "1 hour")
+  aggr_data <- stats::aggregate(
+    x   = as.numeric(tseries),
+    by  = list(date_time = sum_factor),
+    FUN = sum
+  )
+}
+
+################################################################################
 # get_seasonal_features_from_timeseries
 ################################################################################
 
@@ -357,6 +387,12 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
         x   = aggr_data$x,
         by  = list(bin = sum_factor),
         FUN = min
+      )
+      # Aggregate data (sum) according to the bins
+      o[[name[[bb]]]]$"sum" <- stats::aggregate(
+        x   = aggr_data$x,
+        by  = list(bin = sum_factor),
+        FUN = sum
       )
     }
   }

@@ -46,7 +46,6 @@ o_ <- foreach::foreach(
   .inorder = FALSE
 ) %dopar% {
   
-  browser()
   print(in_path_list[ff])
   load(in_path_list[ff])
   
