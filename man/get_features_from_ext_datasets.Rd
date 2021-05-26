@@ -18,13 +18,11 @@ get_features_from_ext_datasets(
 
 \item{output_folder}{Absolute path where the results are wanted.}
 
-\item{type_of_analysis}{A string indicating the type of analysis: either \code{basic} or \code{extra}.}
+\item{type_of_analysis}{A string indicating the type of analysis: \code{basic}, \code{extra} or \code{custom}.}
 
 \item{list_of_functions}{If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.}
 
 \item{If}{\code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.}
-
-\item{resume_from_file}{A string indicating the name of the file to start the analysis.}
 }
 \value{
 File containing the features

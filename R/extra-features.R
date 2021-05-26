@@ -149,7 +149,7 @@ daily_acf <- function(x) {
   # Samples per day
   samples_per_day <- attr(x, "msts")[1]
   # Autocorrelation function
-  acfx <- acf(x, lag.max = 30 * samples_per_day)
+  acfx <- acf(x, lag.max = 30 * samples_per_day, plot = F)
   # Loop
   ac_list <- list()
   for (ii in 1:28) {

@@ -317,8 +317,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         quote     = FALSE,
         append    = TRUE,
         col.names = col_names,
-        row.names = FALSE,
-        
+        row.names = FALSE
       )
     } 
   }

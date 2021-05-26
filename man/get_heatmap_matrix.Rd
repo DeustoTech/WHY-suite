@@ -4,7 +4,7 @@
 \alias{get_heatmap_matrix}
 \title{Get heatmap matrix}
 \usage{
-get_heatmap_matrix(fnames)
+get_heatmap_matrix(fnames, .scale = FALSE)
 }
 \arguments{
 \item{fnames}{Two-column dataframe ("data_set" and "file").}
