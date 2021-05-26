@@ -36,7 +36,7 @@ library(whyT2.1)
 library(foreach)
 
 ################################################################################
-script_selection <- 42
+script_selection <- 12
 ################################################################################
 
 scripts <- function(script_selection) {
@@ -318,8 +318,8 @@ scripts <- function(script_selection) {
   # SCRIPT 12
   if (script_selection == 12) {
     # User parameters
-    input_folder     <- "C:/goiener-ext/" #"G:/Mi unidad/WHY/Datasets/goiener-ext/"
-    output_folder    <- "C:/goiener-ext/" #"G:/Mi unidad/WHY/Datasets/test.BORRAR/"
+    input_folder     <- "G:/Mi unidad/WHY/Datasets/por/ext/" #"G:/Mi unidad/WHY/Datasets/goiener-ext/"
+    output_folder    <- "G:/Mi unidad/WHY/Datasets/por/ext/" #"G:/Mi unidad/WHY/Datasets/test.BORRAR/"
     type_of_analysis <- "extra"
     # Compute features
     feats <- whyT2.1::get_features_from_ext_datasets(

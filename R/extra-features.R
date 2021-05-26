@@ -274,7 +274,6 @@ get_bins <- function(t, type) {
 catch22_features <- function(tseries) {
   library(catch22)
   # Aggregate tseries hourly
-  browser()
   samples_per_day <- attr(tseries, "msts")[1]
   date_by <- as.difftime(24 / samples_per_day, units = "hours")
   ini_date <- get_extrema_dates_from_timeseries(tseries)
@@ -285,6 +284,12 @@ catch22_features <- function(tseries) {
     by  = list(date_time = sum_factor),
     FUN = sum
   )
+  # Compute Catch-22 features
+  catch22_feats <- catch22::catch22_all(aggr_data$x)
+  # Return
+  o <- catch22_feats$values
+  names(o) <- catch22_feats$names
+  return(o)
 }
 
 ################################################################################
