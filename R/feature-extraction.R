@@ -289,19 +289,33 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #' @export
 
 get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, list_of_functions=c(), .scale=FALSE, parallelize=TRUE) {
+  
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
   
-  # FUNCTION to get features
-  inloop_feats <- function(x, col_names) {
+  # Setup parallel backend to use many processors
+  cores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(cores, outfile = "")
+  doParallel::registerDoParallel(cl)
+  
+  # Analysis loop
+  foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
+    
+    # # Compute features
+    # inloop_feats(x, x <= cores)
+    
     # Select file name
     dset_filename <- dset_filenames[x]
     print(dset_filename)
     # Load extended dataframe
-    load(paste(input_folder, dset_filename, sep=""))
+    load(paste0(input_folder, dset_filename))
+    
     # Set exceptions
     if (!edf$is_0) {
-      ff_file <- data.frame(file = dset_filename, data_set = edf$dset_key)
+      ff_file <- data.frame(
+        file     = dset_filename,
+        data_set = edf$dset_key
+      )
       # GET FEATURES
       ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis,
         list_of_functions, .scale)
@@ -320,33 +334,70 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         col.names = col_names,
         row.names = FALSE
       )
-    } 
-  }
-  
-  ### PARALLELIZATION 
-  if (parallelize) {
-    # Setup parallel backend to use many processors
-    cores <- 3 #parallel::detectCores() - 1
-    cl <- parallel::makeCluster(cores, outfile = "")
-    doParallel::registerDoParallel(cl)
-    # Analysis loop
-    foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
-      # Compute features
-      inloop_feats(x, x <= cores)
-    }
-    # Stop parallelization
-    parallel::stopCluster(cl)
-  
-  ### NO PARALLELIZATION 
-  } else {
-    # Analysis loop
-    for(x in 1:length(dset_filenames)) {
-      # Print
-      print(dset_filenames[x])
-      # Compute features
-      inloop_feats(x, x == 1)
     }
   }
+  
+  # Stop parallelization
+  parallel::stopCluster(cl)
+  
+  
+  # Stop parallelization
+  
+  # # FUNCTION to get features
+  # inloop_feats <- function(x, col_names) {
+  #   # Select file name
+  #   dset_filename <- dset_filenames[x]
+  #   print(dset_filename)
+  #   # Load extended dataframe
+  #   load(paste(input_folder, dset_filename, sep=""))
+  #   # Set exceptions
+  #   if (!edf$is_0) {
+  #     ff_file <- data.frame(file = dset_filename, data_set = edf$dset_key)
+  #     # GET FEATURES
+  #     ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis,
+  #       list_of_functions, .scale)
+  #     # Incorporate filename as a column
+  #     all_features <- cbind(ff_file, ff_feats)
+  #     # Output file name
+  #     o_file <- paste(output_folder, "feats-", Sys.getpid(), ".csv", sep="")
+  #     # Save results to the CSV file
+  #     data.table::fwrite(
+  #       x         = all_features,
+  #       file      = o_file,
+  #       sep       = ",",
+  #       na        = "",
+  #       quote     = FALSE,
+  #       append    = TRUE,
+  #       col.names = col_names,
+  #       row.names = FALSE
+  #     )
+  #   } 
+  # }
+  # 
+  # ### PARALLELIZATION 
+  # if (parallelize) {
+  #   # Setup parallel backend to use many processors
+  #   cores <- 3 #parallel::detectCores() - 1
+  #   cl <- parallel::makeCluster(cores, outfile = "")
+  #   doParallel::registerDoParallel(cl)
+  #   # Analysis loop
+  #   foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
+  #     # Compute features
+  #     inloop_feats(x, x <= cores)
+  #   }
+  #   # Stop parallelization
+  #   parallel::stopCluster(cl)
+  # 
+  # ### NO PARALLELIZATION 
+  # } else {
+  #   # Analysis loop
+  #   for(x in 1:length(dset_filenames)) {
+  #     # Print
+  #     print(dset_filenames[x])
+  #     # Compute features
+  #     inloop_feats(x, x == 1)
+  #   }
+  # }
   
   return(NULL)
 }
