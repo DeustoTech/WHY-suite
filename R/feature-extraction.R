@@ -306,14 +306,13 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     
     # Select file name
     dset_filename <- dset_filenames[x]
-    print(dset_filename)
     # Load extended dataframe
     load(paste0(input_folder, dset_filename))
     
     # Set exceptions
     if (!edf$is_0) {
       ff_file <- data.frame(
-        file     = dset_filename,
+        file     = gsub(".RData", "", dset_filename),
         data_set = edf$dset_key
       )
       # GET FEATURES
@@ -323,6 +322,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       all_features <- cbind(ff_file, ff_feats)
       # Output file name
       o_file <- paste0(output_folder, "feats-", Sys.getpid(), ".csv")
+      print(o_file)
       # Save results to the CSV file
       data.table::fwrite(
         x         = all_features,
