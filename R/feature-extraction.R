@@ -322,7 +322,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       # Incorporate filename as a column
       all_features <- cbind(ff_file, ff_feats)
       # Output file name
-      o_file <- paste(output_folder, "feats-", Sys.getpid(), ".csv", sep="")
+      o_file <- paste0(output_folder, "feats-", Sys.getpid(), ".csv")
       # Save results to the CSV file
       data.table::fwrite(
         x         = all_features,
@@ -331,7 +331,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         na        = "",
         quote     = FALSE,
         append    = TRUE,
-        col.names = col_names,
+        col.names = x <= cores,
         row.names = FALSE
       )
     }
