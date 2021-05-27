@@ -301,7 +301,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     load(paste(input_folder, dset_filename, sep=""))
     # Set exceptions
     if (!edf$is_0) {
-      ff_file <- data.frame(file = dset_filename)
+      ff_file <- data.frame(file = dset_filename, data_set = edf$dset_key)
       # GET FEATURES
       ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis,
         list_of_functions, .scale)
@@ -326,13 +326,14 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   ### PARALLELIZATION 
   if (parallelize) {
     # Setup parallel backend to use many processors
-    cores <- 8 #parallel::detectCores() - 1
+    cores <- parallel::detectCores() - 1
     cl <- parallel::makeCluster(cores, outfile = "")
     doParallel::registerDoParallel(cl)
     # Analysis loop
     foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
       # Compute features
       inloop_feats(x, x <= cores)
+      return(NULL)
     }
     # Stop parallelization
     parallel::stopCluster(cl)
