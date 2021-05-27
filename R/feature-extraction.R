@@ -320,22 +320,19 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         col.names = col_names,
         row.names = FALSE
       )
-      
-      rm(list=ls())
     } 
   }
   
   ### PARALLELIZATION 
   if (parallelize) {
     # Setup parallel backend to use many processors
-    cores <- parallel::detectCores() - 1
+    cores <- 3 #parallel::detectCores() - 1
     cl <- parallel::makeCluster(cores, outfile = "")
     doParallel::registerDoParallel(cl)
     # Analysis loop
     foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
       # Compute features
       inloop_feats(x, x <= cores)
-      # return(NULL)
     }
     # Stop parallelization
     parallel::stopCluster(cl)
