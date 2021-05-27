@@ -296,6 +296,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   inloop_feats <- function(x, col_names) {
     # Select file name
     dset_filename <- dset_filenames[x]
+    print(dset_filename)
     # Load extended dataframe
     load(paste(input_folder, dset_filename, sep=""))
     # Set exceptions
@@ -325,8 +326,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   ### PARALLELIZATION 
   if (parallelize) {
     # Setup parallel backend to use many processors
-    cores <- parallel::detectCores() - 1
-    cl <- parallel::makeCluster(cores)
+    cores <- 8 #parallel::detectCores() - 1
+    cl <- parallel::makeCluster(cores, outfile = "")
     doParallel::registerDoParallel(cl)
     # Analysis loop
     foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
