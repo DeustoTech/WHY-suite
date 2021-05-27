@@ -320,6 +320,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         col.names = col_names,
         row.names = FALSE
       )
+      
+      rm(list=ls())
     } 
   }
   
@@ -333,7 +335,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
     foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
       # Compute features
       inloop_feats(x, x <= cores)
-      return(NULL)
+      # return(NULL)
     }
     # Stop parallelization
     parallel::stopCluster(cl)
