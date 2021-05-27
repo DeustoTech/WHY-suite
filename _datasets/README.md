@@ -2,7 +2,7 @@
 
 ### Some considerations
 
-Raw csv files may contain gaps or be shorter than 800 days. They need to be converted to a format compatible with the feature extraction file. In the context of this package, this format is the _extended file_ (or _ext_ file), with the extension "RData". Ext files are lists containing (1) a data frame with the time series and (2) metadata. The time series within the data frame of the "ext" file can be plotted using the function ``whyT2.1::plot_dataframe(edf$df)``.
+Raw *.csv files may contain gaps or be shorter than 800 days. They need to be converted to a format compatible with the feature extraction file. In the context of this package, this format is the _extended_ *.RData file_ (or _ext_ file). _ext_ files are big lists containing (1) a data frame with the time series and (2) metadata. The time series within the data frame of the _ext_ file can be plotted using the function ``whyT2.1::plot_dataframe(edf$df)``.
 
 ### Files
 
