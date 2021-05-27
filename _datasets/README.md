@@ -6,6 +6,6 @@ Raw csv files may contain gaps or be shorter than 800 days. They need to be conv
 
 ## Files
 
-* ``raw2ext.R``: convert from raw to ext. If the raw files do not come from one of the existing datasets, it is necessary to provide extra info to the code (file ``data-load-and-processing.R`` in the ``R`` folder). <small>REMARK: This should be externalized at some moment.</small>
+* ``raw2ext.R``: convert from raw to ext. If the raw files do not come from one of the existing datasets, it is necessary to provide extra info to the code, usually in the file ``data-load-and-processing.R`` of the ``R`` folder. ((REMARK: This should be externalized at some moment.))
 * ``DST_correction.R``: in case the daylight saving time of the time series needs correction.
 * ``get_features.R``: compute features. The process is parallelized, so several files will be created in the output folder.
