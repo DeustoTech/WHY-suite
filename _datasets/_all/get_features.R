@@ -2,18 +2,18 @@ library(whyT2.1)
 library(foreach)
 # Input parameters
 input_folder      <- c(
-	"/home/ubuntu/carlos.quesada/disk/meg/ext/"
-	#"/home/ubuntu/carlos.quesada/disk/goiener/ext-bug-corr-rep/",
-	#"/home/ubuntu/carlos.quesada/disk/issda/ext/",
-	#"/home/ubuntu/carlos.quesada/disk/lcl/ext/",
-	#"/home/ubuntu/carlos.quesada/disk/refit/ext/"
+	"/home/ubuntu/carlos.quesada/disk/go2/ext/",
+	"/home/ubuntu/carlos.quesada/disk/iss/ext/",
+	"/home/ubuntu/carlos.quesada/disk/lcl/ext/",
+	"/home/ubuntu/carlos.quesada/disk/meg/ext/",
+	"/home/ubuntu/carlos.quesada/disk/por/ext/"
 )
 output_folder     <- c(
-	"/home/ubuntu/carlos.quesada/disk/features/meg_21.04.15/"
-	#"/home/ubuntu/carlos.quesada/disk/features/goiener_21.02.04/",
-	#"/home/ubuntu/carlos.quesada/disk/features/issda_21.02.04/",
-	#"/home/ubuntu/carlos.quesada/disk/features/lcl_21.02.04/",
-	#"/home/ubuntu/carlos.quesada/disk/features/refit_21.02.04/"
+	"/home/ubuntu/carlos.quesada/disk/features/go2_21.05.27/",
+	"/home/ubuntu/carlos.quesada/disk/features/iss_21.05.27/",
+	"/home/ubuntu/carlos.quesada/disk/features/lcl_21.05.27/",
+	"/home/ubuntu/carlos.quesada/disk/features/meg_21.05.27/",
+	"/home/ubuntu/carlos.quesada/disk/features/por_21.05.27/"
 )
 type_of_analysis   <- "extra" #"basic"
 #list_of_functions <- c("stat_data_aggregates", "load_factors")
