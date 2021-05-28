@@ -414,7 +414,7 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
 #' @description 
 #' Generate the names of the features.
 #' 
-#' @details NAMING FORMAT: [abs|rel]_[mean|sd|max|mean]_type_(pday)
+#' @details NAMING FORMAT: [abs|rel]_[mean|sd|max|mean|sum]_type_(pday)
 #' 
 #' @return List of lists with the feature names.
 #' 

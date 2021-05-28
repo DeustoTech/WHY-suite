@@ -10,4 +10,4 @@ All the files listed below can be found in the ``_all`` folder:
 
 * ``raw2ext.R``: convert from raw to ext. If the raw files do not come from one of the existing datasets, it is necessary to provide extra info to the code, usually in the file ``data-load-and-processing.R`` of the ``R`` folder. (_REMARK: This should be externalized at some moment_).
 * ``DST_correction.R``: in case the daylight saving time of the time series needs correction.
-* ``get_features.R``: compute features. The process is parallelized, so several files will be created in the output folder.
+* ``get_features_v2.R``: compute features.
