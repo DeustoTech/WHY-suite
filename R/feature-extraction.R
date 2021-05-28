@@ -333,6 +333,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       )
     }
     
+    rm(edf)
     return(NULL)
   }
   
