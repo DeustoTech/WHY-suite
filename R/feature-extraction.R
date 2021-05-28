@@ -129,8 +129,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
       "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
     # List of BASIC functions that REQUIRE normalization
     basic_fns <- c(
-      "frequency", "stl_features", "entropy", "acf_features", "daily_acf", 
-      "catch22_features")
+      "frequency", "stl_features", "entropy", "acf_features", "daily_acf")#, "catch22_features")
     # List of EXTRA functions that REQUIRE normalization
     extra_fns <- c(
       "max_kl_shift", "outlierinclude_mdrmd", "arch_stat", 
@@ -332,7 +331,6 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         row.names = FALSE
       )
     }
-    
     rm(edf)
     return(NULL)
   }
