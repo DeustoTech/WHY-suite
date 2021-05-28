@@ -299,7 +299,7 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   doParallel::registerDoParallel(cl)
   
   # Analysis loop
-  foreach::foreach(x = 1:length(dset_filenames), .packages = c("data.table", "catch22")) %dopar% {
+  foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
     
     # Select file name
     dset_filename <- dset_filenames[x]
@@ -332,6 +332,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
         row.names = FALSE
       )
     }
+    
+    return(NULL)
   }
   
   # Stop parallelization
