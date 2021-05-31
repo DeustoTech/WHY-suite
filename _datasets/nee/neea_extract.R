@@ -82,6 +82,7 @@ for (yy in yearz) {
               stringr::str_pad(dd, 2, pad="0"), ".csv"
             )
             if (file.exists(in_file)) {
+              print(in_file)
               do_the_magic(in_file)
             }
           }
