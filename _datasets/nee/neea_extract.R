@@ -10,7 +10,7 @@ if (.Platform$OS.type == "unix") {
   out_dir <- "/home/ubuntu/carlos.quesada/disk/nee/raw/"
 }
 
-yearz   <- 2018:2020
+yearz <- 2018:2020
 
 ################################################################################
 
@@ -27,9 +27,9 @@ do_the_magic <- function(in_file) {
     sep    = ","
   )
   
-  uniq_values <- unique(w_data[,c("ee_site_id", "regname")])
+  uniq_values <- unique(w_data[, c("ee_site_id", "regname")])
 
-  for (rr in dim(uniq_values)[1]) {
+  for (rr in 1:dim(uniq_values)[1]) {
     # Subset data
     sel_df <- subset(
       w_data,
@@ -38,8 +38,8 @@ do_the_magic <- function(in_file) {
       select = c(min_t, power)
     )
     
-    # From kW to kWh
-    sel_df$power <- sel_df$power * 0.25
+    # Some conversions
+    sel_df$power <- as.numeric(sel_df$power) * 0.25
     
     # File name
     fpath <- paste0(
@@ -58,7 +58,7 @@ do_the_magic <- function(in_file) {
       quote     = F,
       sep       = ",",
       row.names = F,
-      col.names = T,
+      col.names = F,
       dateTimeAs = "write.csv"
     )
   }
