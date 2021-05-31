@@ -86,8 +86,6 @@ o <- foreach::foreach(
 # Stop parallelization
 parallel::stopCluster(cl)
 
-print("AQUI LLEGO")
-
 # Save results to the CSV file
 data.table::fwrite(
   x         = o,
