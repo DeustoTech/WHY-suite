@@ -1,7 +1,14 @@
 # EXTRACT RAW DATA FROM NEEA DATASET ###########################################
 
-in_dir  <- "G:/Mi unidad/WHY/Datos (raw)/NEEA/"
-out_dir <- "G:/Mi unidad/WHY/Datasets/nee/raw/"
+# User defined variables
+if (.Platform$OS.type == "windows") {
+  in_dir  <- "G:/Mi unidad/WHY/Datos (raw)/NEEA/"
+  out_dir <- "G:/Mi unidad/WHY/Datasets/nee/raw/"
+}
+if (.Platform$OS.type == "unix") {
+  in_dir  <- "/home/ubuntu/carlos.quesada/disk/nee/pre-raw/"
+  out_dir <- "/home/ubuntu/carlos.quesada/disk/nee/raw/"
+}
 
 yearz   <- 2018:2020
 
@@ -57,7 +64,7 @@ do_the_magic <- function(in_file) {
   }
 }
 
-# Loop to find the an existing file
+# Loop to find an existing file
 for (yy in yearz) {
   for (qq in 1:4) {
     # Create dir name
