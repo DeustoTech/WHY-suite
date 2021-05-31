@@ -3,6 +3,10 @@ library(foreach)
 
 # Accept arguments from command line
 args <- commandArgs(trailingOnly = TRUE)
+args <- as.numeric(args)
+
+# Size of step
+step_size <- 499
 
 # Input parameters
 input_folder <- c(
@@ -16,8 +20,6 @@ input_folder <- c(
 output_path <- paste0(
   "/home/ubuntu/carlos.quesada/disk/features/feats_21.05.26/c22_feats_",
   args[1],
-  "-",
-  args[2],
   ".csv"
 )
 # Type of analysis
@@ -37,7 +39,12 @@ for (ii in 1:length(input_folder)) {
   )
 }
 
-fpaths <- fpaths[args[1]:args[2]]
+fpaths_len <- length(fpaths)
+min_val <- min(fpaths_len, args[1]+step_size)
+
+if (args[1] > fpaths_len) {
+  stop(paste0("NO MORE FILES! max = ", fpaths_len, ", curr = ", args[1]))
+}
 
 # Setup parallel backend to use many processors
 cores <- parallel::detectCores() - 1
@@ -45,18 +52,17 @@ cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
 o <- foreach::foreach(
-  x              = 1:length(fpaths),
+  x              = args[1]:min_val,
   .combine       = rbind,
   .inorder       = TRUE,
   .errorhandling = "stop",
   .packages      = c("whyT2.1")
-
 ) %dopar% {
 
   # Select file name
   fpath <- fpaths[x]
   fname <- strsplit(basename(fpath), split=".RData")[[1]]
-  print(fname)
+  print(paste0(x, fpath))
   # Load extended dataframe
   load(fpath)
   # Set exceptions
@@ -64,8 +70,10 @@ o <- foreach::foreach(
     ff_file <- data.frame(file = fname, data_set = edf$dset_key)
     # GET FEATURES
     ff_feats <- get_features_from_cooked_dataframe(
-      cdf              = edf,
-      type_of_analysis = type_of_analysis
+      cdf               = edf,
+      type_of_analysis  = type_of_analysis,
+      list_of_functions = list_of_functions,
+      .scale            = .scale
     )
     # Incorporate filename as a column
     all_features <- cbind(ff_file, ff_feats)
@@ -77,6 +85,8 @@ o <- foreach::foreach(
 
 # Stop parallelization
 parallel::stopCluster(cl)
+
+print("AQUI LLEGO")
 
 # Save results to the CSV file
 data.table::fwrite(
