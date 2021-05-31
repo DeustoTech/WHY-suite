@@ -273,17 +273,7 @@ get_bins <- function(t, type) {
 
 catch22_features <- function(tseries) {
   library(catch22)
-  # Aggregate tseries hourly
-  samples_per_day <- attr(tseries, "msts")[1]
-  date_by <- as.difftime(24 / samples_per_day, units = "hours")
-  ini_date <- get_extrema_dates_from_timeseries(tseries)
-  t <- seq(from = ini_date, length.out = length(tseries), by = date_by)
-  sum_factor <- cut(t, breaks = "1 hour")
-  aggr_data <- stats::aggregate(
-    x   = as.numeric(tseries),
-    by  = list(date_time = sum_factor),
-    FUN = sum
-  )
+
   # Compute Catch-22 features
   catch22_feats <- catch22::catch22_all(aggr_data$x)
   # Return
@@ -566,7 +556,7 @@ stat_data_aggregates <- function(x) {
   # Get names & constants
   n <- get_feature_names()
   # Mean & sd strings
-  msd_str <- c("mean", "sd", "max", "min")
+  msd_str <- c("mean", "sd", "max", "min", "sum")
   pd <- "pday"
   
   # Season loop
@@ -576,7 +566,7 @@ stat_data_aggregates <- function(x) {
     if (ss >= 5) {
       sum_of_wmeans <- sum(ft[[ss]]$mean$x / n$const[[ss-4]])
     }
-    # Loop mean|sd|max|min
+    # Loop mean|sd|max|min|sum
     for (mm in 1:2) {
       # Loop for elements in the dataframe
       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
