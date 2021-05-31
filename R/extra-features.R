@@ -5,7 +5,7 @@
 #' Features related to statistical moments
 #'
 #' @description
-#' Compute the mean, variance, skewness and kurtosis of a time series.
+#' Compute the mean, variance, skewness and kurtosis of a time series. It also includes the sum of the entire time series.
 #'
 #' @param x Time series of class \code{msts}.
 #'
@@ -18,7 +18,8 @@ stat_moments <- function(x) {
     mean     = mean(x),
     variance = stats::var(x),
     skewness = moments::skewness(x),
-    kurtosis = moments::kurtosis(x)
+    kurtosis = moments::kurtosis(x),
+    sum      = sum(x)
   )
 }
 
@@ -271,11 +272,9 @@ get_bins <- function(t, type) {
 #' 
 #' @export
 
-catch22_features <- function(tseries) {
-  library(catch22)
-
+catch22_features <- function(x) {
   # Compute Catch-22 features
-  catch22_feats <- catch22::catch22_all(aggr_data$x)
+  catch22_feats <- catch22::catch22_all(x)
   # Return
   o <- catch22_feats$values
   names(o) <- catch22_feats$names
