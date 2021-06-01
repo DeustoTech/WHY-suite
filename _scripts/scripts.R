@@ -2451,13 +2451,13 @@ scripts <- function(script_selection) {
   if (script_selection == 42) {
     
     m <- whyT2.1::get_heatmap_matrix(
-      as.data.frame("G:/Mi unidad/WHY/Datasets/nee/ext/9036-Mains.RData")
+      as.data.frame("G:/Mi unidad/WHY/Datasets/nee/ext/1726-Mains.RData")
     )
     
     whyT2.1::plot_heatmap_matrix(
       m,
       format_file = "png",
-      file_path   = "G:/Mi unidad/WHY/Datasets/nee/9036-Mains.png"
+      file_path   = "G:/Mi unidad/WHY/Datasets/nee/1726b-Mains.png"
     )
     
     # m <- whyT2.1::get_heatmap_matrix(
