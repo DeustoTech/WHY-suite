@@ -13,5 +13,5 @@ List of lists with the feature names.
 Generate the names of the features.
 }
 \details{
-NAMING FORMAT: [abs|rel]_[mean|sd|max|mean]_type_(pday)
+NAMING FORMAT: [abs|rel]_[mean|sd|max|mean|sum]_type_(pday)
 }

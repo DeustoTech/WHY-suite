@@ -4,7 +4,7 @@
 \alias{catch22_features}
 \title{Catch-22 features from time series}
 \usage{
-catch22_features(tseries)
+catch22_features(x)
 }
 \arguments{
 \item{tseries}{Time series of class \code{msts}.}

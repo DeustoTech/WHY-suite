@@ -13,5 +13,5 @@ stat_moments(x)
 A list with the mean, variance, skewness and kurtosis of the time series.
 }
 \description{
-Compute the mean, variance, skewness and kurtosis of a time series.
+Compute the mean, variance, skewness and kurtosis of a time series. It also includes the sum of the entire time series.
 }
