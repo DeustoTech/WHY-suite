@@ -1,7 +1,7 @@
 Package: whyT2.1
 Type: Package
 Title: WHY Task 2.1
-Version: 0.3
+Version: 0.4
 Author: Carlos Quesada <carlos.quesada@deusto.es>
 Maintainer: Carlos Quesada <carlos.quesada@deusto.es>
 Description: Implementation of WHY Task 2.1

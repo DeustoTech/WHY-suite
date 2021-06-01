@@ -153,7 +153,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     is_0             = cooked_df_is_0
   )
   # Particular list 
-  dset_list <- get_dataset_dependent_metadata(dset_key)
+  dset_list <- get_dataset_dependent_metadata(dset_key, metadata)
   
   # Append both lists
   output <- append(common_list, dset_list)
