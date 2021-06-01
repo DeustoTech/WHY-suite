@@ -71,7 +71,7 @@ get_dataframe <- get_raw_dataframe_from_dataset
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  samples_per_day <- list(lcl = 48, goi = 24, go2 = 24, ref = 24, iss = 48, por = 96)
+  samples_per_day <- whyT2.1::get_samples_per_day()
   # Selection
   spd <- samples_per_day[[dset_key]]
   
@@ -152,34 +152,8 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     number_of_na     = number_of_na,
     is_0             = cooked_df_is_0
   )
-  # Particular list  
-  if (dset_key == "lcl") {
-    dset_list <- list(
-      acorn         = metadata[[2]],
-      acorn_grouped = metadata[[3]]
-    )
-  }
-  if (dset_key %in% c("goi", "go2")) {
-    dset_list <- list(
-      cups         = metadata[[1]],      start_date   = metadata[[2]],
-      end_date     = metadata[[3]],      tariff       = metadata[[4]],
-      p1_kw        = metadata[[5]],      p2_kw        = metadata[[6]],
-      p3_kw        = metadata[[7]],      self_consump = metadata[[8]],
-      province     = metadata[[9]],      municipality = metadata[[10]],
-      zip_code     = metadata[[11]],     cnae         = metadata[[12]]
-    )
-  }
-  if (dset_key == "iss") {
-    dset_list <- list(
-      id         = metadata[[2]],
-      code       = metadata[[3]],
-      res_stimul = metadata[[4]],
-      res_tariff = metadata[[5]]
-    )
-  }
-  if (dset_key %in% c("ref", "por")) {
-    dset_list <- list()
-  }
+  # Particular list 
+  dset_list <- get_dataset_dependent_metadata(dset_key)
   
   # Append both lists
   output <- append(common_list, dset_list)
@@ -244,8 +218,7 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 #'
 #' @export
 
-extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,  
-                                     extend_after_end=TRUE) {
+extend_imputed_dataframe <- function(idf, wanted_days, back_years=1, extend_after_end=TRUE) {
   # Get current length in months of idf
   idf_init_date  <- idf$df[1,1]
   idf_final_date <- tail(idf$df, n=1)[[1]]
@@ -324,69 +297,6 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1,
 }
 
 ################################################################################
-# extract_metadata
-################################################################################
-
-#' Ancillary function to extract metadata
-#'
-#' @description
-#' Extract metadata from files.
-#'
-#' @param metadata_files A string or a vector of strings with the file paths.
-#' @param dset_key Dataset key: \code{lcl}, \code{goi}, etc.
-#'
-#' @return A list of metadata.
-#'
-#' @export
-
-extract_metadata <- function(dfs, dset_key, filename) {
-  # Low Carbon London
-  if (dset_key == "lcl") {
-    acorn_tag     <- strsplit(filename, ".csv")[[1]]
-    acorn         <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 3]
-    acorn_grouped <- dfs[[1]][dfs[[1]][,1] == acorn_tag, 4]
-    
-    return(list(acorn_tag, acorn, acorn_grouped))
-  }
-  # Goiener
-  if (dset_key %in% c("goi", "go2")) {
-    # Identify current user
-    cups <- strsplit(filename, ".csv")[[1]]
-    # There may be several entries for a cups: get index (highest date)
-    idx <- which.max(as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2]))
-    # Get all data
-    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][idx], tz="GMT")
-    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][idx], tz="GMT")
-    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][idx]
-    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][idx])
-    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][idx])
-    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][idx])
-    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][idx]
-    province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][idx]
-    municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][idx]
-    zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][idx])
-    cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][idx])
-    
-    return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
-                self_consump, province, municipality, zip_code, cnae))
-  }
-  # ISSDA
-  if (dset_key == "iss") {
-    id         <- strsplit(filename, ".csv")[[1]]
-    code       <- as.numeric(dfs[[1]][dfs[[1]][,1] == id, 2][1])
-    res_stimul <-            dfs[[1]][dfs[[1]][,1] == id, 3][1]
-    res_tariff <-            dfs[[1]][dfs[[1]][,1] == id, 4][1]
-    sme_alloc  <-            dfs[[1]][dfs[[1]][,1] == id, 5][1]
-    
-    return(list(id, code, res_stimul, res_tariff, sme_alloc))
-  }
-  # REFIT
-  if (dset_key == "ref" | dset_key == "por") {
-    return(NULL)
-  }
-}
-
-################################################################################
 # extend_dataset
 ################################################################################
 
@@ -440,9 +350,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg #, .errorhandling = 'remove'
-                    ) %dopar% {
- #for(x in 1:length(dset_filenames)) {
+  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg) %dopar% {
+    
     print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
