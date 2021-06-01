@@ -2451,24 +2451,24 @@ scripts <- function(script_selection) {
   if (script_selection == 42) {
     
     m <- whyT2.1::get_heatmap_matrix(
-      as.data.frame("G:/Mi unidad/WHY/Datasets/lcl/ext/MAC000050.RData")
+      as.data.frame("G:/Mi unidad/WHY/Datasets/nee/ext/9036-Mains.RData")
     )
     
     whyT2.1::plot_heatmap_matrix(
       m,
       format_file = "png",
-      file_path   = "G:/Mi unidad/WHY/Github/why-T2.1/_scripts/pre.png"
+      file_path   = "G:/Mi unidad/WHY/Datasets/nee/9036-Mains.png"
     )
     
-    m <- whyT2.1::get_heatmap_matrix(
-      as.data.frame("G:/Mi unidad/WHY/Datasets/lcl/ext_dst/MAC000050.RData")
-    )
-    
-    whyT2.1::plot_heatmap_matrix(
-      m,
-      format_file = "png",
-      file_path   = "G:/Mi unidad/WHY/Github/why-T2.1/_scripts/post.png"
-    )
+    # m <- whyT2.1::get_heatmap_matrix(
+    #   as.data.frame("G:/Mi unidad/WHY/Datasets/lcl/ext_dst/MAC000050.RData")
+    # )
+    # 
+    # whyT2.1::plot_heatmap_matrix(
+    #   m,
+    #   format_file = "png",
+    #   file_path   = "G:/Mi unidad/WHY/Github/why-T2.1/_scripts/post.png"
+    # )
     
     return()
   }
