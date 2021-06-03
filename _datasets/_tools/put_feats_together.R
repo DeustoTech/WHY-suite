@@ -3,13 +3,13 @@
 ################################################################
 
 # Conventional features file path
-ft_path <- "G:/Mi unidad/WHY/Features/feats_21.05.26/feats.csv"
+ft_path <- "G:/Mi unidad/WHY/Features/feats_21.06.01/featsAB.csv"
 # Catch-22 folder
-c22_dir <- "G:/Mi unidad/WHY/Features/feats_21.05.26/"
+c22_dir <- "G:/Mi unidad/WHY/Features/c22feats_21.06.01/"
 # Catch-22 file vector
 c22_v <- paste0(c22_dir, "c22_feats_", seq(1,23501,500), ".csv")
 # Output path
-ft_out <- "G:/Mi unidad/WHY/Features/feats_21.05.26/feats-all.csv"
+ft_out <- "G:/Mi unidad/WHY/Features/feats_21.06.01/feats.csv"
 
 # Read conventional feats file
 conv_feats <- data.table::fread(
@@ -31,19 +31,16 @@ for (c22_path in c22_v) {
 
 # Put feats together
 feats <- merge(conv_feats, c22_feats, by=c("file", "data_set"))
-feats_2 <- plyr::join(conv_feats, c22_feats, by=c("file", "data_set"))
 
-# # Save feats to the CSV file
-# data.table::fwrite(
-#   x          = feats,
-#   file       = ft_out,
-#   sep        = ",",
-#   na         = "",
-#   quote      = FALSE,
-#   append     = FALSE,
-#   col.names  = TRUE,
-#   row.names  = FALSE,
-#   dateTimeAs = "write.csv"
-# )
-  
-browser()
+# Save feats to the CSV file
+data.table::fwrite(
+  x          = feats,
+  file       = ft_out,
+  sep        = ",",
+  na         = "",
+  quote      = FALSE,
+  append     = FALSE,
+  col.names  = TRUE,
+  row.names  = FALSE,
+  dateTimeAs = "write.csv"
+)
