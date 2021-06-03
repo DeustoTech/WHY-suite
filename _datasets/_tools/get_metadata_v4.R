@@ -5,9 +5,6 @@
 library(foreach)
 library(stringi)
 
-# Key of the dataset
-key <- "por"
-
 # User defined variables
 if (.Platform$OS.type == "unix") {
   # EXT input folders
@@ -30,7 +27,7 @@ if (.Platform$OS.type == "windows") {
 
 # Get all filenames in the ext folders
 ext_filenames <- c()
-for (ii in length(input_folders)) {
+for (ii in 1:length(input_folders)) {
   ext_filenames <- c(
     ext_filenames,
     list.files(path=input_folders[ii], pattern="*.RData", full.names=T)
@@ -44,10 +41,11 @@ doParallel::registerDoParallel(cl)
 
 x <- foreach::foreach(
   ii             = 1:length(ext_filenames), 
-  .combine       = rbind, 
-  .inorder       = F, 
+  .combine       = dplyr::bind_rows, 
+  .inorder       = T, 
   .errorhandling = "stop", 
-  .packages      = c("stringi")
+  .packages      = c("stringi"),
+  .verbose       = F
 ) %dopar% {
   
   # Load file
@@ -60,7 +58,7 @@ x <- foreach::foreach(
   # file
   o$file <- sub('\\.csv$', '', edf$filename)
   # data_set
-  o$data_set <- key
+  o$data_set <- edf$dset_key
   # overall_start_date
   o$overall_start_date <- edf$df$times[1]
   # overall_end_date
@@ -96,7 +94,7 @@ x <- foreach::foreach(
   o$total_imputed_pct <- o$imputed_days_pct + o$imputed_na_pct
   
   ## GOIENER-SPECIFIC METADATA #################################################
-  if (key %in% c("goi", "go2", "meg", "cor")) {
+  if (o$data_set %in% c("goi", "go2", "meg", "cor")) {
     # country
     o$country <- "es"
     # administrative_division
@@ -114,6 +112,7 @@ x <- foreach::foreach(
     # zip_code
     o$zip_code <- edf$zip_code
     ## Spatial resolution
+	if (length(edf$cnae) == 0) edf$cnae <- NA
     if (is.na(edf$cnae)) {
       o$is_household <- NA
     } else {
@@ -136,11 +135,15 @@ x <- foreach::foreach(
   	o$p2_kw <- edf$p2_kw
   	o$p3_kw <- edf$p3_kw
   	# type of self-consumption
-  	o$self_consumption_type <- edf$self_consump
+  	if (length(edf$self_consump) == 0) {
+  	  o$self_consumption_type <- NA
+  	} else {
+  	  o$self_consumption_type <- as.character(edf$self_consump)
+  	}
   }
   
   ## ISSDA-SPECIFIC METADATA ###################################################
-  if (key == "iss") {
+  if (o$data_set == "iss") {
     # country
     o$country <- "ie"
     # administrative_division
@@ -164,7 +167,7 @@ x <- foreach::foreach(
   }
 
   ## LOW CARBON LONDON-SPECIFIC METADATA #######################################
-  if (key == "lcl") {
+  if (o$data_set == "lcl") {
     # country
     o$country <- "gb"
     # administrative_division
@@ -184,20 +187,26 @@ x <- foreach::foreach(
   }
   
   ## NEEA-SPECIFIC METADATA ####################################################
-  if (key == "nee") {
+  if (o$data_set == "nee") {
     # country
     o$country <- "us"
     # administrative_division
     o$administrative_division <- tolower(edf$state)
   } 
   
-  ## PORTUGAL METADATA ####################################################
-  if (key == "por") {
+  ## PORTUGAL METADATA #########################################################
+  if (o$data_set == "por") {
     # country
     o$country <- "pt"
   }  
   
-  return(data.frame(o))
+  ## FINAL PROCESSING ##########################################################
+  # Convert numeric(0) to NA
+  for (jj in 1:length(o)) {
+    if (length(o[[jj]]) == 0) o[[jj]] <- NA
+  }
+  
+  return(as.data.frame(o))
 }
 
 # Stop parallelization
