@@ -6,7 +6,7 @@ Raw *.csv files may contain gaps or be shorter than 800 days. They need to be co
 
 ### Files
 * ``raw2ext.R``: convert from raw to ext. If the raw files do not come from one of the existing datasets, it is necessary to provide extra info to the code: check all functions in ``R/dataset-metadata.R``. After this, some **optional** processing can be performed:
-	* ``correct-dataset-metadata-field.R``: batch-corrects fields in EXT files of a dataset in case it's wrong (e.g. ``edf$dset_key: "go2"`` in ``meg`` dataset).
+	* ``correct-dataset-metadata-field.R``: batch-corrects fields in EXT files of a dataset in case it's wrong (e.g. ``edf$dset_key: "go2"`` to ``edf$dset_key: "meg"`` in dataset ``meg``).
 	* ``DST_correction.R``: in case the daylight saving time of the time series needs correction.
 	* Inside the 3-letter dataset folders there may be more extra post-processing files. For example, dataset ``nee`` requires timezone correction and the specific file to do it is there. Please check.
 * ``get_features_v2.R``: compute features.
