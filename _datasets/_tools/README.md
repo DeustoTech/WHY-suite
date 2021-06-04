@@ -9,8 +9,8 @@ Raw *.csv files may contain gaps or be shorter than 800 days. They need to be co
 	* ``correct-dataset-metadata-field.R``: batch-corrects fields in EXT files of a dataset in case it's wrong (e.g. ``edf$dset_key: "go2"`` to ``edf$dset_key: "meg"`` in dataset ``meg``).
 	* ``DST_correction.R``: in case the daylight saving time of the time series needs correction.
 	* Inside the 3-letter dataset folders there may be more extra post-processing files. For example, dataset ``nee`` requires timezone correction and the specific file to do it is there. Please check.
-* ``get_features_v2.R``: compute features.
+* ``get_features_v2.R``: compute features. It takes 4 or 5 hours.
 * ``perl get_c22.pl`` (command line): compute Catch-22 features. They have to be computed piecewise due to [its known memory leak bug](https://github.com/chlubba/catch22/issues/4). ``get_c22_features.R`` is required.
 * ``put_feats_together.R``: join conventional and Catch-22 features.
-* ``get_metadata_v4.R``: extract metadata from EXT files.
+* ``get_metadata_v4.R``: extract metadata from EXT files. It takes 1 or 2 minutes.
 * ``put_metadata_together.R``: join metadata and features.
