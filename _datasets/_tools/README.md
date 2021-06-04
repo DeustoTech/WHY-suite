@@ -13,3 +13,4 @@ Raw *.csv files may contain gaps or be shorter than 800 days. They need to be co
 * ``perl get_c22.pl`` (command line): compute Catch-22 features. They have to be computed piecewise due to [its known memory leak bug](https://github.com/chlubba/catch22/issues/4). ``get_c22_features.R`` is required.
 * ``put_feats_together.R``: join conventional and Catch-22 features.
 * ``get_metadata_v4.R``: extract metadata from EXT files.
+* ``put_metadata_together.R``: join metadata and features.
