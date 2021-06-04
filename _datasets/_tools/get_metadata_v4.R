@@ -17,7 +17,8 @@ if (.Platform$OS.type == "unix") {
     "/home/ubuntu/carlos.quesada/disk/nee/ext/"
   )
   # Path of the output file
-  out_file <- "/home/ubuntu/carlos.quesada/disk/features/metadata/2021.06.03_mdata.csv"
+  out_file <- 
+    "/home/ubuntu/carlos.quesada/disk/features/metadata/2021.06.03_mdata.csv"
 }
 if (.Platform$OS.type == "windows") {
   # BETTER UNDER LINUX
@@ -51,6 +52,8 @@ x <- foreach::foreach(
   # Load file
   load(ext_filenames[ii])
   print(ext_filenames[ii])
+  
+  if (edf$is_0) return(NULL)
   
   o <- list()
   
