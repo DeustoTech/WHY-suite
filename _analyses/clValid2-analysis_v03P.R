@@ -1,10 +1,8 @@
-## THIS VERSION SCALES DATA
-
 library(foreach)
 library(clValid2)
 library(mclust)
 
-feats_vers <- "v1.17"
+feats_vers <- "v1.12"
 
 get_cluster_analysis <- function(analysis_type) {
 
@@ -27,7 +25,7 @@ get_cluster_analysis <- function(analysis_type) {
   }
   if (.Platform$OS.type == "unix") {
     feats_dir <- "/home/ubuntu/carlos.quesada/disk/features/"
-    out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/"
+    out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/"
     source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R")
   }
 
@@ -70,16 +68,12 @@ get_cluster_analysis <- function(analysis_type) {
     feats$data_set %in% dsets &
     feats$imputed_na_pct < imp_na_pct &
     feats$is_household %in% is_hhold &
-    feats$sum_per_day > sum_pday &
-    feats$minimum >= 0
+    feats$sum_per_day > sum_pday
 
-  row_names <- paste0(feats$data_set, "_", feats$file)
+  row.names(feats) <- paste0(feats$data_set, "_", feats$file)
   feats <- feats[row_conditions,]
   feats <- subset(feats, select = ft_set)
   feats <- as.matrix(feats)
-  ## SCALE
-  feats <- scale(feats)
-  row.names(feats) <- row_names[row_conditions]
 
   o <- clValid2::clValid(
     obj        = feats,
@@ -98,29 +92,17 @@ get_cluster_analysis <- function(analysis_type) {
 ################################################################################
 
 # Setup parallel backend to use many processors
-cores <- 6 #parallel::detectCores() - 1
+cores <- 3 #parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
-cluster_codes <- vector()
-
-for (ff in 1:4) {
-  for (dd in c(4, 2, 3, 5:7)) {
-    for (mm in c(2, 5)) {
-      for (vv in 1) {
-        for (cc in 2) {
-          cluster_codes <-
-            c(cluster_codes, as.numeric(paste0(ff, dd, mm, vv, cc)))
-        }
-      }
-    }
-  }
-}
-
-xx <- foreach::foreach(
-  ii             = cluster_codes,
+foreach::foreach(
+  ii             = c (
+    c(11,12,15,                     41,42,45) * 100 + 10011,
+    c(11,12,15, 21,22,25, 31,32,35, 41,42,45) * 100 + 10021
+    ),
   .inorder       = FALSE,
-  .errorhandling = "stop",
+  .errorhandling = "remove",
   .packages      = c("clValid2", "mclust")
 ) %dopar% {
   get_cluster_analysis(ii)

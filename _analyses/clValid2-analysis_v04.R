@@ -97,15 +97,15 @@ get_cluster_analysis <- function(analysis_type) {
 ##  CALL TO THE FUNCTION
 ################################################################################
 
-# Setup parallel backend to use many processors
-cores <- 6 #parallel::detectCores() - 1
-cl <- parallel::makeCluster(cores, outfile = "")
-doParallel::registerDoParallel(cl)
+# # Setup parallel backend to use many processors
+# cores <- 2 #parallel::detectCores() - 1
+# cl <- parallel::makeCluster(cores, outfile = "")
+# doParallel::registerDoParallel(cl)
 
 cluster_codes <- vector()
 
-for (ff in 1:4) {
-  for (dd in c(4, 2, 3, 5:7)) {
+for (dd in c(4, 2, 3, 5:7)) {
+  for (ff in 1:4) {
     for (mm in c(2, 5)) {
       for (vv in 1) {
         for (cc in 2) {
@@ -117,14 +117,16 @@ for (ff in 1:4) {
   }
 }
 
-xx <- foreach::foreach(
-  ii             = cluster_codes,
-  .inorder       = FALSE,
-  .errorhandling = "stop",
-  .packages      = c("clValid2", "mclust")
-) %dopar% {
+# xx <- foreach::foreach(
+  # ii             = cluster_codes,
+  # .inorder       = FALSE,
+  # .errorhandling = "stop",
+  # .packages      = c("clValid2", "mclust")
+# ) %dopar% {
+
+for (ii in cluster_codes) {
   get_cluster_analysis(ii)
 }
 
-# Stop parallelization
-parallel::stopCluster(cl)
+# # Stop parallelization
+# parallel::stopCluster(cl)
