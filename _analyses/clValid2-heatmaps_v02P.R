@@ -18,7 +18,6 @@ clValid2_heatmaps <- function() {
     feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.17.csv"
     clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/data/"
     dataset_dir <- "/home/ubuntu/carlos.quesada/disk/"
-    hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/hmp/"
     hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/hmm/"
     hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/hmp/"
     source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R", local=T)

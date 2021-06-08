@@ -1,0 +1,455 @@
+---
+title: "Cluster Report v2.0"
+author: "Universidad de Deusto (carlos.quesada@deusto.es)"
+date: "June 8, 2021"
+output:
+  html_document: 
+    toc: true
+    toc_depth: 3
+    theme: united
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+# Introduction
+This report contains the results of applying three clustering methods to four datasets of energy consumption at the residential level. For each dataset, clustering method and resulting cluster, a series of graphs is displayed, the meaning of which is explained in the following sections.
+
+#### Datasets
+
+The datasets consist of time series of at least 800 days of household energy consumption (in kWh). Some of the time series may have been processed either to replace missing data by imputation or to be extended by replication. The four datasets considered are:
+
+1. **Goiener & Megara (households)**: Contains 10,413 time series from Spain, mainly the Basque Country and Navarre (2016-2020, prior to COVID-19 lockdown). This dataset only contains time series whose CNAE code belongs under the heading "*activities of households as producers of goods/services for own use*" (code 98xx).
+2. **Low Carbon London**: Contains 5,210 publicly available time series from households in Greater London (2011-2014).
+3. **Irish Social Science Data Archive (ISSDA)**: Contains 4,225 publicly available time series from households in Ireland (2009-2011).
+4. **Goiener & Megara (all)**: The same as dataset #1 but including all time series regardless their CNAE codes. Contains 11,840 time series, which may include companies, offices, public institutions, etc. in addition to households.
+
+The time series above meet the following criteria:
+
+<!--* The original time series is longer than 364 days (52 weeks).-->
+* The percentage of imputed samples in the original time series is less than 10%.
+* The average energy consumed in a day is greater than 0.1 kWh (non-empty houses).
+
+<!--All time series originally longer than 364 days but shorter than 800 days have been expanded to 800 days (approx. 2 years and 2 months) by repetition, always taking into account the weekly pattern.-->
+
+#### Feature extraction
+
+Since each time series consists of tens of thousands of samples, a machine learning technique known as *feature extraction* has been used to reduce its dimensionality to just a few values. In this report, a set of 25 features related to **seasonal aggregation** has been computed to characterize each time series. These features are:
+
+* ``rel_mean_XXhYYhZZZ``, where ``XX`` may be ``00``, ``04``, ``08``, ``12``, ``16`` or ``20``; ``YY`` is ``XX`` + 4 (with 24 being expressed as ``00``); and ``ZZZ`` may be ``spr`` (spring), ``sum`` (summer), ``aut`` (autumn) or ``win`` (winter): There are 24 features following this pattern. Each of them represents the average energy consumption between hours ``XX`` and ``YY`` **and** in the meteorological season ``ZZZ``, computed over the entire time series. The value is expressed as a percentage with respect to the sum of the 24 features.
+* ``rel_mean_weekday_pday``: This feature represents the average energy consumption **per day** during the weekdays (from Monday to Friday) computed over the entire time series. The value is expressed as a percentage with respect to the sum of ``rel_mean_weekday_pday`` and ``rel_mean_weekend_pday``, the latter being the equivalent feature for the weekends (Saturday and Sunday).
+
+In this report, at the beginning of each dataset subsection, the feature distribution per dataset is provided for each feature.
+
+#### Clustering methods
+
+Three clustering algorithms have been used to classify the time series from their features:
+
+* **Hierarchical clustering**: an agglomerative clustering algorithm that yields a dendrogram which can be cut at a chosen height to produce the desired number of clusters.
+* **_k_-means**: an iterative method which minimizes the within-class sum of squares for a given number of clusters.
+* **Self-Organizing Maps** (**SOM**): an unsupervised learning technique based on neural networks, highly regarded for its ability to map and visualize high-dimensional data in 2D.
+
+The selected number of clusters has been 5, 10, 15, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50, 60 and 70 for each of the clustering methods.
+
+#### Validation methods
+
+Two types of cluster validation have been chosen: **internal** and **stability** measures.
+
+* **Internal measures** take only the dataset and the clustering partition as
+input and use intrinsic information in the data to assess the quality of the clustering.
+* **Stability measures** are a special version of internal measures. They evaluate the consistency of a clustering result by comparing it with the clusters obtained after each column is removed, one at a time.
+
+For internal validation, the selected measures were:
+
+* **Connectivity**: has a value between zero and ∞ and should be minimized.
+* **Silhouette width**: lies in the interval [−1, 1], and should be maximized.
+* **Dunn index**: has a value between zero and ∞, and should be maximized.
+
+For stability validation, the selected measures were:
+
+* **Average proportion of non-overlap** (**APN**): is in the interval [0, 1], with values close to zero corresponding with highly consistent clustering results.
+* **Average distance** (**AD**): has a value between zero and ∞, and smaller values are preferred.
+* **Average distance between means** (**ADM**): has a value between zero and ∞, and again smaller values are prefered.
+* **Figure of merit** (**FOM**): has a value between zero and ∞, with smaller values equaling better performance.
+
+In this report, at the beginning of each clustering method subsection, the seven validation measures are provided.
+
+It has been decided to use the same number of clusters for all analyses in order to facilitate the subsequent cluster tagging. The number of clusters chosen has been **24**, as the vast majority of the validation measures obtained show relative maxima (or minima) at or around this number.
+
+#### Cluster graphs
+
+Between 3 and 5 graphs have been plotted for each cluster. Two of the graphs are common to all clusters, while the rest of graphs depend on the dataset. These dataset-dependent graphs reflect the socioeconomical indicators provided as metadata by the dataset.
+
+The graphs common to all datasets are:
+
+* **Average yearly consumption**: a heatmap showing the average time series of a cluster. The vertical axis represents the hours of the day, while the horizontal axis shows the days of the year. The days are organized using the ISO week date system, which consists of 53 weeks (instead of the 52.14 weeks of an actual year), so the labels for the months are rather indicative. The different color intensities of the heatmap indicate the average energy consumption values of that cluster, with red representing high values and yellow low values.
+* **Feature distribution per cluster**: a sequence of boxplots representing the distribution of values of the 25 features in the cluster. An extra feature, indicating the distribution of energy consumption (kWh/year), has also been added.
+
+For the **Goiener & Megara** dataset:
+
+* **Provinces**: a barplot showing the Spanish provinces in which the users in the cluster are located.
+* **CNAE codes**: a barplot showing the 4-digit CNAE codes describing the economic activities performed by the users in the cluster. The meaning of the codes can be checked [here](https://www.cnae.com.es/lista-actividades.php) (in Spanish). The most frequent CNAE codes in the dataset are: **98xx** (household activities); **84xx** (public administration and defense); **52xx** (transport and storage); **85xx** (education); **94xx** (associative activities: religious, political, trade union, etc.); **56xx** (food establishments); **41xx** (construction); etc.
+* **Tariffs and contracted power**: on the left, a barplot showing the electricity tariffs contracted by the users in the cluster; on the right, a boxplot showing the power contracted by the users in the cluster.
+
+For the **Low Carbon London** dataset:
+
+* **ACORN segmentation**: a barplot indicating the ACORN code of the households in the cluster. ACORN codes categorize the population of the United Kingdom into 17 demographic types, labeled from **A** (the richest) to **Q** (the poorest). Check the [_ACORN user guide_](https://www.caci.co.uk/sites/default/files/resources/Acorn%20User%20Guide%202020.pdf). The 17 ACORN codes are simplified into 5 groups: _Affluent Achievers_, from **A** to **C**; _Rising Prosperity_, **D** and **E**; _Comfortable Communities_, from **F** to **J**; _Financially Stretched_, from **K** to **N**; and _Urban Adversity_, from **O** to **Q**. Those groups have been indicated in the graphs using the same colors for the bars.
+
+For the **ISSDA** dataset:
+
+Three graphs (**Survey answers #1**, **#2** and **#3**) show, for each cluster, the answers given by the consumers in a pre-trial survey. The questions are labeled with numbers, as well as the answers.
+
+In **Survey answers #1**, the following Q&A can be found:
+
+* **200**: PLEASE RECORD SEX FROM VOICE.
+* **47001**: Do you have a timer to control when your heating comes on and goes off?
+* **47011**: Do you have a timer to control when your hot water/immersion heater comes on and goes off?
+* **4801**: Do you use your immersion when your heating is not switched on?
+* **471**: Returning to heating your home, in your opinion, is your home kept adequately warm?
+* **473**: Have you had to go without heating during the last 12 months through lack of money?
+* **420**: How many people over 15 years of age live in your home?
+* **430**: And how many of these are typically in the house during the day (for example for 5-6 hours during the day)?
+* **4551**: What rating did your house achieve? (1) A; (2) B; ...; (7) G
+* **43521**: If you were to make changes to the way you and people you live with use electricity, how much do you believe you could
+reduce your usage by? (1) 0%; (2) <5%; (3) 5%-10%; (4) 10%-20%; (5) 20%-30%; (6) >30%.
+* **4531**: Approximately how old is your home? (1) <5 years; (2) <10 years; (3) <30 years; (4) <75 years; (5) >75 years.
+* **453**: What year was your house built?
+* **6103**: What is the approximate floor area of your home? (square meters)
+
+In **Survey answers #2**, the following Q&A can be found:
+
+* **410**: What best describes the people you live with? (1) I live alone; (2) All people in my home are over 15 years of age; (3) Both adults and children under 15 years of age live in my home.
+* **4321**: Multiple: (1) I/we have already done a lot to reduce the amount of electricity I/we use; (2) I/we have already made changes to the way I/we live my life in order to reduce the amount of electricity we use; (3) I/we would like to do more to reduce electricity usage; (4) I/we know what I/we need to do in order to reduce electricity usage.
+* **450**: I would now like to ask some questions about your home. Which best describes your home? (1) Apartment; (2) Semi-detached house; (3) Detached house; (4) Terraced house; (5) Bungalow; (6) Refused.
+* **452**: Do you own or rent your home? (1) Rent (from a private landlord); (2) Rent (from a local authority); (3) Own Outright (not mortgaged); (4) Own with mortgage, etc; (5) Other.
+* **470**: Which of the following best describes how you heat your home? (1) Electricity (electric central heating storage heating); (2) Electricity (plug in heaters); (3) Gas; (4) Oil; (5) Solid fuel; (6) Renewable (e.g. solar); (7) Other.
+
+
+In **Survey answers #3**, the following Q&A can be found:
+
+* **4701**: Which of the following best describes how you heat water in your home? (1) Central heating system; (2) Electric (immersion); (3) Electric (instantaneous heater); (4) Gas; (5) Oil; (6) Solid fuel boiler; (7) Renewable (e.g. solar); (8) Other.
+* **472**: Do any of the following reasons apply? (1) I prefer cooler temperature; (2) I cannot afford to have the home as warm as I would like; (3) It is hard to keep the home warm because it is not well insulated; (4) None of these.
+* **455**: Does your home have a Building Energy Rating (BER) - a recently introduced scheme for rating the energy efficiency of your home? (1) Yes; (2) No; (3) Don’t know.
+* **5418**: Moving on to education, which of the following best describes the level of education of the chief income earner? (1) No formal education; (2) Primary; (3) Secondary to Intermediate Cert Junior Cert level; (4) Secondary to Leaving Cert level; (5) Third level; (6) Refused.
+* **4021**: Can you state which of the following broad categories best represents the yearly household income BEFORE TAX? (1) <15,000 EUR; (2) 15,000-30,000 EUR; (3) 30,000-50,000 EUR; (4) 50,000-75,000 EUR; (5) >75,000 EUR; (6) Refused.
+
+
+```{r, include=FALSE}
+################################################################################
+##  TO GENERATE AN HTML OUTPUT                                                ##
+##  rmarkdown::render("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/clValid2-report_v01.Rmd")                
+################################################################################
+
+# File paths
+clValid_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.06.07_km-som-nodst/"
+no.file_path  <- "G:/Mi unidad/WHY/Github/why-T2.1/_analyses/no-file.png"
+# feat_hist_dir <- "G:/Mi unidad/WHY/Features/histograms_v1.11/"
+# Number of clusters
+nc <- 24
+
+# Load numel_df.RData
+numel_df <- data.table::fread(
+  file   = paste0(clValid_dir, "numel_df.csv"),
+  header = TRUE,
+  sep    = ","
+)
+
+# Datasets
+dataset_list <- c(
+  "Goiener & Megara (households)",
+  "Low Carbon London",
+  "ISSDA",
+  "Goiener & Megara (all)"
+)
+# Set of features
+feature_set_list <- c(
+  "Seasonal aggregates",
+  "Peaks and off-peaks",
+  "Strengths and ACs",
+  "Catch-22"
+)
+# Clustering
+clust_methods_list <- c(
+  "Hierarchical",
+  "*k*-means",
+  "DIANA",
+  "FANNY",
+  "SOM",
+  "PAM",
+  "SOTA",
+  "CLARA",
+  "Model-based"
+)
+# Validation
+internal_val_list <- c(
+  "Connectivity (min)",
+  "Dunn index (max)",
+  "Silhouette (max)"
+)
+stability_val_list <- c(
+  "APN (min)",
+  "AD (min)",
+  "ADM (min)",
+  "FOM (min)"
+)
+# Feature names set #1
+feat_names_1 <- c(
+    "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+    "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+    "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+    "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+    "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+    "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+    "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+    "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+    "rel_mean_weekday_pday"
+)
+feat_codes_1 <- c(seq(378,470,4), 236)
+
+############################################
+##  FUNCTION TO GENERATE A ROW OF IMAGES  ##
+############################################
+
+img_row <- function(txt_list) {
+  o <- paste0(
+    '<table border="0">
+    <tr>
+    <td width="20%">', txt_list$img[1], '</td>
+    <td width="20%">', txt_list$img[2], '</td>
+    <td width="20%">', txt_list$img[3], '</td>
+    <td width="20%">', txt_list$img[4], '</td>
+    <td width="20%">', txt_list$img[5], '</td>
+    </tr>
+    <tr>
+    <td><center>', txt_list$cap[1], '</center></td>
+    <td><center>', txt_list$cap[2], '</center></td>
+    <td><center>', txt_list$cap[3], '</center></td>
+    <td><center>', txt_list$cap[4], '</center></td>
+    <td><center>', txt_list$cap[5], '</center></td>
+    </tr>
+    </table>\n\n'
+  )
+  return(o)
+}
+
+```
+
+
+```{r, results='asis', echo=FALSE}
+# No file by DEFAULT
+no_file <- paste0("![](", no.file_path, ")")
+
+# Features loop
+ff_loop <- 1
+# Dataset loop
+dd_loop <- 1:4
+# Methods loop
+mm_loop <- c(1,2,5)
+# Clusters loop
+cc_loop <- 1:nc
+
+####################
+##  FEATURE LOOP  ##
+####################
+for (ff in ff_loop) {
+  # cat("# Set of features: ", feature_set_list[ff], "\n\n", sep="")
+  cat("# Results\n\n", sep="")
+  
+  ####################
+  ##  DATASET LOOP  ##
+  ####################
+  for (dd in dd_loop) {
+    cat("## Dataset: ", dataset_list[dd], "\n\n", sep="")
+    
+    # Density of features
+    cat("**Feature distribution per dataset**\n\n")
+    if (ff == 1) {
+      for (row_r in 1:5) {
+        txt_list <- list(img = rep("", 5), cap = rep("", 5))
+        for (col_c in 1:5) {
+          val_fname <- paste0(feat_codes_1[col_c + 5*(row_r-1)], "_", dd, ".png")
+          # val_path  <- paste0(feat_hist_dir, val_fname)
+          txt_list$img[col_c] <- paste0("![](", val_path, ")")
+          txt_list$cap[col_c] <- feat_names_1[col_c + 5*(row_r-1)]
+        }
+        cat(img_row(txt_list))
+      }
+    }
+
+    ###################
+    ##  METHOD LOOP  ##
+    ###################
+    for (mm in mm_loop) {
+      cat("### Clustering method: ", clust_methods_list[mm], "\n\n", sep="")
+      
+      ### Internal validation ###
+      cat("**Internal validation**\n\n")
+      txt_list <- list(img = rep("", 5), cap = rep("", 5))
+      # val filename formation
+      for (ii in 1:3) {
+        val_fname <- paste0("meas_", ff, dd, mm, "11_", ii, ".png")
+        val_path  <- paste0(clValid_dir, "meas/", val_fname)
+        txt_list$img[ii] <- paste0("![](", val_path, ")")
+        txt_list$cap[ii] <- internal_val_list[ii]
+      }
+      cat(img_row(txt_list))
+      
+      ### Stability validation ###
+      cat("**Stability validation**\n\n")
+      txt_list <- list(img = rep("", 5), cap = rep("", 5))
+      # val filename formation
+      for (ii in 1:4) {
+        val_fname <- paste0("meas_", ff, dd, mm, "21_", ii, ".png")
+        val_path  <- paste0(clValid_dir, "meas/", val_fname)
+        txt_list$img[ii] <- paste0("![](", val_path, ")")
+        txt_list$cap[ii] <- stability_val_list[ii]
+      }
+      cat(img_row(txt_list))
+      
+      ####################
+      ##  CLUSTER LOOP  ##
+      ####################
+      for (cc in cc_loop) {
+        cat("#### ", feature_set_list[ff], " > ", dataset_list[dd], " > ",
+            clust_methods_list[mm], " > **Cluster #", cc, "**\n\n", sep="")
+        
+        # Initialization of image codes and caption texts
+        txt_list <- list(img = rep("", 5), cap = rep("", 5))
+        
+        # # Sort by cluster size
+        # idx <- numel_df$n1 == ff & numel_df$n2 == dd & numel_df$n3 == mm
+        # list_of_elements <- numel_df$numel[idx]
+        # ss <- sort(list_of_elements, index.return = TRUE, decreasing = T)
+        # The good ordered cc index
+        c2 <- cc
+        
+        
+        # Information about the number of elements per cluster
+        idx <- numel_df$n1 == ff & numel_df$n2 == dd & numel_df$n3 == mm &
+               numel_df$cc == c2
+        pct_value <- round(100*numel_df[idx]$pctel, 1)
+        if (pct_value == 0) pct_value <- "~0"
+        cat("Number of elements in cluster: ", numel_df[idx]$numel, " (",
+            pct_value, "%)\n\n", sep="")
+        
+        # HMP filename formation
+        hmp_fname <- paste0("hmp_", ff, dd, mm, "_", c2, "-", nc, ".png")
+        hmp_path  <- paste0(clValid_dir, "hmp/", hmp_fname)
+        
+        # Generate HMP code
+        if (file.exists(hmp_path)) {
+          txt_list$img[1] <- paste0("![](", hmp_path, ")")
+        } else {
+          txt_list$img[1] <- no_file
+        }
+        txt_list$cap[1] <- "Average yearly consumption"
+        
+        # GRAPH filename formation
+        graph_fname <- paste0("graph_", ff, dd, mm, "_", c2, "-", nc, ".png")
+        graph_path  <- paste0(clValid_dir, "graph/", graph_fname)
+        
+        # Generate GRAPH code
+        if (file.exists(graph_path)) {
+          txt_list$img[2] <- paste0("![](", graph_path, ")")
+        } else {
+          txt_list$img[2] <- no_file
+        }
+        txt_list$cap[2] <- "Feature distribution per cluster"
+        
+        ### SPECIFIC FILES OF GOIENER ###
+        if (dd == 1 | dd == 4) {
+          # GOI filename formation
+          goi1_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_1.png")
+          goi2_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_2.png")
+          goi3_fname <- paste0("goi_", ff, dd, mm, "_", c2, "-", nc, "_3.png")
+          goi1_path  <- paste0(clValid_dir, "goi/", goi1_fname)
+          goi2_path  <- paste0(clValid_dir, "goi/", goi2_fname)
+          goi3_path  <- paste0(clValid_dir, "goi/", goi3_fname)
+          
+          # Generate GOI code
+          if (file.exists(goi1_path)) {
+            txt_list$img[3] <- paste0("![](", goi1_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "Provinces"
+          
+          # Generate GOI code
+          if (file.exists(goi2_path)) {
+            txt_list$img[4] <- paste0("![](", goi2_path, ")")
+          } else {
+            txt_list$img[4] <- no_file
+          }
+          txt_list$cap[4] <- "CNAE codes"
+          
+          # Generate GOI code
+          if (file.exists(goi3_path)) {
+            txt_list$img[5] <- paste0("![](", goi3_path, ")")
+          } else {
+            txt_list$img[5] <- no_file
+          }
+          txt_list$cap[5] <- "Tariffs and contracted power"
+        }
+        
+        ### SPECIFIC FILES OF LCL ###
+        if (dd == 2) {
+          # GOI filename formation
+          lcl_fname <- paste0("lcl_", ff, dd, mm, "_", c2, "-", nc, ".png")
+          lcl_path  <- paste0(clValid_dir, "lcl/", lcl_fname)
+          
+          # Generate LCL code
+          if (file.exists(lcl_path)) {
+            txt_list$img[3] <- paste0("![](", lcl_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "ACORN segmentation"
+        }
+        
+        ### SPECIFIC FILES OF ISSDA ###
+        if (dd == 3) {
+          # ISS filename formation
+          iss1_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_1.png")
+          iss2_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_2.png")
+          iss3_fname <- paste0("iss_", ff, dd, mm, "_", c2, "-", nc, "_3.png")
+          iss1_path  <- paste0(clValid_dir, "iss/", iss1_fname)
+          iss2_path  <- paste0(clValid_dir, "iss/", iss2_fname)
+          iss3_path  <- paste0(clValid_dir, "iss/", iss3_fname)
+          
+          # Generate ISS code
+          if (file.exists(iss1_path)) {
+            txt_list$img[3] <- paste0("![](", iss1_path, ")")
+          } else {
+            txt_list$img[3] <- no_file
+          }
+          txt_list$cap[3] <- "Survey answers #1"
+          
+          # Generate ISS code
+          if (file.exists(iss2_path)) {
+            txt_list$img[4] <- paste0("![](", iss2_path, ")")
+          } else {
+            txt_list$img[4] <- no_file
+          }
+          txt_list$cap[4] <- "Survey answers #2"
+          
+          # Generate ISS code
+          if (file.exists(iss3_path)) {
+            txt_list$img[5] <- paste0("![](", iss3_path, ")")
+          } else {
+            txt_list$img[5] <- no_file
+          }
+          txt_list$cap[5] <- "Survey answers #3"
+        }
+
+        # Write code
+        cat(img_row(txt_list))
+      }
+    }
+  }
+}
+```
