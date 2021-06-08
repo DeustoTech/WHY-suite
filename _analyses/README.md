@@ -20,6 +20,7 @@ REMARK: ``selectable_variables.R`` must be included in the folder.
 3. ``clValid2-heatmaps_v02P.R``: Generate heatmap matrices and plots (check if .scale TRUE).
 4. ``clValid2-graphs_v04.R``: Plot features, statistics and surveys.
 5. ``clValid2-report_v01.Rmd``: Markdown report.
+6. ``clValid2-summary_report.Rmd``: Summary of heatmaps (markdown report when feats & stats are skipped).
 
 ## Cards
 See folder ``cards`` for printable heatmaps.

@@ -131,5 +131,13 @@ cluster_set <- list(
   # TYPE 1
   c(5, 10, 15, 20, seq(22, 40, 2), 50, 60, 70),
   # TYPE 2
-  24
+  24,
+  # TYPE 3 (ISS & LCL)
+  16,
+  # TYPE 4 (GOI)
+  30,
+  # TYPE 5 (POR)
+  4,
+  # TYPE 6 (all)
+  40
 )
