@@ -15,11 +15,12 @@ clValid2_heatmaps <- function() {
     source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/selectable_variables.R", local=T)
   }
   if (.Platform$OS.type == "unix") {
-    feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.15.csv"
-    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/data/"
+    feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_v1.17.csv"
+    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/data/"
     dataset_dir <- "/home/ubuntu/carlos.quesada/disk/"
-    hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/hmm/"
     hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/hmp/"
+    hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/hmm/"
+    hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.07_km-som-nodst/hmp/"
     source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R", local=T)
   }
   
@@ -36,7 +37,7 @@ clValid2_heatmaps <- function() {
     file   = feats_path,
     header = TRUE,
     sep    = ",",
-    select = c("data_set", "file", "imputed_na_pct", "is_household", "sum_per_day")
+    select = c("data_set", "file", "imputed_na_pct", "is_household", "sum_per_day", "minimum")
   )
   
   ################################################################################
@@ -69,7 +70,8 @@ clValid2_heatmaps <- function() {
         feats$data_set %in% dset_keys[[n2]]$keys &
         feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
         feats$is_household %in% dset_keys[[n2]]$is_hhold &
-        feats$sum_per_day > dset_keys[[n2]]$sum_pday
+        feats$sum_per_day > dset_keys[[n2]]$sum_pday &
+		feats$minimum >= 0
       
       w_feats <- feats[row_conditions,]
       w_fpath <- paste0(clValid_dir, w_fname)
