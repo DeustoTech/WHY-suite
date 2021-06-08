@@ -142,7 +142,7 @@ In **Survey answers #3**, the following Q&A can be found:
 ```{r, include=FALSE}
 ################################################################################
 ##  TO GENERATE AN HTML OUTPUT                                                ##
-##  rmarkdown::render("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/clValid2-report_v01.Rmd")                
+##  rmarkdown::render("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/clValid2-report_2021-06-08.Rmd")                
 ################################################################################
 
 # File paths
