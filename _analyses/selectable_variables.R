@@ -137,7 +137,7 @@ cluster_set <- list(
   # TYPE 4 (GOI)
   30,
   # TYPE 5 (POR)
-  4,
+  6,
   # TYPE 6 (all)
   40
 )
