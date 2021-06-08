@@ -1,4 +1,4 @@
-## THIS VERSION SCALES DATA
+## THIS VERSION SCALES DATA AND USES A DIFFERENT NUMBER OF CLUSTER PER DATASET
 
 library(foreach)
 library(clValid2)
@@ -97,36 +97,23 @@ get_cluster_analysis <- function(analysis_type) {
 ##  CALL TO THE FUNCTION
 ################################################################################
 
-# # Setup parallel backend to use many processors
-# cores <- 2 #parallel::detectCores() - 1
-# cl <- parallel::makeCluster(cores, outfile = "")
-# doParallel::registerDoParallel(cl)
-
 cluster_codes <- vector()
 
-for (dd in c(4, 2, 3, 5:7)) {
+for (dd in c(2:5, 7)) {
   for (ff in 1:4) {
     for (mm in c(2, 5)) {
       for (vv in 1) {
-        for (cc in 2) {
-          cluster_codes <-
-            c(cluster_codes, as.numeric(paste0(ff, dd, mm, vv, cc)))
-        }
+	    if (dd == 2) cc <- 3 # LCL 16 cl
+		if (dd == 3) cc <- 3 # ISS 16 cl
+		if (dd == 4) cc <- 4 # GOI 30 cl
+		if (dd == 5) cc <- 5 # POR  4 cl
+		if (dd == 7) cc <- 6 # all 40 cl
+        cluster_codes <- c(cluster_codes, as.numeric(paste0(ff, dd, mm, vv, cc)))
       }
     }
   }
 }
 
-# xx <- foreach::foreach(
-  # ii             = cluster_codes,
-  # .inorder       = FALSE,
-  # .errorhandling = "stop",
-  # .packages      = c("clValid2", "mclust")
-# ) %dopar% {
-
 for (ii in cluster_codes) {
   get_cluster_analysis(ii)
 }
-
-# # Stop parallelization
-# parallel::stopCluster(cl)
