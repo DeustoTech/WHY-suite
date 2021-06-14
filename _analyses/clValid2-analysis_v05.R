@@ -103,11 +103,12 @@ for (dd in c(2:5, 7)) {
   for (ff in 1:4) {
     for (mm in c(2, 5)) {
       for (vv in 1) {
-	    if (dd == 2) cc <- 3 # LCL 16 cl
-		if (dd == 3) cc <- 3 # ISS 16 cl
-		if (dd == 4) cc <- 4 # GOI 30 cl
-		if (dd == 5) cc <- 5 # POR  4 cl
-		if (dd == 7) cc <- 6 # all 40 cl
+  	    if (dd == 2) cc <- 3 # LCL 16 cl
+    		if (dd == 3) cc <- 3 # ISS 16 cl
+    		if (dd == 4) cc <- 4 # GOI 30 cl
+    		if (dd == 5) cc <- 5 # POR  6 cl
+    		if (dd == 7) cc <- 6 # all 40 cl
+    		
         cluster_codes <- c(cluster_codes, as.numeric(paste0(ff, dd, mm, vv, cc)))
       }
     }

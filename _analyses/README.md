@@ -22,6 +22,7 @@ REMARK: ``selectable_variables.R`` must be included in the folder.
 4. ``clValid2-graphs_v04.R``: Plot features, statistics and surveys.
 5. ``clValid2-report_v01.Rmd``: Markdown report.
 6. ``clValid2-summary_report.Rmd``: Summary of heatmaps (markdown report when feats & stats are skipped).
+    * ``v02``: for variable number of clusters per dataset (linked to ``clValid2-heatmaps_v03P.R``).
 
 ## Cards
 See folder ``cards`` for printable heatmaps.
