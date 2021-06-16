@@ -1,6 +1,6 @@
 ## Remarks
 
-* ``clValid2`` requires the installation of "tuned" ``clValid`` package.
+* ``clValid2`` requires the installation of "tuned" ``clValid2`` package.
 * ``selectable_variables.R`` must be included in the folder.
 
 ## Summary of files
