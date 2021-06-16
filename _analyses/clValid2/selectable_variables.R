@@ -1,4 +1,18 @@
 ################################################################################
+##  ROW CONDITIONS (FUNCTION)
+################################################################################
+
+row_conditions_fun <- function(feats, n2) {
+  return(
+    feats$data_set %in% dset_keys[[n2]]$keys &
+    feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
+    feats$is_household %in% dset_keys[[n2]]$is_hhold &
+    feats$sum_per_day > dset_keys[[n2]]$sum_pday &
+    feats$minimum >= 0
+  )
+}
+
+################################################################################
 ##  SELECTABLE VARIABLES
 ################################################################################
 
