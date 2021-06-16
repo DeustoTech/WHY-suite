@@ -11,7 +11,7 @@
 	* ``v05``: like ``v04`` but for variable number of clusters per dataset.
 	* REMARK: if variable ``row_conditions`` is modified here, it must be modified in ``clValid2-heatmaps_vXX.R`` too.
 2. ``clValid2-validations_v01.R``: Plot validation curves.
-3. ``clValid2-heatmaps_v02P.R``: Generate heatmap matrices and plots (check if .scale TRUE).
+3. ``clValid2-heatmaps_v02P.R``: Generate heatmap matrices (hmm) and heatmap plots (hmp). Check if ``.scale`` is ``TRUE``.
     * ``v03P``: for variable number of clusters per dataset (linked to ``clValid2-analysis_v05.R``).
 4. ``clValid2-graphs_v04.R``: Plot features, statistics and surveys.
 5. ``clValid2-report_v01.Rmd``: Markdown report.
