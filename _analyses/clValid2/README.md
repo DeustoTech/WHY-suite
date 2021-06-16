@@ -2,7 +2,10 @@
 
 * ``clValid2`` requires the installation of "tuned" ``clValid2`` package (**[here](https://github.com/quesadagranja/clValid2)**).
 * ``selectable_variables.R`` must be included in the folder.
-* Variable ``row_conditions`` is modified in ``clValid2-analysis_vXX.R``, modify it also in ``clValid2-heatmaps_vXX.R``.
+* Consider using ``row_conditions_fun`` in ``selectable_variables.R``. Variable ``row_conditions`` appears in:
+	* ``clValid2-analysis_vXX.R``
+	* ``clValid2-heatmaps_vXX.R``
+	* ``clValid2-graphs_vXX.R``
 
 ## Summary of files
 
