@@ -468,12 +468,12 @@ for (ff in 1:length(fnames)) {
   n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
   
   # Number of clusters
-  if (n2 == 2) cc <- 3 # LCL 16 cl
-  if (n2 == 3) cc <- 3 # ISS 16 cl
-  if (n2 == 4) cc <- 4 # GOI 30 cl
-  if (n2 == 5) cc <- 5 # POR  6 cl
-  if (n2 == 7) cc <- 6 # all 40 cl
-  number_of_clusters <- cluster_set[cc]
+  if (n2 == 2) cc_max <- 3 # LCL 16 cl
+  if (n2 == 3) cc_max <- 3 # ISS 16 cl
+  if (n2 == 4) cc_max <- 4 # GOI 30 cl
+  if (n2 == 5) cc_max <- 5 # POR  6 cl
+  if (n2 == 7) cc_max <- 6 # all 40 cl
+  number_of_clusters <- cluster_set[[cc_max]]
 
   for (cc in 1:number_of_clusters) {
 
@@ -481,11 +481,7 @@ for (ff in 1:length(fnames)) {
   
     if (skip_xxx2x & n4 != 2) {
       # Rows
-      row_conditions <- 
-        feats$data_set %in% dset_keys[[n2]]$keys &
-        feats$imputed_na_pct < dset_keys[[n2]]$imp_na_pct &
-        feats$is_household %in% dset_keys[[n2]]$is_hhold &
-        feats$sum_per_day > dset_keys[[n2]]$sum_pday
+      row_conditions <- row_conditions_fun(feats, n2)
       
       # Working features
       w_feats <- feats[row_conditions,]
