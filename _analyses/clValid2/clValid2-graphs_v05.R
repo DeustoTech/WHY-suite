@@ -2,6 +2,43 @@ library(foreach)
 library(stringr)
 
 ##############################################################################
+##  get_all_graphs()
+##############################################################################
+get_all_graphs <- function() {
+  # Create dir if it does not exist
+  if (!dir.exists(paste0(root_dir, "all/"))) {
+    dir.create(paste0(root_dir, "all/"))
+  }
+  
+  # Retrieve dataset keys
+  data_set_keys <- subset(
+    x      = feats,
+    subset = row_conditions,
+    select = "data_set"
+  )
+  
+  data_set_count <- setNames(
+    as.data.frame(table(data_set_keys[cluster_list == cc])),
+    c("keys", "n")
+  )
+  
+  # Name of the file to create
+  ft_fname <- paste0("all_", n1, n2, n3, "_", cc, "-", number_of_clusters, ".png")
+  # Open png file
+  png(
+    paste0(root_dir, "all/", ft_fname),
+    width = 1200,
+    height = 900
+  )
+  # Plot cluster contents (features 1 to 24)
+  par(fig=c(0,1,0,1), cex=1)
+  barplot(data_set_count$n, names.arg = data_set_count$keys)
+  
+  # Save file
+  dev.off()
+}
+
+##############################################################################
 ##  get_lcl_graphs()
 ##############################################################################
 get_lcl_graphs <- function() {
@@ -392,23 +429,25 @@ get_feature_graphs <- function() {
     # Save file
     dev.off()
   }
-  # REST OF FEATURE SETS
-  if (n1 != 1) {
-    # Save as PNG
-    png(
-      paste0(root_dir, "graph/", ft_fname),
-      width = 1200,
-      height = 900
-    )
-    # Plot cluster contents (features 1 to 7)
-    par(fig=c(0,1,0,1))
-    par(cex=0.9, mai=c(0.8,0.5,0.05,0.05))
-    cluster_elems <- w_feats[km$cluster == ii,]
-    # short_labels <- substr(names(cluster_elems), 10, 18)
-    boxplot(cluster_elems, las=2)
-    # Save file
-    dev.off()
-  }
+  
+  # # REST OF FEATURE SETS
+  
+  # if (n1 != 1) {
+  #   # Save as PNG
+  #   png(
+  #     paste0(root_dir, "graph/", ft_fname),
+  #     width = 1200,
+  #     height = 900
+  #   )
+  #   # Plot cluster contents (features 1 to 7)
+  #   par(fig=c(0,1,0,1))
+  #   par(cex=0.9, mai=c(0.8,0.5,0.05,0.05))
+  #   cluster_elems <- w_feats[km$cluster == ii,]
+  #   # short_labels <- substr(names(cluster_elems), 10, 18)
+  #   boxplot(cluster_elems, las=2)
+  #   # Save file
+  #   dev.off()
+  # }
 }
 
 ##############################################################################
@@ -418,7 +457,7 @@ get_feature_graphs <- function() {
 ##  PATHS
 # User defined variables
 if (.Platform$OS.type == "windows") {
-  feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.18.csv"
+  feats_path <- "G:/Mi unidad/WHY/Features/feats_v1.19.csv"
   root_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.06.08_km-som-var-cl/"
   source("G:/Mi unidad/WHY/Github/why-T2.1/_analyses/clValid2/selectable_variables.R")
 }
@@ -428,7 +467,10 @@ if (.Platform$OS.type == "unix") {
   source("/home/ubuntu/carlos.quesada/analyses/selectable_variables.R")
 }
 
-skip_xxx2x <- TRUE
+# Feature sets to skip
+skip_n1 <- 2:4
+# Validation methods to skip
+skip_n4 <- 2
 
 ##  COLORS
 boxplot_colors <- c(
@@ -461,11 +503,14 @@ numel_df <- data.frame()
 for (ff in 1:length(fnames)) {
   # Extract data from filename
   w_fname <- fnames[ff]
-  n1 <- as.numeric(substr(w_fname, 3, 3)) # features
+  n1 <- as.numeric(substr(w_fname, 3, 3)) # sets of features
   n2 <- as.numeric(substr(w_fname, 4, 4)) # datasets
   n3 <- as.numeric(substr(w_fname, 5, 5)) # cluster method
   n4 <- as.numeric(substr(w_fname, 6, 6)) # validation method
   n5 <- as.numeric(substr(w_fname, 7, 7)) # cluster sequence
+  
+  # Only seasonal aggregates
+  if (n1 %in% skip_n1 || n4 %in% skip_n4) next
   
   # Number of clusters
   if (n2 == 2) cc_max <- 3 # LCL 16 cl
@@ -476,103 +521,113 @@ for (ff in 1:length(fnames)) {
   number_of_clusters <- cluster_set[[cc_max]]
 
   for (cc in 1:number_of_clusters) {
-
     print(paste0(w_fname, " - ", cc))
   
-    if (skip_xxx2x & n4 != 2) {
-      # Rows
-      row_conditions <- row_conditions_fun(feats, n2)
-      
-      # Working features
-      w_feats <- feats[row_conditions,]
-      w_fpath <- paste0(root_dir, "data/", w_fname)
-      
-      if (file.exists(w_fpath)) {
-        load(w_fpath)
-        ### Get the clustering 
-        # HIERARCHICAL
-        if (n3 == 1) {
-          cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
-        }
-        # K-MEANS
-        if (n3 == 2) {
-          cluster_list <- o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
-        }
-        # DIANA
-        if (n3 == 3) {
-          cluster_list <- cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
-        }
-        # FANNY
-        if (n3 == 4) {
-          cluster_list <- o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
-        }
-        # SOM
-        if (n3 == 5) {
-          cluster_list <- o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
-        }
-        # PAM
-        if (n3 == 6) {
-          cluster_list <- o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
-        }
-        # SOTA
-        if (n3 == 7) {
-          cluster_list <- o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
-        }
-        # CLARA
-        if (n3 == 8) {
-          cluster_list <- o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
-        }
-        # MODEL-BASED
-        if (n3 == 9) {
-          cluster_list <- o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
-        }
-        ###########################
-        ##  Get cluster indices  ##
-        ###########################
-        cluster_idx <- cluster_list == cc
-        
-        ##################
-        ##  Get graphs  ##
-        ##################
-        
-        get_feature_graphs()
-        
-        # GOI & MEG
-        if (n2 == 1 | n2 == 4) {
-          # get_go2_graphs()
-        }
-        # LCL
-        if (n2 == 2) {
-          # get_lcl_graphs()
-        }
-        # ISS
-        if (n2 == 3) {
-          # get_iss_graphs()
-        }
-  
-        # Number of elements per cluster
-        new_df <- data.frame(
-          n1    = n1,
-          n2    = n2,
-          n3    = n3,
-          cc    = cc,
-          numel = sum(cluster_idx),
-          pctel = sum(cluster_idx) / sum(row_conditions)
-        )
-        numel_df <- rbind(numel_df, new_df)
+    # Rows
+    row_conditions <- row_conditions_fun(feats, n2)
+    
+    # Working features
+    w_feats <- feats[row_conditions,]
+    w_fpath <- paste0(root_dir, "data/", w_fname)
+    
+    if (file.exists(w_fpath)) {
+      load(w_fpath)
+      ### Get the clustering 
+      # HIERARCHICAL
+      if (n3 == 1) {
+        cluster_list <- 
+          cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
       }
+      # K-MEANS
+      if (n3 == 2) {
+        cluster_list <- 
+          o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
+      }
+      # DIANA
+      if (n3 == 3) {
+        cluster_list <- 
+          cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
+      }
+      # FANNY
+      if (n3 == 4) {
+        cluster_list <- 
+          o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # SOM
+      if (n3 == 5) {
+        cluster_list <- 
+          o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
+      }
+      # PAM
+      if (n3 == 6) {
+        cluster_list <- 
+          o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # SOTA
+      if (n3 == 7) {
+        cluster_list <- 
+          o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
+      }
+      # CLARA
+      if (n3 == 8) {
+        cluster_list <- 
+          o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
+      }
+      # MODEL-BASED
+      if (n3 == 9) {
+        cluster_list <- 
+          o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
+      }
+      ###########################
+      ##  Get cluster indices  ##
+      ###########################
+      cluster_idx <- cluster_list == cc
+      
+      ##################
+      ##  Get graphs  ##
+      ##################
+      
+      get_feature_graphs()
+      
+      # GOI & MEG
+      if (n2 == 1 | n2 == 4) {
+        # get_go2_graphs()
+      }
+      # LCL
+      if (n2 == 2) {
+        # get_lcl_graphs()
+      }
+      # ISS
+      if (n2 == 3) {
+        # get_iss_graphs()
+      }
+      # all
+      if (n2 == 7) {
+        # get_all_graphs()
+      }
+
+      # Number of elements per cluster
+      # new_df <- data.frame(
+      #   n1    = n1,
+      #   n2    = n2,
+      #   n3    = n3,
+      #   cc    = cc,
+      #   numel = sum(cluster_idx),
+      #   pctel = sum(cluster_idx) / sum(row_conditions)
+      # )
+      # numel_df <- rbind(numel_df, new_df)
     }
   }
 }
 
 # Save
-data.table::fwrite(
-  x         = numel_df,
-  file      = paste0(root_dir, "numel_df.csv"),
-  append    = F,
-  quote     = F,
-  sep       = ",",
-  row.names = F,
-  col.names = T,
-  dateTimeAs = "write.csv"
-)
+# data.table::fwrite(
+#   x         = numel_df,
+#   file      = paste0(root_dir, "numel_df.csv"),
+#   append    = F,
+#   quote     = F,
+#   sep       = ",",
+#   row.names = F,
+#   col.names = T,
+#   dateTimeAs = "write.csv"
+# )

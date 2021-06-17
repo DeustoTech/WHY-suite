@@ -1,8 +1,8 @@
 # User defined variables
 if (.Platform$OS.type == "windows") {
   # clValid files
-  clValid_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/data/"
-  output_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.05.15_3-cl-methods-hmp-scaled/"
+  clValid_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.06.08_km-som-var-cl/data_complete/"
+  output_dir <- "G:/Mi unidad/WHY/Analyses/clValid2/2021.06.08_km-som-var-cl/"
 }
 if (.Platform$OS.type == "unix") {
   # TO BE FILLED IF REQUIRED
