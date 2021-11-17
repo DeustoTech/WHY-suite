@@ -12,15 +12,10 @@
 #' @export
 
 get_samples_per_day <- function() {
-  list(
-    goi = 24, 
-    go2 = 24,
-    iss = 48, 
-    lcl = 48, 
-    nee = 96,
-    por = 96,
-    ref = 24 
-  )
+  f <- read.csv(file="samples_per_day.csv", header=FALSE)
+  l <- as.list(f$V2)
+  names(l) <- f$V1
+  return(l)
 }
 
 ################################################################################
