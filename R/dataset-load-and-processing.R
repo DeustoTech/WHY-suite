@@ -441,7 +441,6 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   # }
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
-  print(dset_filenames)
   # Extract relevant data from metadata files (if any!)
   if (!is.null(metadata_files)) {
     # Load metadata dataframes into a big list
