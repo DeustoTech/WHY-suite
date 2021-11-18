@@ -75,6 +75,11 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   # Selection
   spd <- spd[[dset_key]]
   
+  print(from_date)
+  print(to_date)
+  print(raw_df$times[1])
+  print(raw_df$times[nrow(raw_df)])
+  
   # Time series ends
   first_ts_date <- raw_df$times[1]
   last_ts_date <- raw_df$times[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
@@ -93,9 +98,9 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   }
   
   print(from_date)
-  print(last_ts_date)
   print(to_date)
   print(first_ts_date)
+  print(last_ts_date)
   
   # Adjust date limits to existing data
   if (from_date < last_ts_date & to_date > first_ts_date) {
