@@ -453,7 +453,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  out <- foreach::foreach (x = 1:length_fnames, .packages = pkg) %dopar% {
+  %out <- foreach::foreach (x = 1:length_fnames, .packages = pkg) %dopar% {
+    for(x = 1:length_fnames, .packages = pkg) {
     
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
