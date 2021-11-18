@@ -12,10 +12,16 @@
 #' @export
 
 get_samples_per_day <- function() {
-  f <- read.csv(file="samples_per_day.csv", header=FALSE)
-  l <- as.list(f$V2)
-  names(l) <- f$V1
-  return(l)
+  list(
+    goi = 24, 
+    go2 = 24,
+    go3 = 24,
+    iss = 48, 
+    lcl = 48, 
+    nee = 96,
+    por = 96,
+    ref = 24 
+  )
 }
 
 ################################################################################
@@ -113,25 +119,112 @@ extract_metadata <- function(dfs, dset_key, filename) {
   
   # Goiener
   if (dset_key %in% c("goi", "go2")) {
+    
+    out <- list()
+    
     # Identify current user
     cups <- strsplit(filename, ".csv")[[1]]
-    # There may be several entries for a cups: get index (highest date)
-    idx <- which.max(as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2]))
-    # Get all data
-    start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][idx], tz="GMT")
-    end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][idx], tz="GMT")
-    tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][idx]
-    p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][idx])
-    p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][idx])
-    p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][idx])
-    self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][idx]
-    province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][idx]
-    municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][idx]
-    zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][idx])
-    cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][idx])
+    out[["cups"]] <- cups
     
-    return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
-                self_consump, province, municipality, zip_code, cnae))
+    if("cups_ref" %in% colnames(dfs[[1]])) {
+      idx <- which.max(dfs[[1]]$cups_ref == cups)
+      out[["idx"]] <- cups
+    }
+    if("fecha_alta" %in% colnames(dfs[[1]])) {
+      start_date <- lubridate::ymd(dfs[[1]]$fecha_alta[idx])
+      out[["start_date"]] <- cups
+    }
+    if("fecha_baja" %in% colnames(dfs[[1]])) {
+      end_date <- lubridate::ymd(dfs[[1]]$fecha_baja[idx])
+      out[["end_date"]] <- cups
+    }
+    if("tarifa_ref" %in% colnames(dfs[[1]])) {
+      ref_tariff <- dfs[[1]]$tarifa_ref[idx]
+      ref_tariff <- iconv(ref_tariff, from="UTF-8", to="ASCII//TRANSLIT")
+      out[["ref_tariff"]] <- cups
+    }
+    if("tarifa.tarifa_atr_ref" %in% colnames(dfs[[1]])) {
+      ref_tariff_2 <- dfs[[1]]$tarifa.tarifa_atr_ref[idx]
+      out[["ref_tariff_2"]] <- cups
+    }
+    if("proceso_atr_ref" %in% colnames(dfs[[1]])) {
+      process <- dfs[[1]]$proceso_atr_ref[idx]
+      out[["process"]] <- cups
+    }
+    if("modo_facturacion_ref" %in% colnames(dfs[[1]])) {
+      billing_type <- dfs[[1]]$modo_facturacion_ref[idx]
+      out[["billing_type"]] <- cups
+    }
+    if("margen_indexado" %in% colnames(dfs[[1]])) {
+      indexed_margin <- dfs[[1]]$margen_indexado[idx]
+      out[["indexed_margin"]] <- cups
+    }
+    if("tipo_autoconsumo_ref" %in% colnames(dfs[[1]])) {
+      self_consump <- dfs[[1]]$y[idx]
+      out[["self_consump"]] <- cups
+    }
+    if("p1_kw" %in% colnames(dfs[[1]])) {
+      p1_kw <- dfs[[1]]$p1_kw[idx]
+      out[["p1_kw"]] <- cups
+    }
+    if("p2_kw" %in% colnames(dfs[[1]])) {
+      p2_kw <- dfs[[1]]$p2_kw[idx]
+      out[["p2_kw"]] <- cups
+    }
+    if("p3_kw" %in% colnames(dfs[[1]])) {
+      p3_kw <- dfs[[1]]$p3_kw[idx]
+      out[["p3_kw"]] <- cups
+    }
+    if("p4_kw" %in% colnames(dfs[[1]])) {
+      p4_kw <- dfs[[1]]$p4_kw[idx]
+      out[["p4_kw"]] <- cups
+    }
+    if("p5_kw" %in% colnames(dfs[[1]])) {
+      p5_kw <- dfs[[1]]$p5_kw[idx]
+      out[["p5_kw"]] <- cups
+    }
+    if("p6_kw" %in% colnames(dfs[[1]])) {
+      p6_kw <- dfs[[1]]$p6_kw[idx]
+      out[["p6_kw"]] <- cups
+    }
+    if("cups.direccion_prov.nombre_oficial" %in% colnames(dfs[[1]])) {
+      province <- dfs[[1]]$cups.direccion_prov.nombre_oficial[idx]
+      province <- iconv(province, from="UTF-8", to="ASCII//TRANSLIT")
+      out[["province"]] <- cups
+    }
+    if("cups.direccion_muni.nombre_oficial" %in% colnames(dfs[[1]])) {
+      municipality <- dfs[[1]]$cups.direccion_muni.nombre_oficial[idx]
+      municipality <- iconv(municipality, from="UTF-8", to="ASCII//TRANSLIT")
+      out[["municipality"]] <- cups
+    }
+    if("cups.direccion_cp" %in% colnames(dfs[[1]])) {
+      zip_code <- dfs[[1]]$cups.direccion_cp[idx]
+      out[["zip_code"]] <- cups
+    }
+    if("cnae" %in% colnames(dfs[[1]])) {
+      cnae <- dfs[[1]]$cnae[idx]
+      out[["cnae"]] <- cups
+    }
+  
+    # # There may be several entries for a cups: get index (highest date)
+    # idx <- which.max(as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups, 2]))
+    # # Get all data
+    # start_date   <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  2][idx], tz="GMT")
+    # end_date     <- as.POSIXct(dfs[[1]][dfs[[1]][,1] == cups,  3][idx], tz="GMT")
+    # tariff       <-            dfs[[1]][dfs[[1]][,1] == cups,  4][idx]
+    # p1_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  5][idx])
+    # p2_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  6][idx])
+    # p3_kw        <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups,  7][idx])
+    # self_consump <-            dfs[[1]][dfs[[1]][,1] == cups,  8][idx]
+    # province     <-            dfs[[1]][dfs[[1]][,1] == cups,  9][idx]
+    # municipality <-            dfs[[1]][dfs[[1]][,1] == cups, 10][idx]
+    # zip_code     <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 11][idx])
+    # cnae         <- as.numeric(dfs[[1]][dfs[[1]][,1] == cups, 12][idx])
+    
+    # return(list(cups, start_date, end_date, tariff, p1_kw, p2_kw, p3_kw,
+                # self_consump, province, municipality, zip_code, cnae))
+    
+    return(out)
   }
   
   # ISSDA

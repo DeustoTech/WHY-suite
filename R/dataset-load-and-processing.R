@@ -22,7 +22,7 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
     na.strings = ""
   )
   # Times
-  times <- as.POSIXct(data$V1, tz="GMT")
+  times <- lubridate::ydm_hms(data$V1)
   # Values
   values <- data$V2
   # 2 columns
@@ -36,7 +36,7 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
       return(data.frame(times, values, imputed))
     } else {
       # Original times
-      original_times <- as.POSIXct(data$V4, tz="GMT")
+      original_times <- lubridate::ydm_hms(data$V4)
       # 4 columns
       if (ncol(data) == 4) {
         return(data.frame(times, values, imputed, original_times))
@@ -71,24 +71,24 @@ get_dataframe <- get_raw_dataframe_from_dataset
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
   # List of samples per day (REMARK: ADD AS NEEDED!)
-  samples_per_day <- whyT2.1::get_samples_per_day()
+  spd <- whyT2.1::get_samples_per_day()
   # Selection
-  spd <- samples_per_day[[dset_key]]
+  spd <- spd[[dset_key]]
   
   # Time series ends
-  first_ts_date <- raw_df[[1, 1]]
-  last_ts_date <- utils::tail(raw_df, 1)[[1, 1]]
-
+  first_ts_date <- raw_df$V1[1]
+  last_ts_date <- raw_df$V1[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
+  
   # Check interval left end
   if (any(class(from_date) == "character")) {
     if (from_date == "first") {
-      from_date <- raw_df[[1, 1]]
+      from_date <- first_ts_date
     }
   }
   # Check interval right end
   if (any(class(to_date) == "character")) {
     if (to_date == "last") {
-      to_date <- utils::tail(raw_df, 1)[[1, 1]]
+      to_date <- last_ts_date
     }
   }
   # Adjust date limits to existing data
@@ -100,27 +100,31 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   }
   
   # Sampling period in seconds obtained from the dataset key
-  sampling_period_in_secs <- 86400 / spd
+  #sampling_period_in_secs <- 86400 / spd
   # Step as difftime
-  period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
+  #period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
   
   # Create time sequence
-  time_seq <- seq(from_date, to_date, period_in_secs)
-
-  # Bin by corresponding periods
-  break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
-  cut_seq <- cut(raw_df$times, breaks = break_in_mins)
-  # Aggregate data (sum) according to the bins
-  sum_aggr_ts  <- stats::aggregate(
-    x   = raw_df$values,
-    by  = list(date_time = cut_seq),
-    FUN = sum)
-
-  # Find matches in dataframe (this completes missing samples with NA values
-  # and removes extra samples out of the sampling period)
-  mm <- match(time_seq, as.POSIXct(sum_aggr_ts$date_time, tz="GMT"))
-  # Output
-  cooked_df <- data.frame(times = time_seq, values = sum_aggr_ts$x[mm])
+  time_seq <- seq(from_date, to_date, by=paste(86400 / spd, "sec"))
+  
+  # Complete data frame
+  cooked_df <- raw_df %>% tidyr::complete(times=time_seq)
+  
+  
+  # # Bin by corresponding periods
+  # break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
+  # cut_seq <- cut(raw_df$times, breaks = break_in_mins)
+  # # Aggregate data (sum) according to the bins
+  # sum_aggr_ts  <- stats::aggregate(
+  #   x   = raw_df$values,
+  #   by  = list(date_time = cut_seq),
+  #   FUN = sum)
+  # 
+  # # Find matches in dataframe (this completes missing samples with NA values
+  # # and removes extra samples out of the sampling period)
+  # mm <- match(time_seq, as.POSIXct(sum_aggr_ts$date_time, tz="GMT"))
+  # # Output
+  # cooked_df <- data.frame(times = time_seq, values = sum_aggr_ts$x[mm])
   
   # Get seasonal periods
   seasonal_periods <- NULL
@@ -142,7 +146,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   number_of_na <- sum(is.na(cooked_df[,2]))
   # Check if all values are 0
   cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
-
+  
   # Common list
   common_list <- list(
     df               = cooked_df,
@@ -160,6 +164,98 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   return(output)
 }
+
+# cook_raw_dataframe_OLD <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
+#   # List of samples per day (REMARK: ADD AS NEEDED!)
+#   samples_per_day <- whyT2.1::get_samples_per_day()
+#   # Selection
+#   spd <- samples_per_day[[dset_key]]
+#   
+#   # Time series ends
+#   first_ts_date <- raw_df[[1, 1]]
+#   last_ts_date <- utils::tail(raw_df, 1)[[1, 1]]
+# 
+#   # Check interval left end
+#   if (any(class(from_date) == "character")) {
+#     if (from_date == "first") {
+#       from_date <- raw_df[[1, 1]]
+#     }
+#   }
+#   # Check interval right end
+#   if (any(class(to_date) == "character")) {
+#     if (to_date == "last") {
+#       to_date <- utils::tail(raw_df, 1)[[1, 1]]
+#     }
+#   }
+#   # Adjust date limits to existing data
+#   if (from_date < last_ts_date & to_date > first_ts_date) {
+#     from_date <- max(from_date, first_ts_date)
+#     to_date   <- min(to_date, last_ts_date)
+#   } else {
+#     return(NULL)
+#   }
+#   
+#   # Sampling period in seconds obtained from the dataset key
+#   sampling_period_in_secs <- 86400 / spd
+#   # Step as difftime
+#   period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
+#   
+#   # Create time sequence
+#   time_seq <- seq(from_date, to_date, period_in_secs)
+# 
+#   # Bin by corresponding periods
+#   break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
+#   cut_seq <- cut(raw_df$times, breaks = break_in_mins)
+#   # Aggregate data (sum) according to the bins
+#   sum_aggr_ts  <- stats::aggregate(
+#     x   = raw_df$values,
+#     by  = list(date_time = cut_seq),
+#     FUN = sum)
+# 
+#   # Find matches in dataframe (this completes missing samples with NA values
+#   # and removes extra samples out of the sampling period)
+#   mm <- match(time_seq, as.POSIXct(sum_aggr_ts$date_time, tz="GMT"))
+#   # Output
+#   cooked_df <- data.frame(times = time_seq, values = sum_aggr_ts$x[mm])
+#   
+#   # Get seasonal periods
+#   seasonal_periods <- NULL
+#   cooked_df_length <- dim(cooked_df)[1]
+#   # Days
+#   if (cooked_df_length > 2 * spd) {
+#     seasonal_periods <- c(seasonal_periods, spd)
+#   }
+#   # Weeks
+#   if (cooked_df_length > 2 * 7 * spd) {
+#     seasonal_periods <- c(seasonal_periods, 7 * spd)
+#   }
+#   # Years
+#   if (cooked_df_length > 2 * 365 * spd) {
+#     seasonal_periods <- c(seasonal_periods, 365 * spd)
+#   }
+#   
+#   # Number of NA
+#   number_of_na <- sum(is.na(cooked_df[,2]))
+#   # Check if all values are 0
+#   cooked_df_is_0 <- all(cooked_df[!is.na(cooked_df[,2]),2] == 0.0)
+# 
+#   # Common list
+#   common_list <- list(
+#     df               = cooked_df,
+#     dset_key         = dset_key,
+#     filename         = filename,
+#     seasonal_periods = seasonal_periods,
+#     number_of_na     = number_of_na,
+#     is_0             = cooked_df_is_0
+#   )
+#   # Particular list 
+#   dset_list <- get_dataset_dependent_metadata(dset_key, metadata)
+#   
+#   # Append both lists
+#   output <- append(common_list, dset_list)
+#   
+#   return(output)
+# }
 
 ################################################################################
 # impute_cooked_dataframe
