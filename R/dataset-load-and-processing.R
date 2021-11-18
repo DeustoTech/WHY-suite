@@ -75,11 +75,6 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   # Selection
   spd <- spd[[dset_key]]
   
-  print(from_date)
-  print(to_date)
-  print(raw_df$times[1])
-  print(raw_df$times[nrow(raw_df)])
-  
   print(head(raw_df))
   
   # Time series ends
@@ -98,11 +93,6 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
       to_date <- last_ts_date
     }
   }
-  
-  print(from_date)
-  print(to_date)
-  print(first_ts_date)
-  print(last_ts_date)
   
   # Adjust date limits to existing data
   if (from_date < last_ts_date & to_date > first_ts_date) {
@@ -473,9 +463,9 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
     
-    #print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
+    print(dset_filename)
     # Extract metadata
     if (!is.null(metadata_files)) {
       metadata_list <- extract_metadata(
