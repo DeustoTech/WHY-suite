@@ -443,9 +443,9 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   }
   
   # Setup parallel backend to use many processors
-  cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores, outfile = "")
-  doParallel::registerDoParallel(cl)
+  # cores <- parallel::detectCores() - 1
+  # cl <- parallel::makeCluster(cores, outfile = "")
+  # doParallel::registerDoParallel(cl)
   
   # Progress bar
   pb <- txtProgressBar(style=3)
