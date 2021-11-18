@@ -22,7 +22,7 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
     na.strings = ""
   )
   # Times
-  times <- lubridate::ydm_hms(data$V1)
+  times <- lubridate::ymd_hms(data$V1)
   # Values
   values <- data$V2
   # 2 columns
