@@ -416,7 +416,9 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1, extend_afte
 #'
 #' @export
 
-extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last", extend_after_end=TRUE) {
+extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, 
+                           metadata_files=NULL, from_date="first", to_date="last", 
+                           extend_after_end=TRUE) {
   
   # Check for correct date precedence
   if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
@@ -444,11 +446,19 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, m
   cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
   
+  # Progress bar
+  pb <- txtProgressBar(style=3)
+  # fnames length
+  length_fnames <- length(dset_filenames)
+  
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg) %dopar% {
+  out <- foreach::foreach (x = 1:length_fnames, .packages = pkg) %dopar% {
     
-    print(dset_filenames[x])
+    # Set progress bar
+    setTxtProgressBar(pb, x/length_fnames)
+    
+    #print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
     # Extract metadata
