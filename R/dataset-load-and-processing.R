@@ -91,6 +91,12 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
       to_date <- last_ts_date
     }
   }
+  
+  print(from_date)
+  print(last_ts_date)
+  print(to_date)
+  print(first_ts_date)
+  
   # Adjust date limits to existing data
   if (from_date < last_ts_date & to_date > first_ts_date) {
     from_date <- max(from_date, first_ts_date)
@@ -105,8 +111,6 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   #period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
   
   # Create time sequence
-  print(from_date)
-  print(to_date)
   time_seq <- seq(from_date, to_date, by=paste(86400 / spd, "sec"))
   
   # Complete data frame
