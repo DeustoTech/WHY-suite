@@ -423,6 +423,8 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
                            metadata_files=NULL, from_date="first", to_date="last", 
                            extend_after_end=TRUE) {
   
+  library(tidyr)
+  
   # # Check for correct date precedence
   # if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
   #   if (from_date >= to_date) {
