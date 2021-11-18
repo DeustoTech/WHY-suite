@@ -428,6 +428,7 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   }
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
+  print(dset_filenames)
   # Extract relevant data from metadata files (if any!)
   if (!is.null(metadata_files)) {
     # Load metadata dataframes into a big list
@@ -450,6 +451,7 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   pb <- txtProgressBar(style=3)
   # fnames length
   length_fnames <- length(dset_filenames)
+  print(length_fnames)
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
