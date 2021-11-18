@@ -80,7 +80,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   print(raw_df$times[1])
   print(raw_df$times[nrow(raw_df)])
   
-  head(raw_df)
+  print(head(raw_df))
   
   # Time series ends
   first_ts_date <- raw_df$times[1]
