@@ -76,8 +76,8 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   spd <- spd[[dset_key]]
   
   # Time series ends
-  first_ts_date <- raw_df$V1[1]
-  last_ts_date <- raw_df$V1[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
+  first_ts_date <- raw_df$times[1]
+  last_ts_date <- raw_df$times[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
   
   # Check interval left end
   if (any(class(from_date) == "character")) {
@@ -426,12 +426,12 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
                            metadata_files=NULL, from_date="first", to_date="last", 
                            extend_after_end=TRUE) {
   
-  # Check for correct date precedence
-  if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
-    if (from_date >= to_date) {
-      stop("to_date must be greater than from_date", call. = FALSE)
-    }
-  }
+  # # Check for correct date precedence
+  # if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
+  #   if (from_date >= to_date) {
+  #     stop("to_date must be greater than from_date", call. = FALSE)
+  #   }
+  # }
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   print(dset_filenames)
