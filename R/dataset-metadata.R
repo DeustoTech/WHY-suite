@@ -20,7 +20,11 @@ get_samples_per_day <- function() {
     lcl = 48, 
     nee = 96,
     por = 96,
-    ref = 24 
+    ref = 24,
+    go3_pre = 24,
+    go3_pst = 24,
+    go3_p20 = 24,
+    go3_P21 = 24
   )
 }
 
@@ -48,7 +52,8 @@ get_dataset_dependent_metadata <- function(dset_key, metadata) {
       acorn_grouped = metadata[[3]]
     )
   }
-  if (dset_key %in% c("goi", "go2", "go3")) {
+  if (dset_key %in%
+      c("goi", "go2", "go3", "go3_pre", "go3_pst", "go3_p20", "go3_p21")) {
     dset_list <- metadata
     # dset_list <- list(
     #   cups         = metadata[[1]],      
@@ -119,7 +124,8 @@ extract_metadata <- function(dfs, dset_key, filename) {
   }
   
   # Goiener
-  if (dset_key %in% c("goi", "go2", "go3")) {
+  if (dset_key %in%
+      c("goi", "go2", "go3", "go3_pre", "go3_pst", "go3_p20", "go3_p21")) {
     out <- list()
     
     # Identify current user
