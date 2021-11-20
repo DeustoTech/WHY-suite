@@ -70,6 +70,7 @@ get_dataframe <- get_raw_dataframe_from_dataset
 #' @export
 
 cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NULL, metadata=NULL) {
+  library(tidyr)
   # List of samples per day (REMARK: ADD AS NEEDED!)
   spd <- whyT2.1::get_samples_per_day()
   # Selection
