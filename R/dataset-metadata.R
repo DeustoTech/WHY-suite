@@ -127,15 +127,16 @@ extract_metadata <- function(dfs, dset_key, filename) {
     out[["cups"]] <- cups
     
     if("cups_ref" %in% colnames(dfs[[1]])) {
-      idx <- which.max(dfs[[1]]$cups_ref == cups)
+      all_idx <- which(dfs[[1]]$cups_ref == cups)
+      idx <- max(all_idx)
       out[["mdata_file_idx"]] <- idx
     }
     if("fecha_alta" %in% colnames(dfs[[1]])) {
-      start_date <- lubridate::ymd(dfs[[1]]$fecha_alta[idx])
+      start_date <- min(lubridate::ymd(dfs[[1]]$fecha_alta[all_idx]))
       out[["start_date"]] <- start_date
     }
     if("fecha_baja" %in% colnames(dfs[[1]])) {
-      end_date <- lubridate::ymd(dfs[[1]]$fecha_baja[idx])
+      end_date <- max(lubridate::ymd(dfs[[1]]$fecha_baja[all_idx]))
       out[["end_date"]] <- end_date
     }
     if("tarifa_ref" %in% colnames(dfs[[1]])) {

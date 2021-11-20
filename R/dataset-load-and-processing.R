@@ -75,8 +75,6 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   # Selection
   spd <- spd[[dset_key]]
   
-  print(head(raw_df))
-  
   # Time series ends
   first_ts_date <- raw_df$times[1]
   last_ts_date <- raw_df$times[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
@@ -111,7 +109,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   time_seq <- seq(from_date, to_date, by=paste(86400 / spd, "sec"))
   
   # Complete data frame
-  cooked_df <- raw_df %>% tidyr::complete(times=time_seq)
+  cooked_df <- as.data.frame(raw_df %>% tidyr::complete(times=time_seq))
 
   # # Bin by corresponding periods
   # break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
@@ -279,23 +277,37 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
 #' @export
 
 impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="interpolation", long_algorithm="locf") {
-    # Time series pending imputation
-    not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
-    
-    # Imputed time series
+    # Initialize
+  imp_ts <- NULL
+  
+  # Time series pending imputation
+  not_imp_ts <- ts(data=cdf$df[,2], frequency=season) # 1 week
+
+  # Imputed time series
+  try(
     imp_ts <- imputeTS::na_seasplit(
       not_imp_ts, algorithm = short_algorithm, maxgap = short_gap
-    )
+    ),
+    silent=TRUE
+  )
+  try(
     imp_ts <- imputeTS::na_seasplit(
       imp_ts, algorithm = long_algorithm
-    )
+    ),
+    silent=TRUE
+  )
+  
+  if(!is.null(imp_ts)) {
     # Imputed dataframe
     cdf$df <- data.frame(
       times   = cdf$df[,1],
       values  = as.double(imp_ts),
       imputed = as.integer(is.na(not_imp_ts))
     )
-    return(cdf)
+  } else {
+    cdf <- NULL
+  }
+  return(cdf)
 }
 
 ################################################################################
@@ -318,6 +330,7 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 
 extend_imputed_dataframe <- function(idf, wanted_days, back_years=1, extend_after_end=TRUE) {
   # Get current length in months of idf
+  browser()
   idf_init_date  <- idf$df[1,1]
   idf_final_date <- tail(idf$df, n=1)[[1]]
   idf_days       <- as.numeric(idf_final_date - idf_init_date)
