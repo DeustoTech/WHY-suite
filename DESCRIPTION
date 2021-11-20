@@ -9,7 +9,6 @@ License: The Unlicense
 Encoding: UTF-8
 LazyData: true
 Imports:
-  catch22,
   cluster,
   clusterSim,
   data.table,
@@ -26,7 +25,7 @@ Imports:
   parallel,
   Rfast,
   stats,
-  tidyverse,
+  tidyr,
   tsfeatures,
   utils
 Depends:
