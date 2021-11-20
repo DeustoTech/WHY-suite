@@ -112,8 +112,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   # Complete data frame
   cooked_df <- raw_df %>% tidyr::complete(times=time_seq)
-  
-  
+
   # # Bin by corresponding periods
   # break_in_mins <- paste(as.numeric(period_in_secs)/60, "min")
   # cut_seq <- cut(raw_df$times, breaks = break_in_mins)
@@ -159,7 +158,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     number_of_na     = number_of_na,
     is_0             = cooked_df_is_0
   )
-  # Particular list 
+  # Particular list
   dset_list <- get_dataset_dependent_metadata(dset_key, metadata)
   
   # Append both lists
@@ -400,12 +399,12 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1, extend_afte
 ################################################################################
 
 #' Extension of dataset files from folder of raw datasets
-#'
+#' 
 #' @description
 #' Compute the extended dataframes from an input folder of raw datasets and store them in an output folder.
 #' 
 #' @details Automatizes the following sequence for a whole folder: raw dataset -> raw dataframe -> cooked dataframe -> imputed dataframe -> extended dataframe -> extended dataset.
-#'
+#' 
 #' @param input_folder Input folder of datasets.
 #' @param output_folder Desired output folder of extended datasets.
 #' @param wanted_days Minimum number of complete days of the final extended datasets.
@@ -413,24 +412,127 @@ extend_imputed_dataframe <- function(idf, wanted_days, back_years=1, extend_afte
 #' @param metadata_files Path or vector of paths to metadata files. Metadata files MUST contain a header and be comma-separated (",").
 #' @param from_date Initial date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{first}.
 #' @param to_date Final date and time of the interval. Either a \code{POSIXct} class in the GMT time zone OR a string \code{last}.
-#' @param extend_after_end If \code{TRUE}, the expansion is appended after the end of the time series; if \code{FALSE}, the expansion is prepended before the beginning of the time series. 
-#'
+#' @param extend_after_end If \code{TRUE}, the expansion is appended after the end of the time series; if \code{FALSE}, the expansion is prepended before the beginning of the time series.
+#' 
 #' @return As many extended dataframes as files in the raw dataset folder. The dataframes are saved as R files with extension \code{.RData}.
-#'
+#' 
 #' @export
 
-extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, 
-                           metadata_files=NULL, from_date="first", to_date="last", 
-                           extend_after_end=TRUE) {
+# extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, 
+#                            metadata_files=NULL, from_date="first", to_date="last", 
+#                            extend_after_end=TRUE, working_with_generation=FALSE) {
+#   
+#   # # Check for correct date precedence
+#   # if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
+#   #   if (from_date >= to_date) {
+#   #     stop("to_date must be greater than from_date", call. = FALSE)
+#   #   }
+#   # }
+#   # Get list of filenames in dataset folder
+#   dset_filenames <- list.files(input_folder)
+#   # Extract relevant data from metadata files (if any!)
+#   if (!is.null(metadata_files)) {
+#     # Load metadata dataframes into a big list
+#     metadata_dataframes <- lapply(
+#       metadata_files,
+#       data.table::fread,
+#       header     = TRUE,
+#       sep        = ",",
+#       na.strings = "",
+#       encoding   = "UTF-8"
+#     )
+#   }
+#   
+#   # Setup parallel backend to use many processors
+#   # cores <- parallel::detectCores() - 1
+#   # cl <- parallel::makeCluster(cores, outfile = "")
+#   # doParallel::registerDoParallel(cl)
+#   
+#   # Progress bar
+#   pb <- txtProgressBar(style=3)
+#   # fnames length
+#   length_fnames <- length(dset_filenames)
+# 
+#   # Analysis loop
+#   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
+#   #out <- foreach::foreach (x = 1:length_fnames, .packages = pkg) %dopar% {
+#     for(x in 1:length_fnames) {
+#     
+#     # Set progress bar
+#     setTxtProgressBar(pb, x/length_fnames)
+#     
+#     # File name selection
+#     dset_filename <- dset_filenames[x]
+#     print(dset_filename)
+#     # Extract metadata
+#     if (!is.null(metadata_files)) {
+#       metadata_list <- extract_metadata(
+#         dfs      = metadata_dataframes,
+#         dset_key = dset_key,
+#         filename = dset_filename
+#       )
+#     }
+#     # Load raw dataframe from dataset and impute
+#     file_path <- paste0(input_folder, dset_filename)
+#     rdf <- get_raw_dataframe_from_dataset(file_path)
+#     # GOIENER DATASETS ONLY
+#     if (!working_with_generation) {
+#       rdf <- rdf[,1:2]
+#     } else {
+#       rdf <- rdf[,c(1,3)]
+#       names(rdf) <- c("times", "values")
+#     }
+#     cdf <- cook_raw_dataframe(
+#       raw_df    = rdf,
+#       from_date = from_date, 
+#       to_date   = to_date, 
+#       dset_key  = dset_key, 
+#       filename  = dset_filename, 
+#       metadata  = metadata_list
+#     )
+#     # If cdf is NULL, skip
+#     if (!is.null(cdf)) {
+#       # Get length
+#       initial_date   <- cdf$df[1,1]
+#       final_date     <- cdf$df[nrow(cdf$df),1]
+#       length_in_days <- as.numeric(final_date - initial_date)
+#       # If TS is longer than 364 days, impute; ELSE discard
+#       if (length_in_days >= 364) {
+#         idf <- impute_cooked_dataframe(
+#           cdf       = cdf, 
+#           season    = cdf$seasonal_periods[1] * 7, 
+#           short_gap = cdf$seasonal_periods[1] / 3
+#         )
+#         if (!is.null(idf)) {
+#           # Expand if needed
+#           edf <- extend_imputed_dataframe(
+#             idf              = idf,
+#             wanted_days      = wanted_days,
+#             extend_after_end = extend_after_end
+#           )
+#           if (!is.null(edf)) {
+#             # Save dataframe in output folder
+#             path <- paste0(
+#               output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData"
+#             )
+#             save(edf, file=path)
+#           }
+#         }
+#       }
+#     }
+#   }
+#   # Stop parallelization
+#   parallel::stopCluster(cl)
+# }
+
+extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL, from_date="first", to_date="last", extend_after_end=TRUE) {
   
-  library(tidyr)
-  
-  # # Check for correct date precedence
-  # if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
-  #   if (from_date >= to_date) {
-  #     stop("to_date must be greater than from_date", call. = FALSE)
-  #   }
-  # }
+  # Check for correct date precedence
+  if (is(from_date, "POSIXt") & is(to_date, "POSIXt")) {
+    if (from_date >= to_date) {
+      stop("to_date must be greater than from_date", call. = FALSE)
+    }
+  }
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder)
   # Extract relevant data from metadata files (if any!)
@@ -447,27 +549,17 @@ extend_dataset <- function(input_folder, output_folder, wanted_days, dset_key,
   }
   
   # Setup parallel backend to use many processors
-  # cores <- parallel::detectCores() - 1
-  # cl <- parallel::makeCluster(cores, outfile = "")
-  # doParallel::registerDoParallel(cl)
-  
-  # Progress bar
-  pb <- txtProgressBar(style=3)
-  # fnames length
-  length_fnames <- length(dset_filenames)
-  print(length_fnames)
+  cores <- parallel::detectCores() - 1
+  cl <- parallel::makeCluster(cores, outfile = "")
+  doParallel::registerDoParallel(cl)
   
   # Analysis loop
   pkg <- c("imputeTS", "data.table", "stats", "utils", "dplyr")
-  #out <- foreach::foreach (x = 1:length_fnames, .packages = pkg) %dopar% {
-    for(x in 1:length_fnames) {
+  foreach::foreach (x = 1:length(dset_filenames), .packages = pkg) %dopar% {
     
-    # Set progress bar
-    setTxtProgressBar(pb, x/length_fnames)
-    
+    print(dset_filenames[x])
     # File name selection
     dset_filename <- dset_filenames[x]
-    print(dset_filename)
     # Extract metadata
     if (!is.null(metadata_files)) {
       metadata_list <- extract_metadata(

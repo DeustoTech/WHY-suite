@@ -48,21 +48,22 @@ get_dataset_dependent_metadata <- function(dset_key, metadata) {
       acorn_grouped = metadata[[3]]
     )
   }
-  if (dset_key %in% c("goi", "go2")) {
-    dset_list <- list(
-      cups         = metadata[[1]],      
-      start_date   = metadata[[2]],
-      end_date     = metadata[[3]],      
-      tariff       = metadata[[4]],
-      p1_kw        = metadata[[5]],      
-      p2_kw        = metadata[[6]],
-      p3_kw        = metadata[[7]],      
-      self_consump = metadata[[8]],
-      province     = metadata[[9]],      
-      municipality = metadata[[10]],
-      zip_code     = metadata[[11]],     
-      cnae         = metadata[[12]]
-    )
+  if (dset_key %in% c("goi", "go2", "go3")) {
+    dset_list <- metadata
+    # dset_list <- list(
+    #   cups         = metadata[[1]],      
+    #   start_date   = metadata[[2]],
+    #   end_date     = metadata[[3]],      
+    #   tariff       = metadata[[4]],
+    #   p1_kw        = metadata[[5]],      
+    #   p2_kw        = metadata[[6]],
+    #   p3_kw        = metadata[[7]],      
+    #   self_consump = metadata[[8]],
+    #   province     = metadata[[9]],      
+    #   municipality = metadata[[10]],
+    #   zip_code     = metadata[[11]],     
+    #   cnae         = metadata[[12]]
+    # )
   }
   if (dset_key == "iss") {
     dset_list <- list(
@@ -118,8 +119,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
   }
   
   # Goiener
-  if (dset_key %in% c("goi", "go2")) {
-    
+  if (dset_key %in% c("goi", "go2", "go3")) {
     out <- list()
     
     # Identify current user
@@ -128,82 +128,82 @@ extract_metadata <- function(dfs, dset_key, filename) {
     
     if("cups_ref" %in% colnames(dfs[[1]])) {
       idx <- which.max(dfs[[1]]$cups_ref == cups)
-      out[["idx"]] <- cups
+      out[["mdata_file_idx"]] <- idx
     }
     if("fecha_alta" %in% colnames(dfs[[1]])) {
       start_date <- lubridate::ymd(dfs[[1]]$fecha_alta[idx])
-      out[["start_date"]] <- cups
+      out[["start_date"]] <- start_date
     }
     if("fecha_baja" %in% colnames(dfs[[1]])) {
       end_date <- lubridate::ymd(dfs[[1]]$fecha_baja[idx])
-      out[["end_date"]] <- cups
+      out[["end_date"]] <- end_date
     }
     if("tarifa_ref" %in% colnames(dfs[[1]])) {
       ref_tariff <- dfs[[1]]$tarifa_ref[idx]
       ref_tariff <- iconv(ref_tariff, from="UTF-8", to="ASCII//TRANSLIT")
-      out[["ref_tariff"]] <- cups
+      out[["ref_tariff"]] <- ref_tariff
     }
     if("tarifa.tarifa_atr_ref" %in% colnames(dfs[[1]])) {
-      ref_tariff_2 <- dfs[[1]]$tarifa.tarifa_atr_ref[idx]
-      out[["ref_tariff_2"]] <- cups
+      ref_atr_tariff <- dfs[[1]]$tarifa.tarifa_atr_ref[idx]
+      out[["ref_atr_tariff"]] <- ref_atr_tariff
     }
     if("proceso_atr_ref" %in% colnames(dfs[[1]])) {
-      process <- dfs[[1]]$proceso_atr_ref[idx]
-      out[["process"]] <- cups
+      ref_atr_proc <- dfs[[1]]$proceso_atr_ref[idx]
+      out[["ref_atr_proc"]] <- ref_atr_proc
     }
     if("modo_facturacion_ref" %in% colnames(dfs[[1]])) {
       billing_type <- dfs[[1]]$modo_facturacion_ref[idx]
-      out[["billing_type"]] <- cups
+      out[["billing_type"]] <- billing_type
     }
     if("margen_indexado" %in% colnames(dfs[[1]])) {
       indexed_margin <- dfs[[1]]$margen_indexado[idx]
-      out[["indexed_margin"]] <- cups
+      out[["indexed_margin"]] <- indexed_margin
     }
     if("tipo_autoconsumo_ref" %in% colnames(dfs[[1]])) {
-      self_consump <- dfs[[1]]$y[idx]
-      out[["self_consump"]] <- cups
+      self_consump <- dfs[[1]]$tipo_autoconsumo_ref[idx]
+      out[["self_consump"]] <- self_consump
     }
     if("p1_kw" %in% colnames(dfs[[1]])) {
       p1_kw <- dfs[[1]]$p1_kw[idx]
-      out[["p1_kw"]] <- cups
+      out[["p1_kw"]] <- p1_kw
     }
     if("p2_kw" %in% colnames(dfs[[1]])) {
       p2_kw <- dfs[[1]]$p2_kw[idx]
-      out[["p2_kw"]] <- cups
+      out[["p2_kw"]] <- p2_kw
     }
     if("p3_kw" %in% colnames(dfs[[1]])) {
       p3_kw <- dfs[[1]]$p3_kw[idx]
-      out[["p3_kw"]] <- cups
+      out[["p3_kw"]] <- p3_kw
     }
     if("p4_kw" %in% colnames(dfs[[1]])) {
       p4_kw <- dfs[[1]]$p4_kw[idx]
-      out[["p4_kw"]] <- cups
+      out[["p4_kw"]] <- p4_kw
     }
     if("p5_kw" %in% colnames(dfs[[1]])) {
       p5_kw <- dfs[[1]]$p5_kw[idx]
-      out[["p5_kw"]] <- cups
+      out[["p5_kw"]] <- p5_kw
     }
     if("p6_kw" %in% colnames(dfs[[1]])) {
       p6_kw <- dfs[[1]]$p6_kw[idx]
-      out[["p6_kw"]] <- cups
+      out[["p6_kw"]] <- p6_kw
     }
     if("cups.direccion_prov.nombre_oficial" %in% colnames(dfs[[1]])) {
       province <- dfs[[1]]$cups.direccion_prov.nombre_oficial[idx]
       province <- iconv(province, from="UTF-8", to="ASCII//TRANSLIT")
-      out[["province"]] <- cups
+      out[["province"]] <- province
     }
     if("cups.direccion_muni.nombre_oficial" %in% colnames(dfs[[1]])) {
       municipality <- dfs[[1]]$cups.direccion_muni.nombre_oficial[idx]
       municipality <- iconv(municipality, from="UTF-8", to="ASCII//TRANSLIT")
-      out[["municipality"]] <- cups
+      out[["municipality"]] <- municipality
     }
     if("cups.direccion_cp" %in% colnames(dfs[[1]])) {
       zip_code <- dfs[[1]]$cups.direccion_cp[idx]
-      out[["zip_code"]] <- cups
+      out[["zip_code"]] <- zip_code
     }
     if("cnae" %in% colnames(dfs[[1]])) {
       cnae <- dfs[[1]]$cnae[idx]
-      out[["cnae"]] <- cups
+      out[["cnae"]] <- cnae
     }
   
     # # There may be several entries for a cups: get index (highest date)
