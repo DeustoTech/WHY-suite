@@ -105,6 +105,9 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   # Step as difftime
   #period_in_secs <- as.difftime(sampling_period_in_secs, units = "secs")
   
+  # Chop raw_df
+  raw_df <- raw_df[raw_df[,1] >= from_date & raw_df[,1] <= to_date,]
+  
   # Create time sequence
   time_seq <- seq(from_date, to_date, by=paste(86400 / spd, "sec"))
   
