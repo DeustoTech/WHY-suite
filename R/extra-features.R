@@ -545,7 +545,7 @@ get_peak_times <- function(ft) {
 
 stat_data_aggregates <- function(x) {
   # Get the seasonal features
-  ft <- whyT2.1::get_seasonal_features_from_timeseries(x)
+  ft <- get_seasonal_features_from_timeseries(x)
   # Get peak and off-peak times
   o <- get_peak_times(ft)
   
