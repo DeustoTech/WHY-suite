@@ -201,7 +201,7 @@ get_bins <- function(t, type) {
     t_factor <- as.factor(t_factor)
   }
   # By days
-  if (type %in% c(4, 15:17)) {
+  if (type %in% c(4,15:17)) {
     t_factor <- cut(t, breaks = "1 day")
   }
   # By weekdays/weekends
@@ -648,24 +648,23 @@ get_feature_names <- function() {
   # as.name("season_drm"),       # 17
   # as.name("hour4_season_drm")  # 18
   
-  # 2.0TD, 7 periods
-  n$str$td2.0_p7 <-
-    c("00h08h", "08h10h", "10h14h", "14h18h", "18h22h", "22h00h", "wkends")
-  # 2.0TD, 6 periods
-  n$str$td2.0_p6 <- n$str$td2.0_p7[1:6]
-  # 2.0TD, 7 periods and season
-  n$str$td2.0_p7_season <- paste(
-    rep(n$str$td2.0_p7, times=4),
-    rep(substr(n$str$season[c(4,1:3)],1,3), each=7),
-    sep="_")
-  # 2.0TD, 6 periods and season
+  n$str$td2.0_p6 <-
+    c("00h08h", "08h10h", "10h14h", "14h18h", "18h22h", "22h00h")
+  n$str$td2.0_p7 <- c(n$str$td2.0_p6, "wkends")
   n$str$td2.0_p6_season <- paste(
     rep(n$str$td2.0_p6, times=4),
     rep(substr(n$str$season[c(4,1:3)],1,3), each=6),
     sep="_")
-  # 2.0TD, 3 periods
+  n$str$td2.0_p7_season <- paste(
+    rep(n$str$td2.0_p7, times=4),
+    rep(substr(n$str$season[c(4,1:3)],1,3), each=7),
+    sep="_")
   n$str$td2.0_p3 <- c("punta", "llano", "valle")
-  
+  n$str$td2.0_p3_ym <- n$str$td2.0_p3
+  n$str$weekday_drm <- paste0(n$str$weekday, "_drm")
+  n$str$month_drm <- paste0(n$str$month, "_drm")
+  n$str$season_drm <- paste0(n$str$season, "_drm")
+  n$str$hour4_season_drm <- paste0(n$str$hour4_season, "_drm")
   
   ### Some constants
   # Days per weekday/weekend 
@@ -764,8 +763,41 @@ stat_data_aggregates <- function(x) {
   # Get names & constants
   n <- get_feature_names()
   # Mean & sd strings
-  msd_str <- c("mean", "sd", "max", "min", "sum")
+  msd_str <- c("mean", "sd", "sum", "max", "min")
   pd <- "pday"
+  
+  for(ss in 9:18) {
+    if (ss == 15) browser()
+    # Sum of means
+    sum_of_means <- sum(ft[[ss]]$mean$x)
+    # Sum of sums
+    sum_of_sums <- sum(ft[[ss]]$sum$x)
+    # Loop mean|sd|sum||max|min
+    for (mm in 1:3) {
+      # Loop for elements in the dataframe
+      for (ii in 1:dim(ft[[ss]]$mean)[1]) {
+        # Assemble the name of the ABSOLUTE feature
+        if (ss == 14) {
+          fname <- paste("abs", msd_str[mm], n$str[[ss]][((ii-1)%%3)+1], 
+                         substr(ft[[ss]][[mm]]$bin[ii],1,4), sep = "_")
+        } else {
+          fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], sep = "_")
+        }
+        # Save the value of the feature
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
+        # Assemble the name of the RELATIVE feature
+        if (ss == 14) {
+          fname <- paste("rel", msd_str[mm], n$str[[ss]][((ii-1)%%3)+1], 
+                         substr(ft[[ss]][[mm]]$bin[ii],1,4), sep = "_")
+        } else {
+          fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], sep = "_")
+        }
+        # Save the value of the feature
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% 
+          ifelse(mm == 3, sum_of_sums, sum_of_means)
+      }
+    }
+  }
   
   # Season loop
   for(ss in 1:8) {
@@ -774,7 +806,7 @@ stat_data_aggregates <- function(x) {
     if (ss >= 5) {
       sum_of_wmeans <- sum(ft[[ss]]$mean$x / n$const[[ss-4]])
     }
-    # Loop mean|sd|max|min|sum
+    # Loop mean|sd|sum||max|min
     for (mm in 1:2) {
       # Loop for elements in the dataframe
       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
@@ -801,8 +833,7 @@ stat_data_aggregates <- function(x) {
       }
     }
   }
-  
-  for (ss in 9:18)
+
   return(o)
 }
 
@@ -1183,7 +1214,8 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
 # ---------------------------------------------------------------------------- #
 
 
-load("C:\\Users/carlos.quesada/Mis documentos/GO3/008574811cd6cb3db30c5f9193292368.RData")
+#load("C:\\Users/carlos.quesada/Mis documentos/GO3/008574811cd6cb3db30c5f9193292368.RData")
+load("D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\GO3\\008574811cd6cb3db30c5f9193292368.RData")
 
 tms <- get_timeseries_from_cooked_dataframe(edf)
 stat_data_aggregates(tms)
