@@ -255,6 +255,15 @@ get_bins <- function(t, type) {
     )
     t_factor <- as.factor(t_factor)
   }
+  # By 2.0TD periods excluding weekends
+  if (type == 9) {
+    t_f <- cut(t, breaks = "1 hour")
+    # Convert to vector of dates
+    t_v <- as.POSIXct(as.vector(t_f), tz="GMT")
+    # Subtract properly to get the new groups
+    t_factor <- t_v - hours(hour(t_v) %% 4)
+    t_factor <- as.factor(t_factor)
+  }
   return(t_factor)
 }
 
@@ -317,10 +326,13 @@ get_seasonal_features_from_timeseries <- function(tseries, maxmin = FALSE) {
     as.name("weekday"),
     as.name("month"),
     as.name("season"),
-    as.name("hour4_season")
+    as.name("hour4_season"),
+    as.name("td2.0_p6"),  # 6 periods (workdays)
+    as.name("td2.0_p7"),  # 7 periods (workdays + weekends)
+    as.name("td2.0_ymp"), # year-month-period
   )
   # Loop for the 8 different bins
-  for (bb in 1:8) {
+  for (bb in 1:11) {
     # Get the bins to compute the sum
     sum_factor <- get_bins(t, bb)
     # Aggregate data (sum) according to the bins
