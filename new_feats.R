@@ -1070,31 +1070,58 @@ stat_data_aggregates <- function(x) {
               ifelse(mm == 3, sum_of_sums, sum_of_means)
           }
         }
-        
-        # # Loop for elements in the data frame
-        # for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-        #   # Get feature name
-        #   fname <- get_feature_names(
-        #     block     = ss,
-        #     abs_rel   = ar,
-        #     operation = mm,
-        #     bin       = ft[[ss]][[mm]]$bin[ii]
-        #   )
-        #   # Save the value of the feature
-        #   if (ar == 1) {
-        #     # Absolute value
-        #     o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
-        #   } else {
-        #     # Relative value
-        #     o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/%
-        #       ifelse(mm == 3, sum_of_sums, sum_of_means)
-        #   }
-        # }
       }
     }
   }
   
-  for 
+  #
+  #
+  #
+  #  SUSTITUIR POR ESQUEMA COMO EL DE ARRIBA!!!
+  #
+  #
+  #
+  
+  # Season loop
+  for(ss in 1:8) {
+    # Sum of means
+    sum_of_means <- sum(ft[[ss]]$mean$x)
+    if (ss >= 5) {
+      sum_of_wmeans <- sum(ft[[ss]]$mean$x / fnames$const[[ss-4]])
+    }
+    # Loop mean|sd|sum||max|min
+    for (mm in 1:2) {
+      # Loop for elements in the dataframe
+      for (ii in 1:dim(ft[[ss]]$mean)[1]) {
+        # Assemble the name of the ABSOLUTE feature
+        fname <- paste("abs", operations_str[mm], fnames$str[[ss]][ii], sep = "_")
+        # Save the value of the feature
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
+        if (ss >= 5) {
+          # Assemble the name of the ABSOLUTE feature
+          fname <-
+            paste("abs", operations_str[mm], fnames$str[[ss]][ii], "pday", sep = "_")
+          # Save the value of the feature
+          o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% fnames$const[[ss-4]][ii]
+        }
+      }
+      for (ii in 1:dim(ft[[ss]]$mean)[1]) {
+        # Assemble the name of the RELATIVE feature
+        fname <- paste("rel", operations_str[mm], fnames$str[[ss]][ii], sep = "_")
+        # Save the value of the feature
+        o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% sum_of_means
+        # For seasons higher than the day ('per day' features)
+        if (ss >= 5) {
+          # Assemble the name of the RELATIVE feature
+          fname <-
+            paste("rel", operations_str[mm], fnames$str[[ss]][ii], "pday", sep = "_")
+          # Save the value of the feature
+          o[[as.name(fname)]] <-
+            ft[[ss]][[mm]]$x[ii] %/% fnames$const[[ss-4]][ii] %/% sum_of_wmeans
+        }
+      }
+    }
+  }
   browser()
 }
 
