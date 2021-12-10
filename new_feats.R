@@ -1131,7 +1131,7 @@ stat_data_aggregates <- function(x) {
     }
   }
   
-  browser()
+  return(o)
 }
   #
   #
@@ -1656,9 +1656,90 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
 
 # ---------------------------------------------------------------------------- #
 
+library(tsfeatures)
+library(foreach)
 
-load("C:\\Users/carlos.quesada/Mis documentos/GO3/008574811cd6cb3db30c5f9193292368.RData")
+#load("C:\\Users/carlos.quesada/Mis documentos/GO4/38ba89060953676dfd695e3e4e19e987.RData")
 #load("D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\GO3\\008574811cd6cb3db30c5f9193292368.RData")
 
-tms <- get_timeseries_from_cooked_dataframe(edf)
-stat_data_aggregates(tms)
+#tms <- get_timeseries_from_cooked_dataframe(edf)
+#stat_data_aggregates(tms)
+
+#list_of_files <- list.files("C:\\Users/carlos.quesada/Mis documentos/GO4/")
+#feats <- get_features_from_cooked_dataframe(edf, "extra", )
+
+
+# Input parameters
+input_folder <- c("C:\\Users/carlos.quesada/Mis documentos/GO4/")
+
+# Output parameters
+output_path <- c("C:\\Users/carlos.quesada/Mis documentos/GO4/")
+
+# Type of analysis
+type_of_analysis <- "extra"
+
+# List of file paths
+fpaths <- c()
+for (ii in 1:length(input_folder)) {
+  # Get list of file paths
+  fpaths <- c(
+    fpaths,
+    list.files(input_folder[ii], pattern="*.RData", full.names = T)
+  )
+}
+
+# Setup parallel backend to use many processors
+cores <- parallel::detectCores() - 1
+cl <- parallel::makeCluster(cores, outfile = "")
+doParallel::registerDoParallel(cl)
+
+o <- foreach::foreach(
+  x              = 1:length(fpaths),
+  .combine       = rbind,
+  .inorder       = TRUE
+  # .errorhandling = "stop"
+  #.packages      = c("whyT2.1")
+
+) %dopar% {
+
+#for(x in 1:length(fpaths)) {
+  
+  browser()
+  
+  # Select file name
+  fpath <- fpaths[x]
+  fname <- strsplit(basename(fpath), split=".RData")[[1]]
+  # print(fname)
+  # Load extended dataframe
+  load(fpath)
+  # Set exceptions
+  if (!edf$is_0) {
+    ff_file <- data.frame(file = fname, data_set = edf$dset_key)
+    # GET FEATURES
+    ff_feats <- get_features_from_cooked_dataframe(
+      cdf              = edf,
+      type_of_analysis = type_of_analysis
+    )
+    # Incorporate filename as a column
+    all_features <- cbind(ff_file, ff_feats)
+    all_features
+  } else {
+    NULL
+  }
+}
+
+# Stop parallelization
+parallel::stopCluster(cl)
+
+# Save results to the CSV file
+data.table::fwrite(
+  x         = o,
+  file      = output_path,
+  sep       = ",",
+  na        = "",
+  quote     = FALSE,
+  append    = FALSE,
+  col.names = TRUE,
+  row.names = FALSE
+)
+
