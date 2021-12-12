@@ -1,11 +1,18 @@
+# INPUT FOLDER
+ifold <- "D:/Quesada/Documents/__TRABAJO/why/GO4/"
+# OUTPUT FOLDER
+ofold <- "C:/GO4/out.csv"
+# SOURCE FILE
+sfile <- "D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\_datasets\\goi\\new_feats_src.R"
+
 library(tsfeatures)
 library(foreach)
 
 # Input parameters
-input_folder <- c("D:/Quesada/Documents/__TRABAJO/why/GO4/")
+input_folder <- c(ifold)
 
 # Output parameters
-output_path <- c("C:/GO4/out.csv")
+output_path <- c(ofold)
 
 # Type of analysis
 type_of_analysis <- "extra"
@@ -25,8 +32,13 @@ cores <- parallel::detectCores() - 1
 cl <- parallel::makeCluster(cores, outfile = "")
 doParallel::registerDoParallel(cl)
 
+# Progress bar
+pb <- txtProgressBar(style=3)
+# fnames length
+length_fpaths <- length(fpaths)
+
 o <- foreach::foreach(
-  x              = 1:length(fpaths),
+  x              = 1:length_fpaths,
   .combine       = rbind,
   .inorder       = TRUE,
   # .errorhandling = "stop"
@@ -38,8 +50,11 @@ o <- foreach::foreach(
 
 # for(x in 1:length(fpaths)) {
   
+  # Set progress bar
+  setTxtProgressBar(pb, x/length_fpaths)
+  
   # SOURCE FILE OF FUNCTIONS
-  source("D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\_datasets\\goi\\new_feats_src.R")
+  source(sfile)
   
   # Select file name
   fpath <- fpaths[x]
