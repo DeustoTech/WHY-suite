@@ -689,13 +689,19 @@ get_feature_names <- function() {
   
   ### Some constants
   # Days per weekday/weekend 
-  n$const$dpw <- c(5, 2)
+  n$const$dpw <- c("2"=5, "7"=2)
   # Days per month
-  n$const$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  n$const$dpm <- c("1"=31, "2"=28.25, "3"=31, "4"=30, "5"=31, "6"=30,
+                   "7"=31, "8"=31, "9"=30, "10"=31, "11"=30, "12"=31)
   # Days per season
-  n$const$dps <- c(92, 92, 91, 90.25)
+  n$const$dps <- c("3"=92, "6"=92, "9"=91, "12"=90.25)
   # Days per hour & season
   n$const$dphs <- rep(n$const$dps, each=6)
+  names(n$const$dphs) <- c(
+    "300", "304", "308", "312", "316", "320",
+    "600", "604", "608", "612", "616", "620",
+    "900", "904", "908", "912", "916", "920",
+    "1200", "1204", "1208", "1212", "1216", "1220")
   return(n)
 }
 
@@ -721,13 +727,19 @@ get_peak_times <- function(ft) {
   # Some constants
   const <- list()
   # Days per weekday/weekend 
-  const$dpw <- c(5, 2)
+  const$dpw <- c("2"=5, "7"=2)
   # Days per month
-  const$dpm <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  const$dpm <- c("1"=31, "2"=28.25, "3"=31, "4"=30, "5"=31, "6"=30,
+                 "7"=31, "8"=31, "9"=30, "10"=31, "11"=30, "12"=31)
   # Days per season
-  const$dps <- c(92, 92, 91, 90.25)
+  const$dps <- c("3"=92, "6"=92, "9"=91, "12"=90.25)
   # Days per hour & season
   const$dphs <- rep(const$dps, each=6)
+  names(const$dphs) <- c(
+    "300", "304", "308", "312", "316", "320",
+    "600", "604", "608", "612", "616", "620",
+    "900", "904", "908", "912", "916", "920",
+    "1200", "1204", "1208", "1212", "1216", "1220")
   
   ### Loop of types
   for (ii in 1:8) {
@@ -745,11 +757,11 @@ get_peak_times <- function(ft) {
   for (ii in 5:8) {
     # Peak
     time_name <- paste("peak", names(ft)[ii], "pday", sep="_")
-    idx <- which.max(ft[[ii]][[1]]$x / const[[ii-4]])
+    idx <- which.max(ft[[ii]][[1]]$x / const[[ii-4]][as.character(ft[[ii]]$mean$bin)])
     o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
     # Off-peak
     time_name <- paste("off_peak", names(ft)[ii], "pday", sep="_")
-    idx <- which.min(ft[[ii]][[1]]$x / const[[ii-4]])
+    idx <- which.min(ft[[ii]][[1]]$x / const[[ii-4]][as.character(ft[[ii]]$mean$bin)])
     o[[as.name(time_name)]] <- as.numeric(levels(ft[[ii]][[1]]$bin)[idx])
   }
   
@@ -771,189 +783,6 @@ get_peak_times <- function(ft) {
 #'
 #' @return A list with statistical values of the different bins.
 #' @export
-
-# generate_feature_names <- function() {
-#   # Absolute or relative
-#   abs_rel_str <- c("abs", "rel")
-#   # Operations
-#   operations_str <- c("mean", "sd", "sum", "max", "min")
-#   # 2.0TD 7 periods
-#   p7_str <- c(
-#     bin_0="00h08h",
-#     bin_8="08h10h",
-#     bin_10="10h14h",
-#     bin_14="14h18h",
-#     bin_18="18h22h",
-#     bin_22="22h00h",
-#     bin_25="wkends"
-#   )
-#   p
-#   # 2.0TD 3 periods
-#   p3_str <- c("punta", "llano", "valle")
-#   # Short seasons
-#   short_season_str <- c("win", "spr", "sum", "aut")
-#   
-#   #-----------------------------------------------------------------------------
-#   
-#   # Base
-#   o <- list(abs=NULL, rel=NULL)
-#   for (ii in 1:2) {
-#     # Main branches
-#     o[[ii]] <- list(mean=NULL, sd=NULL, sum=NULL, max=NULL, min=NULL)
-#     # Block names
-#     for (jj in 1:5) {
-#       o[[ii]][[jj]] <- list(
-#         block_1=NULL,
-#         block_2=NULL,
-#         block_3=NULL,
-#         block_4=NULL,
-#         block_5=NULL,
-#         block_6=NULL,
-#         block_7=NULL,
-#         block_8=NULL,
-#         block_9=NULL,
-#         block_10=NULL,
-#         block_11=NULL,
-#         block_12=NULL,
-#         block_13=NULL,
-#         block_14=NULL,
-#         block_15=NULL,
-#         block_16=NULL,
-#         block_17=NULL,
-#         block_18=NULL
-#       )
-#       # Bin names
-#       for (kk in 1:18) {
-#         ### 2.0TD 6 periods
-#         if (kk == 9) {
-#           name_list <- list()
-#           for (mm in 1:6) {
-#             name_list[[mm]] <- paste(
-#               abs_rel_str[ii],
-#               operations_str[jj],
-#               "td2.0_p6",
-#               p7_str[mm],
-#               sep="_"
-#             )
-#           }
-#           names(name_list) <- names(p7_str[1:6])
-#           o[[ii]][[jj]][[kk]] <- name_list
-#         }
-#         ### 2.0TD 7 periods
-#         if (kk == 10) {
-#           name_list <- list()
-#           for (mm in 1:7) {
-#             name_list[[mm]] <- paste(
-#               abs_rel_str[ii],
-#               operations_str[jj],
-#               "td2.0_p7",
-#               p7_str[mm],
-#               sep="_"
-#             )
-#           }
-#           names(name_list) <- names(p7_str[1:7])
-#           o[[ii]][[jj]][[kk]] <- name_list
-#         }
-#         ### 2.0TD 6 periods + season
-#         if (kk == 11) {
-#           name_list <- list()
-#           for (mm in 1:7) {
-#             name_list[[mm]] <- paste(
-#               abs_rel_str[ii],
-#               operations_str[jj],
-#               "td2.0_p6",
-#               p7_str[[as.character(as.numeric(period_idx))]],
-#               short_season_str[as.numeric(season_idx)],
-#               sep="_"
-#             )
-#           }
-#           names(name_list) <- names(p7_str[1:7])
-#           o[[ii]][[jj]][[kk]] <- name_list
-#         }
-#       }
-#     }
-#   }
-#   browser()
-# }
-
-# get_feature_names_NEW <- function(block, abs_rel, operation, bin) {
-#   
-#   # Absolute or relative
-#   abs_rel_str <- c("abs", "rel")
-#   # Operations
-#   operations_str <- c("mean", "sd", "sum", "max", "min")
-#   
-#   out_name <- paste(
-#     abs_rel_str[abs_rel],
-#     operation_str[operation],
-#     infix_str[block],
-#     sufix_str[[block]][bin]
-#   )
-#   
-#   
-#   browser()
-#   # Absolute or relative
-#   abs_rel_str <- c("abs", "rel")
-#   # Operations
-#   operations_str <- c("mean", "sd", "sum", "max", "min")
-#   # 2.0TD 7 periods
-#   p7_str <- c(
-#      "0" = "00h08h",
-#      "8" = "08h10h",
-#     "10" = "10h14h",
-#     "14" = "14h18h",
-#     "18" = "18h22h",
-#     "22" = "22h00h",
-#     "25" = "wkends"
-#   )
-#   # 2.0TD 3 periods
-#   p3_str <- c("punta", "llano", "valle")
-#   # Short seasons
-#   short_season_str <- c("win", "spr", "sum", "aut")
-#   # Infixes
-#   infix_str <- c(
-#      "9" = "td2.0_p6",
-#     "10" = "td2.0_p7",
-#     "11" = "td2.0_p6",
-#     "12" = "td2.0_p7",
-#     "13" = "td2.0_p3"
-#   )
-#   # 2.0TD periods 6 and 7
-#   if(block %in% c(9,10)) {
-#     fname <- paste(
-#       abs_rel_str[abs_rel],
-#       operations_str[operation],
-#       infix_str[[as.name(block)]],
-#       p7_str[[as.numeric(bin)]],
-#       sep="_"
-#     )
-#   }
-#   # 2.0TD periods 6 and 7 with seasons
-#   if(block %in% c(11,12)) {
-#     season_idx <- substr(bin,1,1)
-#     period_idx <- substr(bin,2,3)
-#     fname <- paste(
-#       abs_rel_str[abs_rel],
-#       operations_str[operation],
-#       infix_str[[as.name(block)]],
-#       p7_str[[as.character(as.numeric(period_idx))]],
-#       short_season_str[as.numeric(season_idx)],
-#       sep="_"
-#     )
-#   }
-#   # 2.0TD periods 3
-#   if(block %in% 13) {
-#     fname <- paste(
-#       abs_rel_str[abs_rel],
-#       operations_str[operation],
-#       infix_str[[as.name(block)]],
-#       p3_str[[as.numeric(bin)]],
-#       sep="_"
-#     )
-#   }
-#   return(fname)
-# }
-
 
 get_expected_bins <- function() {
   # Getting the most complex bins
@@ -1016,12 +845,13 @@ get_expected_bins <- function() {
   )
 }
 
- 
+
 stat_data_aggregates <- function(x) {
   # Get the seasonal features
   ft <- get_seasonal_features_from_timeseries(x)
   # Get peak and off-peak times
   o <- get_peak_times(ft)
+  #o <- list()
   
   # Absolute or relative
   abs_rel_str <- c("abs", "rel")
@@ -1035,7 +865,6 @@ stat_data_aggregates <- function(x) {
   "%/%" <- function(x,y) ifelse(y==0, 0, x/y)
   
   for(ss in 9:18) {
-    # if(ss == 14) browser()
     # Sum of means
     sum_of_means <- sum(ft[[ss]]$mean$x)
     # Sum of sums
@@ -1078,7 +907,9 @@ stat_data_aggregates <- function(x) {
     # Sum of means
     sum_of_means <- sum(ft[[ss]]$mean$x)
     if (ss >= 5) {
-      sum_of_wmeans <- sum(ft[[ss]]$mean$x / fnames$const[[ss-4]])
+      sum_of_wmeans <- sum(
+        ft[[ss]]$mean$x / fnames$const[[ss-4]][as.character(ft[[ss]]$mean$bin)]
+      )
     }
     
     # Operations loop (mean, sd, sum, max, min)
@@ -1133,157 +964,6 @@ stat_data_aggregates <- function(x) {
   
   return(o)
 }
-  #
-  #
-  #
-  #  SUSTITUIR POR ESQUEMA COMO EL DE ARRIBA!!!
-  #
-  #
-  #
-  # 
-  # # Season loop
-  # for(ss in 1:8) {
-  #   # Sum of means
-  #   sum_of_means <- sum(ft[[ss]]$mean$x)
-  #   if (ss >= 5) {
-  #     sum_of_wmeans <- sum(ft[[ss]]$mean$x / fnames$const[[ss-4]])
-  #   }
-  #   # Loop mean|sd|sum||max|min
-  #   for (mm in 1:2) {
-  #     # Loop for elements in the dataframe
-  #     for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-  #       # Assemble the name of the ABSOLUTE feature
-  #       fname <- paste("abs", operations_str[mm], fnames$str[[ss]][ii], sep = "_")
-  #       # Save the value of the feature
-  #       o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
-  #       if (ss >= 5) {
-  #         # Assemble the name of the ABSOLUTE feature
-  #         fname <-
-  #           paste("abs", operations_str[mm], fnames$str[[ss]][ii], "pday", sep = "_")
-  #         # Save the value of the feature
-  #         o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% fnames$const[[ss-4]][ii]
-  #       }
-  #     }
-  #     for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-  #       # Assemble the name of the RELATIVE feature
-  #       fname <- paste("rel", operations_str[mm], fnames$str[[ss]][ii], sep = "_")
-  #       # Save the value of the feature
-  #       o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% sum_of_means
-  #       # For seasons higher than the day ('per day' features)
-  #       if (ss >= 5) {
-  #         # Assemble the name of the RELATIVE feature
-  #         fname <-
-  #           paste("rel", operations_str[mm], fnames$str[[ss]][ii], "pday", sep = "_")
-  #         # Save the value of the feature
-  #         o[[as.name(fname)]] <-
-  #           ft[[ss]][[mm]]$x[ii] %/% fnames$const[[ss-4]][ii] %/% sum_of_wmeans
-  #       }
-  #     }
-  #   }
-  # }
-  # browser()
-# }
-
-# stat_data_aggregates_OLD <- function(x) {
-#   # Get the seasonal features
-#   ft <- get_seasonal_features_from_timeseries(x)
-#   # Get peak and off-peak times
-#   o <- get_peak_times(ft)
-#   
-#   # DEFINITION OF FUNCTION TO AVOID NaN WHEN DIVIDING BY 0
-#   "%/%" <- function(x,y) ifelse(y==0, 0, x/y)
-#   
-#   # Get names & constants
-#   n <- get_feature_names()
-#   # Mean & sd strings
-#   msd_str <- c("mean", "sd", "sum", "max", "min")
-#   pd <- "pday"
-#   
-#   for(ss in 9:18) {
-#     browser()
-#     # Sum of means
-#     sum_of_means <- sum(ft[[ss]]$mean$x)
-#     # Sum of sums
-#     sum_of_sums <- sum(ft[[ss]]$sum$x)
-#     # Loop mean|sd|sum||max|min
-#     for (mm in 1:3) {
-#       # Loop for elements in the dataframe
-#       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-#         # Assemble the name of the ABSOLUTE feature
-#         if (ss == 14) {
-#           fname <- paste("abs", msd_str[mm], n$str[[ss]][((ii-1)%%3)+1], 
-#                          substr(ft[[ss]][[mm]]$bin[ii],3,4), 
-#                          substr(ft[[ss]][[mm]]$bin[ii],1,2), sep = "_")
-#         } else {
-#           fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], sep = "_")
-#         }
-#         # Save the value of the feature
-#         o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
-#       }
-#       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-#         # Assemble the name of the RELATIVE feature
-#         if (ss == 14) {
-#           fname <- paste("rel", msd_str[mm], n$str[[ss]][((ii-1)%%3)+1], 
-#                          substr(ft[[ss]][[mm]]$bin[ii],3,4), 
-#                          substr(ft[[ss]][[mm]]$bin[ii],1,2), sep = "_")
-#         } else {
-#           fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], sep = "_")
-#         }
-#         # Save the value of the feature
-#         o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% 
-#           ifelse(mm == 3, sum_of_sums, sum_of_means)
-#       }
-#     }
-#   }
-#   
-#   # Season loop
-#   for(ss in 1:8) {
-#     browser()
-#     # Sum of means
-#     sum_of_means <- sum(ft[[ss]]$mean$x)
-#     if (ss >= 5) {
-#       sum_of_wmeans <- sum(ft[[ss]]$mean$x / n$const[[ss-4]])
-#     }
-#     # Loop mean|sd|sum||max|min
-#     for (mm in 1:2) {
-#       # Loop for elements in the dataframe
-#       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-#         # Assemble the name of the ABSOLUTE feature
-#         fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], sep = "_")
-#         # Save the value of the feature
-#         o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii]
-#         if (ss >= 5) {
-#           # Assemble the name of the ABSOLUTE feature
-#           fname <- paste("abs", msd_str[mm], n$str[[ss]][ii], pd, sep = "_")
-#           # Save the value of the feature
-#           o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii]
-#         }
-#       }
-#       for (ii in 1:dim(ft[[ss]]$mean)[1]) {
-#         # Assemble the name of the RELATIVE feature
-#         fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], sep = "_")
-#         # Save the value of the feature
-#         o[[as.name(fname)]] <- ft[[ss]][[mm]]$x[ii] %/% sum_of_means
-#         # For seasons higher than the day ('per day' features)
-#         if (ss >= 5) {
-#           # Assemble the name of the RELATIVE feature
-#           fname <- paste("rel", msd_str[mm], n$str[[ss]][ii], pd, sep = "_")
-#           # Save the value of the feature
-#           o[[as.name(fname)]] <- 
-#             ft[[ss]][[mm]]$x[ii] %/% n$const[[ss-4]][ii] %/% sum_of_wmeans
-#         }
-#       }
-#     }
-#   }
-# 
-#   browser()
-#   return(o)
-# }
-
-
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
-
 
 ################################################################################
 # get_timeseries_from_cooked_dataframe
@@ -1413,7 +1093,7 @@ get_features_from_cooked_dataframe <- function(cdf, type_of_analysis, list_of_fu
     # List of functions that DON'T require normalization -> they are included in 
     # BOTH "basic" and "extra" analyses
     not_norm_fns <- c(
-      "stat_moments", "quantiles", "stat_data_aggregates", "load_factors")
+      "stat_moments", "quantiles", "stat_data_aggregates") #, "load_factors")
     # List of BASIC functions that REQUIRE normalization
     basic_fns <- c(
       "frequency", "stl_features", "entropy", "acf_features", "daily_acf")#, "catch22_features")
@@ -1652,94 +1332,3 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
   
   return(NULL)
 }
-
-
-# ---------------------------------------------------------------------------- #
-
-library(tsfeatures)
-library(foreach)
-
-#load("C:\\Users/carlos.quesada/Mis documentos/GO4/38ba89060953676dfd695e3e4e19e987.RData")
-#load("D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\GO3\\008574811cd6cb3db30c5f9193292368.RData")
-
-#tms <- get_timeseries_from_cooked_dataframe(edf)
-#stat_data_aggregates(tms)
-
-#list_of_files <- list.files("C:\\Users/carlos.quesada/Mis documentos/GO4/")
-#feats <- get_features_from_cooked_dataframe(edf, "extra", )
-
-
-# Input parameters
-input_folder <- c("C:\\Users/carlos.quesada/Mis documentos/GO4/")
-
-# Output parameters
-output_path <- c("C:\\Users/carlos.quesada/Mis documentos/GO4/")
-
-# Type of analysis
-type_of_analysis <- "extra"
-
-# List of file paths
-fpaths <- c()
-for (ii in 1:length(input_folder)) {
-  # Get list of file paths
-  fpaths <- c(
-    fpaths,
-    list.files(input_folder[ii], pattern="*.RData", full.names = T)
-  )
-}
-
-# Setup parallel backend to use many processors
-cores <- parallel::detectCores() - 1
-cl <- parallel::makeCluster(cores, outfile = "")
-doParallel::registerDoParallel(cl)
-
-o <- foreach::foreach(
-  x              = 1:length(fpaths),
-  .combine       = rbind,
-  .inorder       = TRUE
-  # .errorhandling = "stop"
-  #.packages      = c("whyT2.1")
-
-) %dopar% {
-
-#for(x in 1:length(fpaths)) {
-  
-  browser()
-  
-  # Select file name
-  fpath <- fpaths[x]
-  fname <- strsplit(basename(fpath), split=".RData")[[1]]
-  # print(fname)
-  # Load extended dataframe
-  load(fpath)
-  # Set exceptions
-  if (!edf$is_0) {
-    ff_file <- data.frame(file = fname, data_set = edf$dset_key)
-    # GET FEATURES
-    ff_feats <- get_features_from_cooked_dataframe(
-      cdf              = edf,
-      type_of_analysis = type_of_analysis
-    )
-    # Incorporate filename as a column
-    all_features <- cbind(ff_file, ff_feats)
-    all_features
-  } else {
-    NULL
-  }
-}
-
-# Stop parallelization
-parallel::stopCluster(cl)
-
-# Save results to the CSV file
-data.table::fwrite(
-  x         = o,
-  file      = output_path,
-  sep       = ",",
-  na        = "",
-  quote     = FALSE,
-  append    = FALSE,
-  col.names = TRUE,
-  row.names = FALSE
-)
-
