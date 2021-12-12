@@ -51,8 +51,39 @@ o <- foreach::foreach(
   if (!edf$is_0) {
     # REMOVE 3RD SEASONAL PERIOD
     edf$seasonal_periods <- edf$seasonal_periods[1:2]
-    # Filename and dataset key
-    ff_file <- data.frame(file = fname, data_set = edf$dset_key)
+    # METADATA
+    ff_file <- data.frame(
+      file = fname, 
+      data_set = edf$dset_key,
+      # EXCLUSIVE GOIENER
+      num_of_samples = length(edf$df$values),
+      mdata_file_idx = edf$mdata_file_idx,
+      ts_start_date = edf$df$times[1],
+      ts_end_date = edf$df$times[nrow(edf$df)],
+      ts_days = as.numeric(edf$df$times[nrow(edf$df)] - edf$df$times[1]),
+      contract_start_date = edf$start_date,
+      contract_end_date = edf$end_date,
+      abs_imputed_na = edf$number_of_na,
+      rel_imputed_na = edf$number_of_na / length(edf$df$values),
+      country = "es",
+      administrative_division = edf$province,
+      municipality = edf$municipality,
+      zip_code = edf$zip_code,
+      cnae = edf$cnae,
+      is_household = ifelse(edf$cnae %/% 100 == 98, 1, 0),
+      ref_tariff = edf$ref_tariff,
+      ref_atr_tariff = edf$ref_atr_tariff,
+      ref_atr_proc = edf$ref_atr_proc,
+      billing_type = edf$billing_type,
+      indexed_margin = edf$indexed_margin,
+      self_consump = edf$self_consump,
+      p1_kw = edf$p1_kw,
+      p2_kw = edf$p2_kw,
+      p3_kw = edf$p3_kw,
+      p4_kw = edf$p4_kw,
+      p5_kw = edf$p5_kw,
+      p6_kw = edf$p6_kw
+      )
     # GET FEATURES
     ff_feats <- get_features_from_cooked_dataframe(
       cdf              = edf,
