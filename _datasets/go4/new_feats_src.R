@@ -942,6 +942,8 @@ stat_data_aggregates <- function(x) {
               # Save the value of the feature
               o[[as.name(current_fname)]] <-
                 current_value %/% fnames$const[[ss-4]][bb]
+              # Remove name
+              names(o[[as.name(current_fname)]]) <- NULL
             }
             
           } else {
@@ -955,6 +957,8 @@ stat_data_aggregates <- function(x) {
               # Save the value of the feature
               o[[as.name(current_fname)]] <-
                 current_value %/% fnames$const[[ss-4]][bb] %/% sum_of_wmeans
+              # Remove name
+              names(o[[as.name(current_fname)]]) <- NULL
             }
           }
         }
@@ -1254,7 +1258,10 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 #'
 #' @export
 
-get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_analysis, list_of_functions=c(), .scale=FALSE, parallelize=TRUE) {
+get_features_from_ext_datasets <- function(
+  input_folder, output_folder, type_of_analysis, list_of_functions=c(),
+  .scale=FALSE, parallelize=TRUE
+) {
   
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern="*.RData")
@@ -1300,8 +1307,9 @@ get_features_from_ext_datasets <- function(input_folder, output_folder, type_of_
       }
       
       # GET FEATURES
-      ff_feats <- get_features_from_cooked_dataframe(edf, type_of_analysis,
-                                                     list_of_functions, .scale)
+      ff_feats <- get_features_from_cooked_dataframe(
+        edf, type_of_analysis, list_of_functions, .scal
+      )
       
       # Incorporate filename and dataset as columns
       ff_file <- data.frame(

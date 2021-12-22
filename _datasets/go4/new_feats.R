@@ -1,13 +1,13 @@
 # INPUT FOLDER
-# ifold <- "D:/Quesada/Documents/__TRABAJO/why/GO4/"
+# ifold <- "C:/Users/carlos.quesada/Documents/GO4/"
 ifold <- "/mnt/disk2/go4_pst/imp/"
 
 # OUTPUT FILE
-# ofile <- "C:/GO4/out.csv"
+# ofold <- "C:/Users/carlos.quesada/Documents/GO4_out/"
 ofold <- "/mnt/disk2/features/go4_pst_21.12.12/"
 
 # SOURCE FILE
-# sfile <- "D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\_datasets\\goi\\new_feats_src.R"
+# sfile <- "C:\\Users\\carlos.quesada\\Documents\\GitHub\\why-T2.1\\_datasets\\go4\\new_feats_src.R"
 sfile <- "/home/ubuntu/carlos.quesada/R_scripts/new_feats_src.R"
 
 library(tsfeatures)
