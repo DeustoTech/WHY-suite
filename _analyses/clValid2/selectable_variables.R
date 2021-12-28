@@ -52,6 +52,22 @@ feats_set <- list(
     "SB_MotifThree_quantile_hh", "SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1",
     "SC_FluctAnal_2_dfa_50_1_2_logi_prop_r1",
     "SP_Summaries_welch_rect_centroid", "FC_LocalSimple_mean3_stderr"
+  ),
+  # TYPE 5
+  c(
+    "rel_mean_td2.0_p6_00h08h_spr", "rel_mean_td2.0_p6_08h10h_spr",
+    "rel_mean_td2.0_p6_10h14h_spr", "rel_mean_td2.0_p6_14h18h_spr", 
+    "rel_mean_td2.0_p6_18h22h_spr", "rel_mean_td2.0_p6_22h00h_spr", 
+    "rel_mean_td2.0_p6_00h08h_sum", "rel_mean_td2.0_p6_08h10h_sum",
+    "rel_mean_td2.0_p6_10h14h_sum", "rel_mean_td2.0_p6_14h18h_sum", 
+    "rel_mean_td2.0_p6_18h22h_sum", "rel_mean_td2.0_p6_22h00h_sum", 
+    "rel_mean_td2.0_p6_00h08h_aut", "rel_mean_td2.0_p6_08h10h_aut",
+    "rel_mean_td2.0_p6_10h14h_aut", "rel_mean_td2.0_p6_14h18h_aut", 
+    "rel_mean_td2.0_p6_18h22h_aut", "rel_mean_td2.0_p6_22h00h_aut", 
+    "rel_mean_td2.0_p6_00h08h_win", "rel_mean_td2.0_p6_08h10h_win",
+    "rel_mean_td2.0_p6_10h14h_win", "rel_mean_td2.0_p6_14h18h_win", 
+    "rel_mean_td2.0_p6_18h22h_win", "rel_mean_td2.0_p6_22h00h_win", 
+    "rel_mean_weekday_drm"
   )
 )
 
@@ -59,7 +75,7 @@ feats_set <- list(
 dset_keys <- list(
   # TYPE 1
   list(
-    keys       = c("go2", "meg"),
+    keys       = c("go2", "meg", "goi"),
     is_hhold   = 1,
     imp_na_pct = 0.1,
     sum_pday   = 0.1
@@ -80,7 +96,7 @@ dset_keys <- list(
   ),
   # TYPE 4
   list(
-    keys       = c("go2", "meg"),
+    keys       = c("go2", "meg", "goi"),
     is_hhold   = 0:1,
     imp_na_pct = 0.1,
     sum_pday   = 0.1
@@ -101,7 +117,7 @@ dset_keys <- list(
   ),
   # TYPE 7 - ALL
   list(
-    keys       = c("go2", "meg", "lcl", "iss", "por", "nee"),
+    keys       = c("go2", "meg", "lcl", "iss", "por", "nee", "goi"),
     is_hhold   = c(0, 1, NA),
     imp_na_pct = 0.1,
     sum_pday   = 0.1
