@@ -154,8 +154,13 @@ get_cluster_analysis <- function(analysis_type) {
     maxitems   = nrow(feats_aux) + 1
   )
 
+  # ANALYSIS FILE
   filename <- paste0(out_dir, final_name, ".clValid2")
   save("o", file = filename)
+  # CONFIGURATION FILE
+  filename <- paste0(out_dir, final_name, ".config")
+  analysis_type$ff <- feats_set[[analysis_type$ff]]
+  save("analysis_type", file = filename)
 }
 
 ################################################################################
