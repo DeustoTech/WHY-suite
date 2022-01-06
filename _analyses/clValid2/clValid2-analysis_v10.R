@@ -14,7 +14,7 @@ if (.Platform$OS.type == "windows") {
   out_dir   <- "G:/Mi unidad/WHY/Analyses/clValid2/"
 }
 if (.Platform$OS.type == "unix") {
-  feats_dir <- "/home/ubuntu/carlos.quesada/disk/features/go4_pre_21.12.26/"
+  feats_dir <- "/home/ubuntu/carlos.quesada/disk/features/"
   out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_pre-post/data/"
 }
 
@@ -148,9 +148,9 @@ get_cluster_analysis <- function(analysis_type) {
 
   o <- clValid2::clValid(
     obj        = feats_aux,
-    nClust     = nClust,
-    clMethods  = clMethods,
-    validation = valid,
+    nClust     = analysis_type$cc,
+    clMethods  = analysis_type$mm,
+    validation = analysis_type$vv,
     maxitems   = nrow(feats_aux) + 1
   )
 
