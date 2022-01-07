@@ -15,7 +15,7 @@ if (.Platform$OS.type == "windows") {
 }
 if (.Platform$OS.type == "unix") {
   feats_dir <- "/home/ubuntu/carlos.quesada/disk/features/"
-  out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_pre-post/data/"
+  out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_go4-pre/data/"
 }
 
 # Load dataset
