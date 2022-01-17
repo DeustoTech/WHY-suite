@@ -21,7 +21,15 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE, num_years=2) {
   # INPUT: dataframe with pairs dataset-filename
   align_time_series <- function(fname) {
     # Load dataframe
-    load(fname[[1]])
+    load(fname[[1]]) # UNCOMMENT!
+    
+	  ##############################################
+# 	  print(fname)
+#     # 69abbed24a5685b949114dd5162074c1.RData
+#     browser()
+#     load("C:/Users/carlos.quesada/Documents/WHY/2022.01.14 - go4 clValid analysis/go4_pre/69abbed24a5685b949114dd5162074c1.RData")
+	  ##############################################
+    
     # By hours
     t_factor <- cut(edf$df$times, breaks = "1 hour")
     # Aggregate by hour
@@ -43,6 +51,8 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE, num_years=2) {
     i_times_vect <- lubridate::ymd_hms(aggr_data$date_time, tz="UTC")
     # Input vector of values
     i_value_vect <- aggr_data$V1
+    # Length of input vector
+    i_len <- length(i_value_vect)
     # Number of years to be taken per time series (if "as much as possible" is
     # wanted, just set sp <- 0 and uncomment the commented while loop)
     nyears <- length(unique(lubridate::isoyear(i_times_vect)))
@@ -62,9 +72,24 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE, num_years=2) {
       o2 <- yy*len1yr
       # Get end index of input vector
       i2 <- i1 + (o2 - o1)
+      
+      # THIS PART DOESN'T MATTER BECAUSE IT TAKES NaNs
+      # i2_aux <- i1 + (o2 - o1)
+      # i2 <- ifelse(i2_aux > i_len, i_len, i2_aux)
+      
       # Complete the output vector
       # o_times_vect[o1:o2] <- i_times_vect[i1:i2]
+      
+	    ##############################################
+	    # print(yy)
+	    # print(i1)
+	    # print(i2)
+	    # print("---")
+	    ##############################################
+	    
       o_value_vect[o1:o2] <- i_value_vect[i1:i2]
+      # Out of the loop if the sequence is finished
+	    if ((i2+1) > i_len) break
       # Find the new i1 (it must be Mon, 1 WK at 00:00h)
       aux_idx <- get_matrix_index(i_times_vect[i2+1])
       i1 <- (i2 + 1) - (aux_idx - 1)
@@ -163,11 +188,11 @@ clValid2_heatmaps <- function() {
   }
   if (.Platform$OS.type == "unix") {
     feats_path  <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv"
-    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_go4-pre/data/"
+    clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.01.13_go4-pre/data/"
     # As named vector for each dataset
     dataset_dir <- c(goi="/home/ubuntu/carlos.quesada/disk/go4_pre/imp/")
-    hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_go4-pre/hmm/"
-    hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.12.27_go4-pre/hmp/"
+    hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.01.13_go4-pre/hmm2/"
+    hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.01.13_go4-pre/hmp2/"
   }
   
   number_of_clusters <- 30
@@ -201,7 +226,8 @@ clValid2_heatmaps <- function() {
     foreach::foreach(cc = number_of_clusters:1, .inorder = FALSE, .export=fun_export) %dopar% {
   
   # for(ff in 1:length(fnames)) {
-  #   for(cc in 1:number_of_clusters) {
+  #   for(cc in 2:number_of_clusters) {
+      
       # Working file name
       w_fname <- fnames[ff]
       # Working config file name
@@ -307,8 +333,8 @@ clValid2_heatmaps <- function() {
     # }
   }
   
-  # # Stop parallelization
-  # parallel::stopCluster(cl)
+  # Stop parallelization
+  parallel::stopCluster(cl)
 }
 
 clValid2_heatmaps()
