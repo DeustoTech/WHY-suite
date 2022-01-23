@@ -17,6 +17,7 @@
 2. ``clValid2-validations_v01.R``: Plot validation curves.
 3. ``clValid2-heatmaps_v02P.R``: Generate heatmap matrices (hmm) and heatmap plots (hmp). Check if ``.scale`` is ``TRUE``.
 	* ``v03P``: for **variable** number of clusters per dataset (linked to ``clValid2-analysis_v05.R``).
+	* ``v13P``: RENEWED VERSION - improved and created for ``go4`` (linked to ``clValid2-analysis_v10.R``).
 4. ``clValid2-graphs_v04.R``: Plot features, statistics and surveys (if skipped, generate a "summary report").
 	* ``v05``: like ``v04`` but for **variable** number of clusters per dataset.
 5. ``clValid2-report_v01.Rmd``: Markdown report.
