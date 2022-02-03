@@ -250,11 +250,22 @@ cluster_features <- function(
 cluster_features(
   feats_file = "C:/Users/carlos.quesada/Documents/WHY/2021.12.28 - go4_feats/go4_pre_21.12.28/feats_go4_pre.csv",
   output_dir = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/clusters/",
+  # SELECTOR OF SETS OF FEATURES
+  # e.g. "sAggr", "peaks", "tsfAC", "cat22", "sAggrP6", "sAggrDRM"
   ff_sel = c("sAggr", "sAggrP6", "sAggrDRM"),
+  # SELECTOR OF DATASETS
+  # Each sublist is a different analysis
+  # Each analysis defines "key", "is_household", "rel_imputed_na", and "tariff"
   dd_sel = list(
     list(key="goi", is_household=NULL, rel_imputed_na=0.05, tariff="2")
   ),
+  # SELECTOR OF CLUSTER METHODS
+  # e.g. "hierarchical", "kmeans", "diana", "fanny", "som", "pam", "sota",
+  # "clara", "model"
   mm_sel = c("som"),
+  # SELECTOR OF VALIDATION METHODS
+  # e.g. "internal", "stability", "biological"
   vv_sel = c("internal"),
-  cc_sel = 30
+  # SELECTOR OF NUMBER OF CLUSTERS
+  cc_sel = c(30)
 )
