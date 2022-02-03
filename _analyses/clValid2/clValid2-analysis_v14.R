@@ -9,7 +9,7 @@ library(mclust)
 ##  Function to select the analyses  ##
 #######################################
 
-call_clValid2 <- function(analysis_type, feats, feats_set) {
+call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
 
   ##############################################################################
   ##  ANALYSIS USING THE clValid PACKAGE
@@ -206,7 +206,7 @@ cluster_features <- function(
   }
   
   for (cluster_code_ii in cluster_codes) {
-    call_clValid2(cluster_code_ii, feats, feats_set)
+    call_clValid2(output_dir, cluster_code_ii, feats, feats_set)
   }
 }
 
