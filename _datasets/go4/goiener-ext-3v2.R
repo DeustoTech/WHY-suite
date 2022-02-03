@@ -15,20 +15,11 @@ folder <- "D:\\Quesada\\Documents\\__ACTIVIDADES\\GitHub\\why-T2.1\\R\\"
 get_samples_per_day <- function() {
   list(
     goi = 24, 
-    go2 = 24,
-    go3 = 24,
-    go4 = 24,
     iss = 48, 
     lcl = 48, 
     nee = 96,
     por = 96,
-    ref = 24,
-    go3_pre = 24,
-    go3_pst = 24,
-    go3_p20 = 24,
-    go3_P21 = 24,
-    go4_pre = 24,
-    go4_pst = 24
+    ref = 24
   )
 }
 
@@ -368,9 +359,8 @@ impute_cooked_dataframe <- function(cdf, season, short_gap, short_algorithm="int
 ################################################################################
 
 extend_dataset_v2 <- function(
-  input_folder, output_folder, wanted_days, dset_key, metadata_files=NULL,
-  from_date="first", to_date="last", extend_after_end=TRUE,
-  working_with_generation=FALSE, min_years = 1
+  input_folder, output_folder, dset_key, metadata_files=NULL,
+  from_date="first", to_date="last", working_with_generation=FALSE, min_years = 1
   ) {
   
   # Get list of filenames in dataset folder
@@ -400,7 +390,7 @@ extend_dataset_v2 <- function(
   #print(length_fnames)
   
   # Analysis loop
-  pkg <- c("tidyr", "lubridate")
+  packages <- c("tidyr", "lubridate")
   export <- c(
     "extract_metadata",
     "get_raw_dataframe_from_dataset",
@@ -410,7 +400,7 @@ extend_dataset_v2 <- function(
   )
   
   out <- foreach::foreach (
-    x = 1:length_fnames, .packages = pkg, .export = export) %dopar% {
+    x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
   #for(x in 1:length_fnames) {
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
@@ -478,65 +468,15 @@ extend_dataset_v2 <- function(
 }
 
 ### USER DEFINED VARIABLES
-#if (.Platform$OS.type == "windows") {
-#  raw_folder <- "D:/Quesada/Documents/__TRABAJO/why/raw/"
-#  ext_folder <- "D:/Quesada/Documents/__TRABAJO/why/ext/"
-#  mdata_file <- "D:/Quesada/Documents/__TRABAJO/why/Contratos_Goiener_20211103_anonymized.csv"
-#}
-#if (.Platform$OS.type == "unix") {
-#  raw_folder <- "/home/ubuntu/carlos.quesada/disk/go3/raw/"
-#  ext_folder <- "/home/ubuntu/carlos.quesada/disk/go3_pre/ext/"
-#  mdata_file <- "/home/ubuntu/carlos.quesada/R_scripts/Contratos_Goiener_20211103_anonymized.csv"
-#}
-
-##Function call for "go4_pre" (consumption)
-# extend_dataset_v2(
-  # "/home/ubuntu/carlos.quesada/disk/go4/raw/", 
-  # "/home/ubuntu/carlos.quesada/disk/go4_pre/imp/", 
-  # wanted_days = NULL,
-  # dset_key = "goi",
-  # metadata_files = "/home/ubuntu/carlos.quesada/R_scripts/metadata/Contratos_goi_meg_cor_20211222.csv",
-  # to_date = as.POSIXct("2020-02-29 23:00:00", tz="UTC"),
-  # extend_after_end = NULL,
-  # working_with_generation = FALSE,
-  # min_years = 1
-# )
-
-# #Function call for "go4_pst" (consumption)
-# extend_dataset_v2(
- # "/home/ubuntu/carlos.quesada/disk/go4/raw/", 
- # "/home/ubuntu/carlos.quesada/disk/go4_pst/imp/", 
- # wanted_days = NULL,
- # dset_key = "goi",
- # metadata_files = "/home/ubuntu/carlos.quesada/R_scripts/metadata/Contratos_goi_meg_cor_20211222.csv",
- # from_date = as.POSIXct("2020-03-01 00:00:00", tz="UTC"),
- # extend_after_end = NULL,
- # working_with_generation = FALSE,
- # min_years = 1
-# )
-
-# #Function call for "lcl"
-# extend_dataset_v2(
-#  input_folder = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
-#  output_folder = "/home/ubuntu/carlos.quesada/disk/lcl_imp/imp/",
-#  wanted_days = NULL,
-#  dset_key = "lcl",
-#  metadata_files = NULL,
-#  extend_after_end = NULL,
-#  working_with_generation = FALSE,
-#  min_years = 1
-# )
 
 #Function call for "goi"
 extend_dataset_v2(
   input_folder = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/",
   output_folder = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/",
-  wanted_days = NULL,
   dset_key = "goi",
   metadata_files = c(
     "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/old/Contratos_goi_meg_cor_20211222.csv"
   ),
-  extend_after_end = NULL,
   working_with_generation = FALSE,
   min_years = 1
 )
