@@ -35,8 +35,6 @@ call_clValid2 <- function(analysis_type, feats, feats_set) {
   nrow_feats <- nrow(feats)
   row_conditions <- rep(TRUE, nrow_feats)
   
-  browser()
-  
   ### CONDITIONS ---------------------------------------------------------------
   
   # Condition 1: Dataset key
@@ -107,41 +105,6 @@ call_clValid2 <- function(analysis_type, feats, feats_set) {
 
 cluster_features <- function(
   feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel) {
-  
-  # # Features file version
-  # feats_vers <- "go4_pre"
-  # 
-  # # User defined variables
-  # if (.Platform$OS.type == "windows") {
-  #   feats_file <- "C:/Users/carlos.quesada/Documents/WHY/2021.12.28 - go4_feats/go4_pre_21.12.28/feats_go4_pre.csv"
-  #   out_dir    <- "G:/Mi unidad/WHY/Analyses/clValid2/"
-  # }
-  # if (.Platform$OS.type == "unix") {
-  #   feats_dir <- "/home/ubuntu/carlos.quesada/disk/features/"
-  #   out_dir   <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pre-only-2-tariffs/data/"
-  # }
-  
-  # # Load dataset
-  # feats_path <- paste0(feats_dir, "feats_", feats_vers, ".csv")
-  
-  # # SELECTOR OF SETS OF FEATURES
-  # # e.g. "sAggr", "peaks", "tsfAC", "cat22", "sAggrP6", "sAggrDRM"
-  # ff_sel <- c("sAggr", "sAggrP6", "sAggrDRM")
-  # # SELECTOR OF DATASETS
-  # # Each sublist is a different analysis
-  # # Each analysis defines "key", "is_household", and "rel_imputed_na"
-  # dd_sel <- list(
-  #   list(key="goi", is_household=NULL, rel_imputed_na=0.05, tariff="2")
-  # )
-  # # SELECTOR OF CLUSTER METHODS
-  # # e.g. "hierarchical", "kmeans", "diana", "fanny", "som", "pam", "sota",
-  # # "clara", "model"
-  # mm_sel <- c("som")
-  # # SELECTOR OF VALIDATION METHODS
-  # # e.g. "internal", "stability", "biological"
-  # vv_sel <- c("internal")
-  # # SELECTOR OF NUMBER OF CLUSTERS
-  # cc_sel <- 30
   
   feats <- data.table::fread(
     file   = feats_file,
@@ -248,8 +211,8 @@ cluster_features <- function(
 }
 
 cluster_features(
-  feats_file = "C:/Users/carlos.quesada/Documents/WHY/2021.12.28 - go4_feats/go4_pre_21.12.28/feats_go4_pre.csv",
-  output_dir = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/clusters/",
+  feats_file = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv",
+  output_dir = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pre-only-2-tariffs/data/",
   # SELECTOR OF SETS OF FEATURES
   # e.g. "sAggr", "peaks", "tsfAC", "cat22", "sAggrP6", "sAggrDRM"
   ff_sel = c("sAggr", "sAggrP6", "sAggrDRM"),
@@ -260,8 +223,7 @@ cluster_features(
     list(key="goi", is_household=NULL, rel_imputed_na=0.05, tariff="2")
   ),
   # SELECTOR OF CLUSTER METHODS
-  # e.g. "hierarchical", "kmeans", "diana", "fanny", "som", "pam", "sota",
-  # "clara", "model"
+  # e.g. "hierarchical", "kmeans", "diana", "fanny", "som", "pam", "sota", "clara", "model"
   mm_sel = c("som"),
   # SELECTOR OF VALIDATION METHODS
   # e.g. "internal", "stability", "biological"
