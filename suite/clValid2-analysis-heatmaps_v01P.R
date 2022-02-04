@@ -518,8 +518,7 @@ clValid2_heatmaps <- function(
 ## ASSEMBLY EVERYTHING: get report from folder of imputed TS
 ################################################################################
 imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
-                       ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, hmp_clust,
-                       rmd_title) {
+                       ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, rmd_title, rmd_dir) {
   
   # print("## clValid2 ANALYSES ##")
   # cluster_features(
@@ -539,7 +538,7 @@ imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
   #   hmm_dir     = hmm_dir,
   #   hmp_dir     = hmp_dir,
   #   dataset_dir = dataset_dir,
-  #   num_cluster = hmp_clust,
+  #   num_cluster = cc_sel,
   #   scale_hmm   = TRUE
   # )
   
@@ -572,7 +571,6 @@ dd_sel      <- list(
 mm_sel      <- c("som")
 vv_sel      <- c("internal")
 cc_sel      <- c(30)
-hmp_clust   <- 30
 rmd_title   <- "Cluster Report v3.1: POST-COVID GoiEner"
 rmd_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/report/"
 
@@ -587,6 +585,6 @@ imp2report(
   mm_sel      = mm_sel,
   vv_sel      = vv_sel,
   cc_sel      = cc_sel,
-  hmp_clust   = hmp_clust,
-  rmd_title   = rmd_title
+  rmd_title   = rmd_title,
+  rmd_dir     = rmd_dir
 )
