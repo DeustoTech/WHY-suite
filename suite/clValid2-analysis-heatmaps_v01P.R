@@ -547,12 +547,10 @@ imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
   params_list <- list(
     rmd_title   = rmd_title,
     hmp_dir     = hmp_dir,
-    nofile_path = "no-file.png",
     ff          = ff_sel,
     dd          = dd_sel,
     mm          = mm_sel
   )
-  print(params_list)
   rmarkdown::render(
     input       = "clValid2-summary_report_v03.Rmd",
     output_file = paste0(rmd_dir, "cluster_report.html"),

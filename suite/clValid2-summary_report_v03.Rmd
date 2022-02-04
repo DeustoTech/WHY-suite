@@ -7,6 +7,13 @@ output:
   toc: true
 toc_depth: 4
 theme: united
+params:
+  rmd_title: "Cluster Report"
+  hmp_dir: ""
+  nofile_path: "no-file.png"
+  ff: ""
+  dd: ""
+  mm: ""
 ---
 
 <style type="text/css">
@@ -187,7 +194,8 @@ for (ff in ff_loop) {
         # Get index
         cc_idx <- cc #(cc - 1) %% 12 + 1
         # Path to file
-        card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_", max(cc_loop), "cl_i-", cc, ".png")
+        card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_",
+                            max(cc_loop), "cl_i-", cc, ".png")
         # Complete txt_list
         if (file.exists(card_path)) {
           txt_list$img[cc_idx] <- paste0("![](", card_path, ")")
