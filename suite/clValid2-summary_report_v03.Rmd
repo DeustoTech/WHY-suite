@@ -46,7 +46,7 @@ params:
 # Path to hmp graphs
 hmp_path <- params$hmp_dir
 # Path to hmm values
-hmm_path <- parmas$hmm_dir
+hmm_path <- params$hmm_dir
 # No file by DEFAULT
 no.file_path  <- params$nofile_path
 no_file <- paste0("![](", no.file_path, ")")
@@ -201,7 +201,7 @@ for (ff in ff_loop) {
         card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".png")
         # Load variable "idx"
-        idx_path <- paste0(hmm_path, "hmp_", ff, "_", dd, "_", mm, "_",
+        idx_path <- paste0(hmm_path, "hmm_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".RData")
         load(file=idx_path)
         
@@ -215,8 +215,8 @@ for (ff in ff_loop) {
           ff, " > ", 
           dd, " > ", 
           mm, " > ", 
-          "#", cc, "\n",
-          sum(idx), " elems. (", round(100*sum(idx)/length(idx),1), "%)\n\n"
+          "#", cc, "\n\n",
+          sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
         )
         # Print HTML table
         if (cc_idx == max(cc_loop)) {
