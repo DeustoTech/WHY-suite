@@ -530,17 +530,17 @@ imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
   #   vv_sel     = vv_sel,
   #   cc_sel     = cc_sel
   # )
-  # 
-  # print("## HEATMAP PLOTS ##")
-  # clValid2_heatmaps(
-  #   feats_file  = feats_file,
-  #   clValid_dir = clValid_dir,
-  #   hmm_dir     = hmm_dir,
-  #   hmp_dir     = hmp_dir,
-  #   dataset_dir = dataset_dir,
-  #   num_cluster = cc_sel,
-  #   scale_hmm   = TRUE
-  # )
+
+  print("## HEATMAP PLOTS ##")
+  clValid2_heatmaps(
+    feats_file  = feats_file,
+    clValid_dir = clValid_dir,
+    hmm_dir     = hmm_dir,
+    hmp_dir     = hmp_dir,
+    dataset_dir = dataset_dir,
+    num_cluster = cc_sel,
+    scale_hmm   = TRUE
+  )
   
   print("## RMarkDown REPORT ##")
   
