@@ -517,79 +517,49 @@ clValid2_heatmaps <- function(
 ################################################################################
 ## ASSEMBLY EVERYTHING: get report from folder of imputed TS
 ################################################################################
-imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
+imp2report <- function(actions, clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
                        ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, rmd_title, rmd_dir) {
   
-  # print("## clValid2 ANALYSES ##")
-  # cluster_features(
-  #   feats_file = feats_file,
-  #   output_dir = clValid_dir,
-  #   ff_sel     = ff_sel,
-  #   dd_sel     = dd_sel,
-  #   mm_sel     = mm_sel,
-  #   vv_sel     = vv_sel,
-  #   cc_sel     = cc_sel
-  # )
+  if ("cluster" %in% actions) {
+    print("## clValid2 ANALYSES ##")
+    cluster_features(
+      feats_file = feats_file,
+      output_dir = clValid_dir,
+      ff_sel     = ff_sel,
+      dd_sel     = dd_sel,
+      mm_sel     = mm_sel,
+      vv_sel     = vv_sel,
+      cc_sel     = cc_sel
+    )
+  }
 
-  # print("## HEATMAP PLOTS ##")
-  # clValid2_heatmaps(
-  #   feats_file  = feats_file,
-  #   clValid_dir = clValid_dir,
-  #   hmm_dir     = hmm_dir,
-  #   hmp_dir     = hmp_dir,
-  #   dataset_dir = dataset_dir,
-  #   num_cluster = cc_sel,
-  #   scale_hmm   = TRUE
-  # )
+  if ("heatmap" %in% actions) {
+    print("## HEATMAP PLOTS ##")
+    clValid2_heatmaps(
+      feats_file  = feats_file,
+      clValid_dir = clValid_dir,
+      hmm_dir     = hmm_dir,
+      hmp_dir     = hmp_dir,
+      dataset_dir = dataset_dir,
+      num_cluster = cc_sel,
+      scale_hmm   = TRUE
+    )
+  }
   
-  print("## RMarkDown REPORT ##")
-  
-  params_list <- list(
-    rmd_title   = rmd_title,
-    hmp_dir     = hmp_dir,
-    hmm_dir     = hmm_dir,
-    ff          = ff_sel,
-    dd          = dd_sel,
-    mm          = mm_sel
-  )
-  rmarkdown::render(
-    input       = "clValid2-summary_report_v03.Rmd",
-    output_file = paste0(rmd_dir, "cluster_report.html"),
-    params      = params_list
-  )
+  if ("report" %in% actions) {
+    print("## RMarkDown REPORT ##")
+    params_list <- list(
+      rmd_title   = rmd_title,
+      hmp_dir     = hmp_dir,
+      hmm_dir     = hmm_dir,
+      ff          = ff_sel,
+      dd          = dd_sel,
+      mm          = mm_sel
+    )
+    rmarkdown::render(
+      input       = "clValid2-summary_report_v03.Rmd",
+      output_file = paste0(rmd_dir, "cluster_report.html"),
+      params      = params_list
+    )
+  }
 }
-
-clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/data/"
-dataset_dir <- c(
-  goi="/home/ubuntu/carlos.quesada/disk/go4_pst/imp/"
-)
-hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/hmm/"
-hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/hmp/"
-feats_file  <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv"
-ff_sel      <- c("sAggrP6", "sAggrDRM")
-dd_sel      <- list(
-  # Each sublist is an OR, each element within the sublist is an AND
-  # Each NULL element within the sublist means ALL TRUE
-  list(key="goi", is_household=NULL, rel_imputed_na=0.05, tariff="2")
-)
-mm_sel      <- c("som")
-vv_sel      <- c("internal")
-cc_sel      <- c(30)
-rmd_title   <- "Cluster Report v3.1: POST-COVID GoiEner"
-rmd_dir     <- "/home/ubuntu/carlos.quesada/analyses/suite/" #"/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/report/"
-
-
-imp2report(
-  clValid_dir = clValid_dir,
-  dataset_dir = dataset_dir,
-  hmm_dir     = hmm_dir,
-  hmp_dir     = hmp_dir,
-  feats_file  = feats_file,
-  ff_sel      = ff_sel,
-  dd_sel      = dd_sel,
-  mm_sel      = mm_sel,
-  vv_sel      = vv_sel,
-  cc_sel      = cc_sel,
-  rmd_title   = rmd_title,
-  rmd_dir     = rmd_dir
-)
