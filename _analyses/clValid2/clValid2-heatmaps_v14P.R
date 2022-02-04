@@ -183,7 +183,7 @@ clValid2_heatmaps <- function(
   
   # Load feats
   feats <- data.table::fread(
-    file   = feats_path,
+    file   = feats_file,
     header = TRUE,
     sep    = ",",
     select = c("data_set", "file", "rel_imputed_na", "is_household", "minimum")
@@ -201,10 +201,10 @@ clValid2_heatmaps <- function(
   doParallel::registerDoParallel(cl)
 
   o <- foreach::foreach(ff = 1:length(fnames), .export=fun_export) %:%
-    foreach::foreach(cc = number_of_clusters:1, .inorder = FALSE, .export=fun_export) %dopar% {
+    foreach::foreach(cc = 1:num_cluster, .inorder = FALSE, .export=fun_export) %dopar% {
   
   # for(ff in 1:length(fnames)) {
-  #   for(cc in 2:number_of_clusters) {
+    # for(cc in 2:num_cluster) {
       
       # Working file name
       w_fname <- fnames[ff]
@@ -214,19 +214,47 @@ clValid2_heatmaps <- function(
       w_cpath <- paste0(clValid_dir, w_cname)
       load(w_cpath)
       
-      row_conditions <- rep(FALSE, nrow(feats))
-      
-      for(ii in 1:nrow(analysis_type$dd)) {
-        row_conditions <- row_conditions | (
-          feats$data_set == analysis_type$dd$key[ii] &
-            feats$rel_imputed_na < analysis_type$dd$rel_imputed_na[ii] &
-            feats$is_household == analysis_type$dd$is_household[ii] &
-            # feats$sum_per_day > sum_pday &
-            feats$minimum >= 0
-        )
-      }
-      # Discard NA values
-      row_conditions[is.na(row_conditions)] <- FALSE
+      nrow_feats <- nrow(feats)
+      row_conditions <- rep(TRUE, nrow_feats)
+       
+	  ### CONDITIONS ---------------------------------------------------------------
+	  
+	  # Condition 1: Dataset key
+	  if (is.null(analysis_type$dd$key))
+		cond_key <- TRUE
+	  else
+		cond_key <- feats$data_set %in% analysis_type$dd$key
+	  
+	  # Condition 2: Percentage of imputed samples in TS
+	  if (is.null(analysis_type$dd$rel_imputed_na))
+		cond_imp <- TRUE
+	  else
+		cond_imp <- feats$rel_imputed_na < analysis_type$dd$rel_imputed_na
+	  
+	  # Condition 3: Household or not
+	  if (is.null(analysis_type$dd$is_household))
+		cond_hhd <- TRUE
+	  else
+		cond_hhd <- feats$is_household %in% analysis_type$dd$is_household
+	  
+	  # Condition 4: Type of tariff
+	  if (is.null(analysis_type$dd$ref_atr_tariff))
+		cond_trf <- TRUE
+	  else
+		cond_trf <- substr(feats$ref_atr_tariff,1,1) %in% analysis_type$dd$tariff
+	  
+	  # Mandatory condition
+	  cond_min <- feats$minimum >= 0
+	  
+	  # Check all conditions
+	  row_conditions <- row_conditions & (
+		cond_key & cond_imp & cond_hhd & cond_trf & cond_min
+	  )
+	  
+	  # Discard NA values
+	  row_conditions[is.na(row_conditions)] <- FALSE
+	  
+	  ### --------------------------------------------------------------------------
       
       w_feats <- feats[row_conditions,]
       w_fpath <- paste0(clValid_dir, w_fname)
@@ -236,39 +264,39 @@ clValid2_heatmaps <- function(
       ### Get the clustering 
       # HIERARCHICAL
       if (analysis_type$mm == "hierarchical") {
-        cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=number_of_clusters)
+        cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=num_cluster)
       }
       # K-MEANS
       if (analysis_type$mm == "kmeans") {
-        cluster_list <- o@clusterObjs[["kmeans"]][[as.character(number_of_clusters)]][["cluster"]]
+        cluster_list <- o@clusterObjs[["kmeans"]][[as.character(num_cluster)]][["cluster"]]
       }
       # DIANA
       if (analysis_type$mm == "diana") {
-        cluster_list <- cutree(o@clusterObjs[["diana"]], k=number_of_clusters)
+        cluster_list <- cutree(o@clusterObjs[["diana"]], k=num_cluster)
       }
       # FANNY
       if (analysis_type$mm == "fanny") {
-        cluster_list <- o@clusterObjs[["fanny"]][[as.character(number_of_clusters)]]$clustering
+        cluster_list <- o@clusterObjs[["fanny"]][[as.character(num_cluster)]]$clustering
       }
       # SOM
       if (analysis_type$mm == "som") {
-        cluster_list <- o@clusterObjs[["som"]][[as.character(number_of_clusters)]]$unit.classif
+        cluster_list <- o@clusterObjs[["som"]][[as.character(num_cluster)]]$unit.classif
       }
       # PAM
       if (analysis_type$mm == "pam") {
-        cluster_list <- o@clusterObjs[["pam"]][[as.character(number_of_clusters)]]$clustering
+        cluster_list <- o@clusterObjs[["pam"]][[as.character(num_cluster)]]$clustering
       }
       # SOTA
       if (analysis_type$mm == "sota") {
-        cluster_list <- o@clusterObjs[["sota"]][[as.character(number_of_clusters)]]$clust
+        cluster_list <- o@clusterObjs[["sota"]][[as.character(num_cluster)]]$clust
       }
       # CLARA
       if (analysis_type$mm == "clara") {
-        cluster_list <- o@clusterObjs[["clara"]][[as.character(number_of_clusters)]]$clustering
+        cluster_list <- o@clusterObjs[["clara"]][[as.character(num_cluster)]]$clustering
       }
       # MODEL-BASED
       if (analysis_type$mm == "model") {
-        cluster_list <- o@clusterObjs[["model"]][[as.character(number_of_clusters)]]$classification
+        cluster_list <- o@clusterObjs[["model"]][[as.character(num_cluster)]]$classification
       }
       
       # Get cluster indices
@@ -286,7 +314,7 @@ clValid2_heatmaps <- function(
       # hm_fname_type <- paste0(hm_fname, type)
       
       # File paths
-      #hm_fname <- paste0(w_fname, "-", number_of_clusters)
+      #hm_fname <- paste0(w_fname, "-", num_cluster)
       hmm_path <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
       hmp_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
 
@@ -334,7 +362,7 @@ if (.Platform$OS.type == "unix") {
   hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pre-only-2-tariffs/hmp/"
 }
 
-# number_of_clusters <- 30
+# num_cluster <- 30
 # scale_hmm <- TRUE
 
 clValid2_heatmaps(
