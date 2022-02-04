@@ -5,7 +5,7 @@ date: "`r format(Sys.time())`"
 output:
   html_document:
   toc: true
-toc_depth: 4
+toc_depth: 1
 theme: united
 params:
   rmd_title: "Cluster Report"
@@ -39,7 +39,8 @@ params:
 * __som__: self-organizing maps
 
 <hr>
-  
+
+
 ```{r, include=FALSE}
 # Path to hmp graphs
 hmp_path <- params$hmp_dir
@@ -49,126 +50,126 @@ no_file <- paste0("![](", no.file_path, ")")
 # Table of cards
 table_of_cards <- function(txt_list) {
   o <- paste0(
-    '<table border="0">
-    <tr>
-    <td width="16.66%">', txt_list$img[1], '</td>
-    <td width="16.66%">', txt_list$img[2], '</td>
-    <td width="16.66%">', txt_list$img[3], '</td>
-    <td width="16.66%">', txt_list$img[4], '</td>
-    <td width="16.66%">', txt_list$img[5], '</td>
-    <td width="16.66%">', txt_list$img[6], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[1], '</small></center></td>
-    <td><center><small>', txt_list$cap[2], '</small></center></td>
-    <td><center><small>', txt_list$cap[3], '</small></center></td>
-    <td><center><small>', txt_list$cap[4], '</small></center></td>
-    <td><center><small>', txt_list$cap[5], '</small></center></td>
-    <td><center><small>', txt_list$cap[6], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[7], '</td>
-    <td>', txt_list$img[8], '</td>
-    <td>', txt_list$img[9], '</td>
-    <td>', txt_list$img[10], '</td>
-    <td>', txt_list$img[11], '</td>
-    <td>', txt_list$img[12], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[7], '</small></center></td>
-    <td><center><small>', txt_list$cap[8], '</small></center></td>
-    <td><center><small>', txt_list$cap[9], '</small></center></td>
-    <td><center><small>', txt_list$cap[10], '</small></center></td>
-    <td><center><small>', txt_list$cap[11], '</small></center></td>
-    <td><center><small>', txt_list$cap[12], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[13], '</td>
-    <td>', txt_list$img[14], '</td>
-    <td>', txt_list$img[15], '</td>
-    <td>', txt_list$img[16], '</td>
-    <td>', txt_list$img[17], '</td>
-    <td>', txt_list$img[18], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[13], '</small></center></td>
-    <td><center><small>', txt_list$cap[14], '</small></center></td>
-    <td><center><small>', txt_list$cap[15], '</small></center></td>
-    <td><center><small>', txt_list$cap[16], '</small></center></td>
-    <td><center><small>', txt_list$cap[17], '</small></center></td>
-    <td><center><small>', txt_list$cap[18], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[19], '</td>
-    <td>', txt_list$img[20], '</td>
-    <td>', txt_list$img[21], '</td>
-    <td>', txt_list$img[22], '</td>
-    <td>', txt_list$img[23], '</td>
-    <td>', txt_list$img[24], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[19], '</small></center></td>
-    <td><center><small>', txt_list$cap[20], '</small></center></td>
-    <td><center><small>', txt_list$cap[21], '</small></center></td>
-    <td><center><small>', txt_list$cap[22], '</small></center></td>
-    <td><center><small>', txt_list$cap[23], '</small></center></td>
-    <td><center><small>', txt_list$cap[24], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[25], '</td>
-    <td>', txt_list$img[26], '</td>
-    <td>', txt_list$img[27], '</td>
-    <td>', txt_list$img[28], '</td>
-    <td>', txt_list$img[29], '</td>
-    <td>', txt_list$img[30], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[25], '</small></center></td>
-    <td><center><small>', txt_list$cap[26], '</small></center></td>
-    <td><center><small>', txt_list$cap[27], '</small></center></td>
-    <td><center><small>', txt_list$cap[28], '</small></center></td>
-    <td><center><small>', txt_list$cap[29], '</small></center></td>
-    <td><center><small>', txt_list$cap[30], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[31], '</td>
-    <td>', txt_list$img[32], '</td>
-    <td>', txt_list$img[33], '</td>
-    <td>', txt_list$img[34], '</td>
-    <td>', txt_list$img[35], '</td>
-    <td>', txt_list$img[36], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[31], '</small></center></td>
-    <td><center><small>', txt_list$cap[32], '</small></center></td>
-    <td><center><small>', txt_list$cap[33], '</small></center></td>
-    <td><center><small>', txt_list$cap[34], '</small></center></td>
-    <td><center><small>', txt_list$cap[35], '</small></center></td>
-    <td><center><small>', txt_list$cap[36], '</small></center></td>
-    </tr>
-    <tr>
-    <td>', txt_list$img[37], '</td>
-    <td>', txt_list$img[38], '</td>
-    <td>', txt_list$img[39], '</td>
-    <td>', txt_list$img[40], '</td>
-    <td>', txt_list$img[41], '</td>
-    <td>', txt_list$img[42], '</td>
-    </tr>
-    <tr>
-    <td><center><small>', txt_list$cap[37], '</small></center></td>
-    <td><center><small>', txt_list$cap[38], '</small></center></td>
-    <td><center><small>', txt_list$cap[39], '</small></center></td>
-    <td><center><small>', txt_list$cap[40], '</small></center></td>
-    <td><center><small>', txt_list$cap[41], '</small></center></td>
-    <td><center><small>', txt_list$cap[42], '</small></center></td>
-    </tr>
-    </table>\n\n'
+'<table border="0">
+<tr>
+<td width="16.66%">', txt_list$img[1], '</td>
+<td width="16.66%">', txt_list$img[2], '</td>
+<td width="16.66%">', txt_list$img[3], '</td>
+<td width="16.66%">', txt_list$img[4], '</td>
+<td width="16.66%">', txt_list$img[5], '</td>
+<td width="16.66%">', txt_list$img[6], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[1], '</small></center></td>
+<td><center><small>', txt_list$cap[2], '</small></center></td>
+<td><center><small>', txt_list$cap[3], '</small></center></td>
+<td><center><small>', txt_list$cap[4], '</small></center></td>
+<td><center><small>', txt_list$cap[5], '</small></center></td>
+<td><center><small>', txt_list$cap[6], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[7], '</td>
+<td>', txt_list$img[8], '</td>
+<td>', txt_list$img[9], '</td>
+<td>', txt_list$img[10], '</td>
+<td>', txt_list$img[11], '</td>
+<td>', txt_list$img[12], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[7], '</small></center></td>
+<td><center><small>', txt_list$cap[8], '</small></center></td>
+<td><center><small>', txt_list$cap[9], '</small></center></td>
+<td><center><small>', txt_list$cap[10], '</small></center></td>
+<td><center><small>', txt_list$cap[11], '</small></center></td>
+<td><center><small>', txt_list$cap[12], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[13], '</td>
+<td>', txt_list$img[14], '</td>
+<td>', txt_list$img[15], '</td>
+<td>', txt_list$img[16], '</td>
+<td>', txt_list$img[17], '</td>
+<td>', txt_list$img[18], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[13], '</small></center></td>
+<td><center><small>', txt_list$cap[14], '</small></center></td>
+<td><center><small>', txt_list$cap[15], '</small></center></td>
+<td><center><small>', txt_list$cap[16], '</small></center></td>
+<td><center><small>', txt_list$cap[17], '</small></center></td>
+<td><center><small>', txt_list$cap[18], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[19], '</td>
+<td>', txt_list$img[20], '</td>
+<td>', txt_list$img[21], '</td>
+<td>', txt_list$img[22], '</td>
+<td>', txt_list$img[23], '</td>
+<td>', txt_list$img[24], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[19], '</small></center></td>
+<td><center><small>', txt_list$cap[20], '</small></center></td>
+<td><center><small>', txt_list$cap[21], '</small></center></td>
+<td><center><small>', txt_list$cap[22], '</small></center></td>
+<td><center><small>', txt_list$cap[23], '</small></center></td>
+<td><center><small>', txt_list$cap[24], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[25], '</td>
+<td>', txt_list$img[26], '</td>
+<td>', txt_list$img[27], '</td>
+<td>', txt_list$img[28], '</td>
+<td>', txt_list$img[29], '</td>
+<td>', txt_list$img[30], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[25], '</small></center></td>
+<td><center><small>', txt_list$cap[26], '</small></center></td>
+<td><center><small>', txt_list$cap[27], '</small></center></td>
+<td><center><small>', txt_list$cap[28], '</small></center></td>
+<td><center><small>', txt_list$cap[29], '</small></center></td>
+<td><center><small>', txt_list$cap[30], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[31], '</td>
+<td>', txt_list$img[32], '</td>
+<td>', txt_list$img[33], '</td>
+<td>', txt_list$img[34], '</td>
+<td>', txt_list$img[35], '</td>
+<td>', txt_list$img[36], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[31], '</small></center></td>
+<td><center><small>', txt_list$cap[32], '</small></center></td>
+<td><center><small>', txt_list$cap[33], '</small></center></td>
+<td><center><small>', txt_list$cap[34], '</small></center></td>
+<td><center><small>', txt_list$cap[35], '</small></center></td>
+<td><center><small>', txt_list$cap[36], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[37], '</td>
+<td>', txt_list$img[38], '</td>
+<td>', txt_list$img[39], '</td>
+<td>', txt_list$img[40], '</td>
+<td>', txt_list$img[41], '</td>
+<td>', txt_list$img[42], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[37], '</small></center></td>
+<td><center><small>', txt_list$cap[38], '</small></center></td>
+<td><center><small>', txt_list$cap[39], '</small></center></td>
+<td><center><small>', txt_list$cap[40], '</small></center></td>
+<td><center><small>', txt_list$cap[41], '</small></center></td>
+<td><center><small>', txt_list$cap[42], '</small></center></td>
+</tr>
+</table>\n\n'
   )
   return(o)
 }
 ```
 
-```{r, results='asis', echo=FALSE}
+```{r, echo=FALSE, results='asis'}
 # Features loop
 ff_loop <- params$ff
 # Dataset loop
@@ -184,7 +185,7 @@ for (ff in ff_loop) {
   for (dd in dd_loop) {
     # METHOD LOOP
     for (mm in mm_loop) {
-      cat(paste0("#### ", ff, " > ", dd, " > ", mm, "\n\n"))
+      cat(paste0("## ", ff, " > ", dd, " > ", mm, "\n\n"))
       # Initialization of txt_list
       txt_list <- list(img = rep("", 42), cap = rep("", 42))
       # CLUSTER LOOP
@@ -206,7 +207,8 @@ for (ff in ff_loop) {
           ff, " > ", 
           dd, " > ", 
           mm, " > ", 
-          "#", cc, "\n\n"
+          "#", cc, "\n\n",
+          "Texto random\n\n"
         )
         # Print HTML table
         if (cc_idx == max(cc_loop)) {
