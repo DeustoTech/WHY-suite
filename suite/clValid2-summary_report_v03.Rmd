@@ -165,7 +165,10 @@ table_of_cards <- function(txt_list) {
 # Features loop
 ff_loop <- params$ff
 # Dataset loop
-dd_loop <- params$dd
+key     <- unique(unlist(lapply(params$dd, `[[`, 1)))
+len_key <- length(key)
+dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds")) 
+dd_loop <- dd_name
 # Methods loop
 mm_loop <- params$mm
 # FEATURE LOOP

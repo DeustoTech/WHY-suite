@@ -18,13 +18,13 @@ library(rmarkdown)
 
 set_row_conditions <- function(feats, analysis_type) {
   # Initialization
-  row_conditions <- rep(TRUE, nrow(feats))
+  row_conditions <- rep(FALSE, nrow(feats))
   
   # Condition 1: Dataset key
   if (is.null(analysis_type$dd$key))
     cond_key <- TRUE
   else
-    cond_key <- feats$data_set %in% analysis_type$dd$key
+    cond_key <- feats$data_set == analysis_type$dd$key
   
   # Condition 2: Percentage of imputed samples in TS
   if (is.null(analysis_type$dd$rel_imputed_na))
@@ -36,19 +36,19 @@ set_row_conditions <- function(feats, analysis_type) {
   if (is.null(analysis_type$dd$is_household))
     cond_hhd <- TRUE
   else
-    cond_hhd <- feats$is_household %in% analysis_type$dd$is_household
+    cond_hhd <- feats$is_household == analysis_type$dd$is_household
   
   # Condition 4: Type of tariff
   if (is.null(analysis_type$dd$ref_atr_tariff))
     cond_trf <- TRUE
   else
-    cond_trf <- substr(feats$ref_atr_tariff,1,1) %in% analysis_type$dd$tariff
+    cond_trf <- substr(feats$ref_atr_tariff,1,1) == analysis_type$dd$tariff
   
   # Mandatory condition
   cond_min <- feats$minimum >= 0
   
   # Check all conditions
-  row_conditions <- row_conditions & (
+  row_conditions <- row_conditions | (
     cond_key & cond_imp & cond_hhd & cond_trf & cond_min
   )
   
@@ -67,9 +67,9 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
   
   # Set file name
   ff_name <- analysis_type$ff
-  key     <- unique(analysis_type$dd$key)
+  key     <- unique(unlist(lapply(analysis_type$dd, `[[`, 1)))
   len_key <- length(key)
-  dd_name <- ifelse(len_key == 1, key, paste0(len_key, "varDS")) 
+  dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds")) 
   mm_name <- substr(analysis_type$mm,1,3)
   vv_name <- substr(analysis_type$vv,1,1)
   len_cl  <- length(analysis_type$cc)
@@ -543,36 +543,42 @@ imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
   # )
   
   print("## RMarkDown REPORT ##")
+  
+  params_list <- list(
+    rmd_title   = rmd_title,
+    hmp_dir     = hmp_dir,
+    nofile_path = "no-file.png",
+    ff          = ff_sel,
+    dd          = dd_sel,
+    mm          = mm_sel
+  )
+  print(params_list)
   rmarkdown::render(
     input       = "clValid2-summary_report_v03.Rmd",
-    output_file = "cluster_report.html",
-    params      = list(
-      rmd_title   = rmd_title,
-      hmp_dir     = hmp_dir,
-      nofile_path = "/img/no-file.png",
-      ff          = ff_sel,
-      dd          = dd_sel,
-      mm          = mm_sel
-    )
+    output_file = paste0(rmd_dir, "cluster_report.html"),
+    params      = params_list
   )
 }
 
 clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/data/"
 dataset_dir <- c(
   goi="/home/ubuntu/carlos.quesada/disk/go4_pst/imp/"
-  )
+)
 hmm_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/hmm/"
 hmp_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/hmp/"
 feats_file  <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv"
 ff_sel      <- c("sAggrP6", "sAggrDRM")
 dd_sel      <- list(
+  # Each sublist is an OR, each element within the sublist is an AND
+  # Each NULL element within the sublist means ALL TRUE
   list(key="goi", is_household=NULL, rel_imputed_na=0.05, tariff="2")
-  )
+)
 mm_sel      <- c("som")
 vv_sel      <- c("internal")
 cc_sel      <- c(30)
 rmd_title   <- "Cluster Report v3.1: POST-COVID GoiEner"
 rmd_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/report/"
+
 
 imp2report(
   clValid_dir = clValid_dir,
