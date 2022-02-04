@@ -407,7 +407,7 @@ clValid2_heatmaps <- function(
   
   # LOOP
   fnames <- list.files(path = clValid_dir, pattern = "*.clValid2")
-  fun_export <- c("get_heatmap_matrix", "plot_heatmap_matrix")
+  fun_export <- c("get_heatmap_matrix", "plot_heatmap_matrix", "set_row_conditions")
   
   # Setup parallel backend to use many processors
   cores <- parallel::detectCores() - 1
@@ -531,22 +531,23 @@ imp2report <- function(clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
   #   cc_sel     = cc_sel
   # )
 
-  print("## HEATMAP PLOTS ##")
-  clValid2_heatmaps(
-    feats_file  = feats_file,
-    clValid_dir = clValid_dir,
-    hmm_dir     = hmm_dir,
-    hmp_dir     = hmp_dir,
-    dataset_dir = dataset_dir,
-    num_cluster = cc_sel,
-    scale_hmm   = TRUE
-  )
+  # print("## HEATMAP PLOTS ##")
+  # clValid2_heatmaps(
+  #   feats_file  = feats_file,
+  #   clValid_dir = clValid_dir,
+  #   hmm_dir     = hmm_dir,
+  #   hmp_dir     = hmp_dir,
+  #   dataset_dir = dataset_dir,
+  #   num_cluster = cc_sel,
+  #   scale_hmm   = TRUE
+  # )
   
   print("## RMarkDown REPORT ##")
   
   params_list <- list(
     rmd_title   = rmd_title,
     hmp_dir     = hmp_dir,
+    hmm_dir     = hmm_dir,
     ff          = ff_sel,
     dd          = dd_sel,
     mm          = mm_sel

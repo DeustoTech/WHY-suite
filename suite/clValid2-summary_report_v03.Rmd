@@ -10,6 +10,7 @@ theme: united
 params:
   rmd_title: "Cluster Report"
   hmp_dir: ""
+  hmm_dir: ""
   nofile_path: "no-file.png"
   ff: ""
   dd: ""
@@ -44,6 +45,8 @@ params:
 ```{r, include=FALSE}
 # Path to hmp graphs
 hmp_path <- params$hmp_dir
+# Path to hmm values
+hmm_path <- parmas$hmm_dir
 # No file by DEFAULT
 no.file_path  <- params$nofile_path
 no_file <- paste0("![](", no.file_path, ")")
@@ -197,6 +200,11 @@ for (ff in ff_loop) {
         # Path to file
         card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".png")
+        # Load variable "idx"
+        idx_path <- paste0(hmm_path, "hmp_", ff, "_", dd, "_", mm, "_",
+                            max(cc_loop), "cl_i-", cc, ".RData")
+        load(file=idx_path)
+        
         # Complete txt_list
         if (file.exists(card_path)) {
           txt_list$img[cc_idx] <- paste0("![](", card_path, ")")
@@ -207,8 +215,8 @@ for (ff in ff_loop) {
           ff, " > ", 
           dd, " > ", 
           mm, " > ", 
-          "#", cc, "\n\n",
-          "Texto random\n\n"
+          "#", cc, "\n",
+          sum(idx), " elems. (", round(100*sum(idx)/length(idx),1), "%)\n\n"
         )
         # Print HTML table
         if (cc_idx == max(cc_loop)) {
