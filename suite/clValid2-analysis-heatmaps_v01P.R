@@ -493,7 +493,7 @@ clValid2_heatmaps <- function(
       hmp_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
       
       # Save heatmap matrix
-      save(m, file = hmm_path)
+      save(m, idx, file = hmm_path)
       
       # Generate heatmaps
       plot_heatmap_matrix(
@@ -575,7 +575,7 @@ mm_sel      <- c("som")
 vv_sel      <- c("internal")
 cc_sel      <- c(30)
 rmd_title   <- "Cluster Report v3.1: POST-COVID GoiEner"
-rmd_dir     <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/report/"
+rmd_dir     <- "/home/ubuntu/carlos.quesada/analyses/suite/" #"/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/report/"
 
 
 imp2report(
