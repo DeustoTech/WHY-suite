@@ -5,8 +5,8 @@ source("clValid2-analysis-heatmaps_v01P.R")
 ################################################################################
 
 # "actions":
-# [1] "cluster" for cluster analysis
-# [2] "heatmap" for heatmap plots
+# [1] "cluster" for cluster analysis ("/data/" folder)
+# [2] "heatmap" for heatmap plots ("/hmm/" and "/hmp/" folders)
 # [3] "report"  for cluster report
 actions     <- c("report")
 clValid_dir <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.02_go4-pst-only-2-tariffs/data/"
