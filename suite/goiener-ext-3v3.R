@@ -25,69 +25,91 @@ get_samples_per_day <- function() {
 # extract_metadata()
 ################################################################################
 
-## LOS METADATOS NO goi HAY QUE HACERLOS IGUAL QUE goi!!!
-
-extract_metadata <- function(dfs, dset_key, filename) {
+extract_metadata <- function(edf, dfs, dset_key, filename) {
   # Initialize the output list
   out <- list()
   
-  # Low Carbon London
+  # Common metadata (depending on the data.frame) ##############################
+  out[["data_set"]]       <- edf$dset_key
+  out[["num_of_samples"]] <- length(edf$df$values)
+  out[["ts_start_date"]]  <- edf$df$times[1]
+  out[["ts_end_date"]]    <- edf$df$times[nrow(edf$df)]
+  out[["ts_days"]]        <- as.numeric(edf$df$times[nrow(edf$df)] - edf$df$times[1])
+  out[["abs_imputed_na"]] <- edf$number_of_na
+  out[["rel_imputed_na"]] <- edf$number_of_na / length(edf$df$values)
+  
+  # Low Carbon London ##########################################################
   if (dset_key == "lcl") {
     # Identify current user
     file_id <- strsplit(filename, ".csv")[[1]]
-    out[["file_id"]] <- file_id
+    out[["fname"]] <- file_id
     
     # Retrieve index in metadata file
     idx <- which(dfs[[1]]$LCLid == file_id)
     
     # Retrieve all columns in metadata file
-    out[["std_or_ToU"]]    <- dfs[[1]]$stdorToU[idx]
-    out[["acorn"]]         <- dfs[[1]]$Acorn[idx]
-    out[["acorn_grouped"]] <- dfs[[1]]$Acorn_grouped[idx]
-    out[["block_file"]]    <- dfs[[1]]$file[idx]
+    out[["std_or_ToU"]]     <- dfs[[1]]$stdorToU[idx]
+    out[["acorn"]]          <- dfs[[1]]$Acorn[idx]
+    out[["acorn_grouped"]]  <- dfs[[1]]$Acorn_grouped[idx]
+    out[["block_file"]]     <- dfs[[1]]$file[idx]
+    
+    # Processed metadata
+    out[["mdata_file_idx"]] <- idx
+    out[["country"]] <- "gb"
+    out[["is_household"]] <- 
+      ifelse(dfs[[1]]$Acorn_grouped[idx] %in% c("ACORN-", "ACORN-U"), 0, 1)
   }
   
-  # ISSDA
+  # ISSDA ######################################################################
   if (dset_key == "iss") {
     # Identify current user
     file_id <- strsplit(filename, ".csv")[[1]]
-    out[["file_id"]] <- file_id
+    out[["fname"]] <- file_id
     
     # Retrieve index in metadata file
     idx <- which(dfs[[1]]$id == file_id)
     
     # Retrieve all columns in metadata file
-    out[["code"]]       <- dfs[[1]]$code[idx]
-    out[["res_stimul"]] <- dfs[[1]]$residential_tariff_allocation[idx]
-    out[["res_tariff"]] <- dfs[[1]]$residential_stimulus_allocation[idx]
-    out[["sme_alloc"]]  <- dfs[[1]]$sme_allocation[idx]
+    out[["iss_code"]]             <- dfs[[1]]$code[idx]
+    out[["resid_tariff_alloc"]]   <- dfs[[1]]$residential_tariff_allocation[idx]
+    out[["resid_stimulus_alloc"]] <- dfs[[1]]$residential_stimulus_allocation[idx]
+    out[["sme_alloc"]]            <- dfs[[1]]$sme_allocation[idx]
+    
+    # Processed metadata
+    out[["mdata_file_idx"]] <- idx
+    out[["country"]] <- "ie"
+    out[["is_household"]] <- ifelse(dfs[[1]]$code[idx] == 1, 1, 0)
   }
   
-  # NEEA
+  # NEEA #######################################################################
   if (dset_key == "nee") {
-    browser()
     # Identify current user
     file_id <- strsplit(filename, "-Mains.csv")[[1]]
-    out[["file_id"]] <- file_id
+    out[["fname"]] <- file_id
     
     # Retrieve index in metadata file
     idx <- which(dfs[[1]]$ee_site_id == file_id)
     
     # Retrieve all columns in metadata file
     out[["site_id"]]       <- dfs[[1]]$site_id[idx]
-    out[["state"]]         <- dfs[[1]]$state[idx]
+    out[["administrative_division"]] <- dfs[[1]]$state[idx]
     out[["hz"]]            <- dfs[[1]]$hz[idx]
     out[["cz"]]            <- dfs[[1]]$cz[idx]
     out[["tz_abbr"]]       <- dfs[[1]]$tz_abbr[idx]
     out[["tz_utc_offset"]] <- dfs[[1]]$tz_utc_offset[idx]
     out[["station_id"]]    <- dfs[[1]]$station_id[idx]
+    
+    # Processed metadata
+    out[["mdata_file_idx"]] <- idx
+    out[["country"]] <- "us"
+    out[["is_household"]] <- 1
   }
   
-  # GoiEner
+  # GoiEner ####################################################################
   if (dset_key == "goi") {
     # Identify current user
     cups <- strsplit(filename, ".csv")[[1]]
-    out[["cups"]] <- cups
+    out[["fname"]] <- cups
     
     if("cups_ref" %in% colnames(dfs[[1]])) {
       all_idx <- which(dfs[[1]]$cups_ref == cups)
@@ -96,11 +118,11 @@ extract_metadata <- function(dfs, dset_key, filename) {
     }
     if("fecha_alta" %in% colnames(dfs[[1]])) {
       start_date <- min(lubridate::ymd(dfs[[1]]$fecha_alta[all_idx]))
-      out[["start_date"]] <- start_date
+      out[["contract_start_date"]] <- start_date
     }
     if("fecha_baja" %in% colnames(dfs[[1]])) {
       end_date <- max(lubridate::ymd(dfs[[1]]$fecha_baja[all_idx]))
-      out[["end_date"]] <- end_date
+      out[["contract_end_date"]] <- end_date
     }
     if("tarifa_ref" %in% colnames(dfs[[1]])) {
       ref_tariff <- dfs[[1]]$tarifa_ref[idx]
@@ -154,7 +176,7 @@ extract_metadata <- function(dfs, dset_key, filename) {
     if("cups.direccion_prov.nombre_oficial" %in% colnames(dfs[[1]])) {
       province <- dfs[[1]]$cups.direccion_prov.nombre_oficial[idx]
       province <- iconv(province, from="UTF-8", to="ASCII//TRANSLIT")
-      out[["province"]] <- province
+      out[["administrative_division"]] <- province
     }
     if("cups.direccion_muni.nombre_oficial" %in% colnames(dfs[[1]])) {
       municipality <- dfs[[1]]$cups.direccion_muni.nombre_oficial[idx]
@@ -169,9 +191,13 @@ extract_metadata <- function(dfs, dset_key, filename) {
       cnae <- dfs[[1]]$cnae[idx]
       out[["cnae"]] <- cnae
     }
+    
+    # Processed metadata
+    out[["country"]] <- "es"
+    out[["is_household"]] <- ifelse(dfs[[1]]$cnae[idx] %/% 100 == 98, 1, 0)
   }
   
-  # REFIT
+  # REFIT ######################################################################
   if (dset_key == "ref" | dset_key == "por") {
     out <- NULL
   }
@@ -306,11 +332,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     number_of_na     = number_of_na,
     is_0             = cooked_df_is_0
   )
-  
-  # Append both lists
-  output <- append(common_list, metadata)
-  
-  return(output)
+  return(common_list)
 }
 
 ################################################################################
@@ -411,24 +433,14 @@ extend_dataset_v2 <- function(
     "impute_cooked_dataframe"
   )
   
-  # out <- foreach::foreach (
-  #   x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
-  for(x in 1:length_fnames) {
+  out <- foreach::foreach (
+    x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
+  #for(x in 1:length_fnames) {
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
     
     # File name selection
     dset_filename <- dset_filenames[x]
-    # Extract metadata
-    if (!is.null(metadata_files)) {
-      metadata_list <- extract_metadata(
-        dfs      = metadata_dataframes,
-        dset_key = dset_key,
-        filename = dset_filename
-      )
-    } else {
-	  metadata_list <- NULL
-	}
     # Load raw dataframe from dataset and impute
     file_path <- paste0(input_folder, dset_filename)
     rdf <- get_raw_dataframe_from_dataset(file_path)
@@ -439,17 +451,16 @@ extend_dataset_v2 <- function(
       rdf <- rdf[,c(1,3)]
       names(rdf) <- c("times", "values")
     }
-	### HERE IS THE tidyr::complete() FUNCTION
+	### HERE IS THE tidyr::complete() FUNCTION (Complete gaps with NAs)
     cdf <- cook_raw_dataframe(
       raw_df    = rdf,
       from_date = from_date, 
       to_date   = to_date, 
       dset_key  = dset_key, 
-      filename  = dset_filename, 
-      metadata  = metadata_list
+      filename  = dset_filename
     )
-    # If cdf is NULL, skip
-    if (!is.null(cdf)) {
+    # If cdf is NULL OR samples are NOT equidistributed in time, SKIP
+    if (!is.null(cdf) & length(table(diff(cdf$df$times))) == 1) {
       # Get length
       initial_date   <- cdf$df[1,1]
       final_date     <- cdf$df[nrow(cdf$df),1]
@@ -468,6 +479,20 @@ extend_dataset_v2 <- function(
           path <- paste0(
             output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData"
           )
+          # Extract metadata
+          if (!is.null(metadata_files)) {
+            metadata_list <- extract_metadata(
+              edf      = edf,
+              dfs      = metadata_dataframes,
+              dset_key = dset_key,
+              filename = dset_filename
+            )
+          } else {
+            metadata_list <- NULL
+          }
+          # Append metadata
+          edf <- append(edf, metadata_list)
+          
           save(edf, file=path)
         }
       }
@@ -476,7 +501,7 @@ extend_dataset_v2 <- function(
   # Stop parallelization
   parallel::stopCluster(cl)
   
-  cat("/n")
+  cat("\n")
 }
 
 ### USER DEFINED VARIABLES
@@ -489,10 +514,12 @@ metadata_nee <- "G:/Mi unidad/WHY/Datos (raw)/NEEA/sites.csv"
 
 #Function call for "goi"
 extend_dataset_v2(
-  input_folder = "G:/Mi unidad/WHY/Datasets/nee/raw/",
+  input_folder = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/", #"G:/Mi unidad/WHY/Datasets/nee/raw/",
   output_folder = "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/",
-  dset_key = "nee",
-  metadata_files = metadata_nee,
+  dset_key = "goi",
+  metadata_files = metadata_goi,
   working_with_generation = FALSE,
-  min_years = 1
+  min_years = 1,
+  from_date = "first",
+  to_date = "last"
 )
