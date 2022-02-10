@@ -8,6 +8,7 @@
 
 library(tsfeatures)
 library(foreach)
+library(lubridate)
 
 ################################################################################
 # stat_moments
@@ -1252,158 +1253,38 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
 }
 
 ################################################################################
-# get_features_from_ext_datasets
+# get_hourly_data()
 ################################################################################
-
-#' Features of extended datasets in a folder
-#'
-#' @description
-#' Get features of all extended datasets contained in a folder.
-#'
-#' @param input_folder Absolute path to the dataset folder.
-#' @param output_folder Absolute path where the results are wanted.
-#' @param type_of_analysis A string indicating the type of analysis: \code{basic}, \code{extra} or \code{custom}.
-#' @param list_of_functions If \code{type_of_analysis} is \code{custom}, a list of strings indicating the functions that perform the feature extraction.
-#' @param If \code{type_of_analysis} is \code{custom}, TRUE or FALSE indicating if the time series must be scaled to mean 0 and sd 1 prior the analysis.
-#'
-#' @return File containing the features
-#'
-#' @export
-
-get_features_from_ext_datasets <- function(
-  input_folder, output_folder, type_of_analysis, list_of_functions=c(),
-  .scale=FALSE, parallelize=TRUE
-) {
-  
-  # Get list of filenames in dataset folder
-  dset_filenames <- list.files(input_folder, pattern="*.RData")
-  
-  # Setup parallel backend to use many processors
-  cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores, outfile = "")
-  doParallel::registerDoParallel(cl)
-  
-  # Analysis loop
-  foreach::foreach(x = 1:length(dset_filenames)) %dopar% {
-    
-    # Select file name
-    dset_filename <- dset_filenames[x]
-    print(dset_filename)
-    # Load extended dataframe
-    load(paste0(input_folder, dset_filename))
-    
-    # Set exceptions
-    if (!edf$is_0) {
-      
-      # AGGREGATE HOURLY (in case periods > 24)
-      samples_per_day <- edf$seasonal_periods[1]
-      if (samples_per_day != 24) {
-        date_by <- as.difftime(24 / samples_per_day, units = "hours")
-        ini_date <- edf$df$times[1]
-        t <- seq(
-          from       = ini_date,
-          length.out = length(edf$df$values),
-          by         = date_by
-        )
-        sum_factor <- cut(t, breaks = "1 hour")
-        aggr_data <- stats::aggregate(
-          x   = as.numeric(edf$df$values),
-          by  = list(date_time = sum_factor),
-          FUN = sum
-        )
-        edf$df <- data.frame(
-          times  = aggr_data$date_time,
-          values = aggr_data$x
-        )
-        edf$seasonal_periods <- edf$seasonal_periods * (24 / samples_per_day)
-      }
-      
-      # GET FEATURES
-      ff_feats <- get_features_from_cooked_dataframe(
-        edf, type_of_analysis, list_of_functions, .scal
-      )
-      
-      # Incorporate filename and dataset as columns
-      ff_file <- data.frame(
-        file     = gsub(".RData", "", dset_filename),
-        data_set = edf$dset_key
-      )
-      all_features <- cbind(ff_file, ff_feats)
-      # Output file name
-      o_file <- paste0(output_folder, "feats-", Sys.getpid(), ".csv")
-      # Save results to the CSV file
-      data.table::fwrite(
-        x         = all_features,
-        file      = o_file,
-        sep       = ",",
-        na        = "",
-        quote     = FALSE,
-        append    = TRUE,
-        col.names = x <= cores,
-        row.names = FALSE
-      )
-    }
-    rm(edf)
-    return(NULL)
-  }
-  
-  # Stop parallelization
-  parallel::stopCluster(cl)
-  
-  return(NULL)
-}
-
-################################################################################
-# get_metadata()
-################################################################################
-
-get_metadata <- function(edf) {
-  
-  browser()
-  
-  ff_file <- data.frame(
-    file = fname, #
-    data_set = edf$dset_key, #
-    # EXCLUSIVE GOIENER
-    num_of_samples = length(edf$df$values), #
-    mdata_file_idx = edf$mdata_file_idx, ##
-    ts_start_date = edf$df$times[1], #
-    ts_end_date = edf$df$times[nrow(edf$df)], #
-    ts_days = as.numeric(edf$df$times[nrow(edf$df)] - edf$df$times[1]), #
-    contract_start_date = edf$start_date, ##
-    contract_end_date = edf$end_date, ##
-    abs_imputed_na = edf$number_of_na, #
-    rel_imputed_na = edf$number_of_na / length(edf$df$values), #
-    country = "es", ##
-    administrative_division = edf$province, ##
-    municipality = edf$municipality, ##
-    zip_code = edf$zip_code, ##
-    cnae = edf$cnae, ##
-    is_household = ifelse(edf$cnae %/% 100 == 98, 1, 0), ##
-    ref_tariff = edf$ref_tariff, ##
-    ref_atr_tariff = edf$ref_atr_tariff, ##
-    ref_atr_proc = edf$ref_atr_proc, ##
-    billing_type = edf$billing_type, ##
-    indexed_margin = edf$indexed_margin, ##
-    self_consump = edf$self_consump, ##
-    p1_kw = edf$p1_kw, 
-    p2_kw = edf$p2_kw,
-    p3_kw = edf$p3_kw,
-    p4_kw = edf$p4_kw,
-    p5_kw = edf$p5_kw,
-    p6_kw = edf$p6_kw
+get_hourly_data <- function(edf) {
+  # Round dates to the nearest hour towards zero
+  downtimes <- floor_date(edf$df$times, unit = "1 hour")
+  # Aggregate data
+  aggr_data <- stats::aggregate(
+    x   = edf$df$values,
+    by  = list(date_time = downtimes),
+    FUN = sum
   )
+  # Adapt to working dataframe
+  edf$df <- data.frame(
+    times  = aggr_data$date_time,
+    values = aggr_data$x
+  )
+  # REDUCE SEASONAL PERIODS TO TWO VALUES
+  edf$seasonal_periods <- c(24, 168)
+  
+  return(edf)
 }
+
 ################################################################################
 ################################################################################
 
 # INPUT FOLDER
-# ifold <- "C:/Users/carlos.quesada/Documents/GO4/"
-ifold <- "/mnt/disk2/go4_pst/imp/"
+ifold <- "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/iss/"
+#ifold <- "/mnt/disk2/go4_pst/imp/"
 
 # OUTPUT FILE
-# ofold <- "C:/Users/carlos.quesada/Documents/GO4_out/"
-ofold <- "/mnt/disk2/features/go4_pst_21.12.12/"
+ofold <- ifold
+#ofold <- "/mnt/disk2/features/go4_pst_21.12.12/"
 
 
 # Input parameters
@@ -1442,20 +1323,22 @@ for (SS in 1:(length(SS_seq)-1)) {
     "utils"
   )
   export <- c(
-    "get_features_from_ext_datasets", "get_features_from_raw_datasets",
-    "get_features_from_cooked_dataframe", "get_seasonal_features_from_timeseries"
   )
   
-  # o <- foreach::foreach(
-  #   x         = (SS_seq[SS]+1):SS_seq[SS+1],
-  #   .combine  = rbind,
-  #   .inorder  = TRUE,
-  #   .packages = packages,
-  #   .export   = export
-  # ) %dopar% {
+  o <- foreach::foreach(
+    x         = (SS_seq[SS]+1):SS_seq[SS+1],
+    .combine  = rbind,
+    .inorder  = TRUE,
+    .packages = packages,
+    .export   = export
+  ) %dopar% {
+  # for(x in 1:length(fpaths)) {
     
-    for(x in 1:length(fpaths)) {
-    
+    .GlobalEnv$stat_moments <- stat_moments
+    .GlobalEnv$quantiles <- quantiles
+    .GlobalEnv$stat_data_aggregates <- stat_data_aggregates
+    .GlobalEnv$daily_acf <- daily_acf
+  
     # Set progress bar
     setTxtProgressBar(pb, x/length_fpaths)
     
@@ -1467,17 +1350,17 @@ for (SS in 1:(length(SS_seq)-1)) {
     load(fpath)
     # Set exceptions
     if (!edf$is_0) {
-      # REMOVE 3RD SEASONAL PERIOD
-      edf$seasonal_periods <- edf$seasonal_periods[1:2]
       # METADATA
-      ff_file <- get_metadata(edf)
+      ff_meta <- edf[-c(1:6)]
+      # AGGREGATE TO HOURLY DATA
+      edf <- get_hourly_data(edf)
       # GET FEATURES
       ff_feats <- get_features_from_cooked_dataframe(
         cdf              = edf,
         type_of_analysis = type_of_analysis
       )
       # Incorporate filename as a column
-      o <- cbind(ff_file, ff_feats)
+      o <- cbind(ff_meta, ff_feats)
     } else {
       NULL
     }
@@ -1486,10 +1369,12 @@ for (SS in 1:(length(SS_seq)-1)) {
   # Stop parallelization
   parallel::stopCluster(cl)
   
+  cat("\n")
+  
   # Save results to the CSV file
   data.table::fwrite(
     x         = o,
-    file      = paste0(output_path, "o_", SS_seq[SS+1], ".csv"),
+    file      = paste0(output_path, "feats_", SS_seq[SS+1], ".csv"),
     sep       = ",",
     na        = "",
     quote     = FALSE,
@@ -1497,5 +1382,4 @@ for (SS in 1:(length(SS_seq)-1)) {
     col.names = TRUE,
     row.names = FALSE
   )
-  
 }
