@@ -1325,6 +1325,12 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
     ) %dopar% {
     # for(x in 1:length(fpaths)) {
       
+      # TO SKIP ERROR "object 'stat_moments' of mode 'function' was not found"
+      .GlobalEnv$stat_moments         <- stat_moments
+      .GlobalEnv$quantiles            <- quantiles
+      .GlobalEnv$stat_data_aggregates <- stat_data_aggregates
+      .GlobalEnv$daily_acf            <- daily_acf
+      
       # Set progress bar
       setTxtProgressBar(pb, x/length_fpaths)
       
