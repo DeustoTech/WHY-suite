@@ -197,6 +197,14 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
     out[["is_household"]] <- ifelse(dfs[[1]]$cnae[idx] %/% 100 == 98, 1, 0)
   }
   
+  # Elergone Energia ###########################################################
+  if (dset_key == "por") {
+    # Processed metadata
+    out[["mdata_file_idx"]] <- NA
+    out[["country"]] <- "pt"
+    out[["is_household"]] <- NA
+  }
+  
   return(out)
 }
 
