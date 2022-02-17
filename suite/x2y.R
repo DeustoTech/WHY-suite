@@ -48,7 +48,7 @@ operation <- 3
 if (operation == 3) {
   fea2clu(
     fea_file = fea_file_por,
-    clu_dir  = clu_dir_por,
+    clu_dir  = paste0(clu_dir_por, "data/"),
     ff_sel   = c("sAggrP6", "sAggrDRM"),
     dd_sel   = dd_sel_por,
     mm_sel   = c("som"),
@@ -58,7 +58,7 @@ if (operation == 3) {
   
   clu2hmp(
     fea_file = fea_file_por,
-    clu_dir  = clu_dir_por,
+    clu_dir  = paste0(clu_dir_por, "data/"),
     hmm_dir  = paste0(clu_dir_por, "hmm/"),
     hmp_dir  = paste0(clu_dir_por, "hmp/"),
     dset_dir = imp_dir_por,
