@@ -1308,6 +1308,12 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
       "utils"
     )
     export <- c(
+      "stat_moments", "quantiles", "stat_data_aggregates", "daily_acf", 
+      "get_bins", "catch22_features", "get_seasonal_features_from_timeseries",
+      "get_feature_names", "get_peak_times", "stat_data_aggregates",
+      "get_expected_bins", "get_timeseries_from_cooked_dataframe",
+      "get_extrema_dates_from_timeseries", "get_features_from_cooked_dataframe",
+      "get_features_from_raw_datasets", "get_hourly_data"
     )
     
     o <- foreach::foreach(
@@ -1319,11 +1325,6 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
     ) %dopar% {
     # for(x in 1:length(fpaths)) {
       
-      .GlobalEnv$stat_moments <- stat_moments
-      .GlobalEnv$quantiles <- quantiles
-      .GlobalEnv$stat_data_aggregates <- stat_data_aggregates
-      .GlobalEnv$daily_acf <- daily_acf
-    
       # Set progress bar
       setTxtProgressBar(pb, x/length_fpaths)
       
