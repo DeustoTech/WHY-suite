@@ -12,6 +12,7 @@ raw2imp_src <- "goiener-ext-3v3.R"
 imp2fea_src <- "new_feats.R"
 fea2hmp_src <- "clValid2-analysis-heatmaps_v01P.R"
 hmp2rep_src <- "clValid2-summary_report_v03.Rmd"
+no_file_src <- "no-file.png"
 
 ################################
 ## RAW FILES TO IMPUTED FILES ##
@@ -125,6 +126,7 @@ hmp2rep <- function(
     rmd_title   = rep_title,
     hmp_dir     = hmp_dir,
     hmm_dir     = hmm_dir,
+    nofile_path = paste(getwd(), "src", no_file_src, sep="/"),
     ff          = ff,
     dd          = dd,
     mm          = mm
