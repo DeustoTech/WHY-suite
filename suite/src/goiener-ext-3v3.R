@@ -197,11 +197,6 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
     out[["is_household"]] <- ifelse(dfs[[1]]$cnae[idx] %/% 100 == 98, 1, 0)
   }
   
-  # REFIT ######################################################################
-  if (dset_key == "ref" | dset_key == "por") {
-    out <- NULL
-  }
-  
   return(out)
 }
 
