@@ -515,9 +515,9 @@ clValid2_heatmaps <- function(
 }
 
 ################################################################################
-## ASSEMBLY EVERYTHING: get report from folder of imputed TS
+## ASSEMBLY EVERYTHING: get report from feats
 ################################################################################
-imp2report <- function(actions, clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
+feats2report <- function(actions, clValid_dir, dataset_dir, hmm_dir, hmp_dir, feats_file,
                        ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, rmd_title, rmd_dir) {
   
   if ("cluster" %in% actions) {
