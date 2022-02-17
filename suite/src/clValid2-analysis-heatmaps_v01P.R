@@ -3,7 +3,7 @@
 # 4 de febrero de 2022
 # UNIVERSIDAD DE DEUSTO
 # ---------------------
-# Definitive file for generating reports from imputed folders
+# Definitive file for generating analysis and reports from imputed folders
 ################################################################################
 
 library(foreach)
@@ -11,6 +11,8 @@ library(clValid2)
 library(mclust)
 library(lubridate)
 library(rmarkdown)
+
+set.seed(1981)
 
 ################################################################################
 ##  Function to select the row conditions (common to analysis and heatmaps)
