@@ -69,7 +69,7 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
   
   # Set file name
   ff_name <- analysis_type$ff
-  key     <- unique(unlist(lapply(analysis_type$dd, `[[`, 1)))
+  key     <- unique(unlist(lapply(analysis_type$dd$key, `[[`, 1)))
   len_key <- length(key)
   dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds")) 
   mm_name <- substr(analysis_type$mm,1,3)

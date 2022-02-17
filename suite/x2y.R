@@ -28,7 +28,7 @@ mdata_file_por <- NULL
 fea_dir_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
 
 # Feature files
-fea_file_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_por.csv"
+fea_file_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
 
 # Cluster folders (ClValid2)
 clu_dir_por <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
