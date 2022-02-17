@@ -1,3 +1,12 @@
+################################################################################
+##  CARLOS QUESADA GRANJA
+##  FEBRUARY 17, 2022
+##  UNIVERSIDAD DE DEUSTO
+##  ---------------------
+##  THE x2y PROCESS:
+##  raw > imp > fea > clu > hmp > rep
+################################################################################
+
 # FILES IN SUBFOLDER 'src'
 raw2imp_src <- "goiener-ext-3v3.R"
 imp2fea_src <- "new_feats.R"
@@ -28,6 +37,23 @@ raw2imp <- function(
     min_years               = min_yrs,
     from_date               = from_date,
     to_date                 = to_date
+  )
+}
+
+###############################
+## IMPUTED FILES TO FEATURES ##
+###############################
+imp2fea <- function(
+  imp_dir,
+  fea_file,
+  analysis = "extra"
+) {
+  source(paste(getwd(), "src", imp2fea_src, sep="/"))
+  print("## IMPUTED TO FEATURES ##")
+  get_features(
+    input_folder     = imp_dir,
+    output_path      = fea_file,
+    type_of_analysis = analysis
   )
 }
 

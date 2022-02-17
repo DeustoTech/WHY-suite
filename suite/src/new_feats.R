@@ -1276,110 +1276,96 @@ get_hourly_data <- function(edf) {
 }
 
 ################################################################################
-################################################################################
-
-# INPUT FOLDER
-ifold <- "C:/Users/carlos.quesada/Documents/WHY/2022.02.01 - Corrigiendo goiener-ext-3.R/iss/"
-#ifold <- "/mnt/disk2/go4_pst/imp/"
-
-# OUTPUT FILE
-ofold <- ifold
-#ofold <- "/mnt/disk2/features/go4_pst_21.12.12/"
 
 
-# Input parameters
-input_folder <- c(ifold)
-# Output parameters
-output_path <- c(ofold)
-
-# Type of analysis
-type_of_analysis <- "extra"
-
-# List of file paths
-fpaths <- c()
-for (ii in 1:length(input_folder)) {
-  # Get list of file paths
-  fpaths <- c(
-    fpaths,
-    list.files(input_folder[ii], pattern="*.RData", full.names = T)
-  )
-}
-
-# SEQUENCING
-length_fpaths <- length(fpaths)
-SS_seq <- c(seq(0, length_fpaths, 7000), length_fpaths)
-for (SS in 1:(length(SS_seq)-1)) {
+get_features <- function(input_folder, output_path, type_of_analysis = "extra") {
   
-  # Setup parallel backend to use many processors
-  cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(cores, outfile = "")
-  doParallel::registerDoParallel(cl)
-  
-  # Progress bar
-  pb <- txtProgressBar(style=3)
-  
-  packages <- c(
-    "tsfeatures", "moments", "forecast", "stats", "lubridate", "stringr",
-    "utils"
-  )
-  export <- c(
-  )
-  
-  o <- foreach::foreach(
-    x         = (SS_seq[SS]+1):SS_seq[SS+1],
-    .combine  = rbind,
-    .inorder  = TRUE,
-    .packages = packages,
-    .export   = export
-  ) %dopar% {
-  # for(x in 1:length(fpaths)) {
-    
-    .GlobalEnv$stat_moments <- stat_moments
-    .GlobalEnv$quantiles <- quantiles
-    .GlobalEnv$stat_data_aggregates <- stat_data_aggregates
-    .GlobalEnv$daily_acf <- daily_acf
-  
-    # Set progress bar
-    setTxtProgressBar(pb, x/length_fpaths)
-    
-    # Select file name
-    fpath <- fpaths[x]
-    fname <- strsplit(basename(fpath), split=".RData")[[1]]
-    # print(fname)
-    # Load extended dataframe
-    load(fpath)
-    # Set exceptions
-    if (!edf$is_0) {
-      # METADATA
-      ff_meta <- edf[-c(1:6)]
-      # AGGREGATE TO HOURLY DATA
-      edf <- get_hourly_data(edf)
-      # GET FEATURES
-      ff_feats <- get_features_from_cooked_dataframe(
-        cdf              = edf,
-        type_of_analysis = type_of_analysis
-      )
-      # Incorporate filename as a column
-      o <- cbind(ff_meta, ff_feats)
-    } else {
-      NULL
-    }
+  # List of file paths
+  fpaths <- c()
+  for (ii in 1:length(input_folder)) {
+    # Get list of file paths
+    fpaths <- c(
+      fpaths,
+      list.files(input_folder[ii], pattern="*.RData", full.names = T)
+    )
   }
   
-  # Stop parallelization
-  parallel::stopCluster(cl)
-  
-  cat("\n")
-  
-  # Save results to the CSV file
-  data.table::fwrite(
-    x         = o,
-    file      = paste0(output_path, "feats_", SS_seq[SS+1], ".csv"),
-    sep       = ",",
-    na        = "",
-    quote     = FALSE,
-    append    = FALSE,
-    col.names = TRUE,
-    row.names = FALSE
-  )
+  # SEQUENCING
+  length_fpaths <- length(fpaths)
+  SS_seq <- c(seq(0, length_fpaths, 7000), length_fpaths)
+  for (SS in 1:(length(SS_seq)-1)) {
+    
+    # Setup parallel backend to use many processors
+    cores <- parallel::detectCores() - 1
+    cl <- parallel::makeCluster(cores, outfile = "")
+    doParallel::registerDoParallel(cl)
+    
+    # Progress bar
+    pb <- txtProgressBar(style=3)
+    
+    packages <- c(
+      "tsfeatures", "moments", "forecast", "stats", "lubridate", "stringr",
+      "utils"
+    )
+    export <- c(
+    )
+    
+    o <- foreach::foreach(
+      x         = (SS_seq[SS]+1):SS_seq[SS+1],
+      .combine  = rbind,
+      .inorder  = TRUE,
+      .packages = packages,
+      .export   = export
+    ) %dopar% {
+    # for(x in 1:length(fpaths)) {
+      
+      .GlobalEnv$stat_moments <- stat_moments
+      .GlobalEnv$quantiles <- quantiles
+      .GlobalEnv$stat_data_aggregates <- stat_data_aggregates
+      .GlobalEnv$daily_acf <- daily_acf
+    
+      # Set progress bar
+      setTxtProgressBar(pb, x/length_fpaths)
+      
+      # Select file name
+      fpath <- fpaths[x]
+      fname <- strsplit(basename(fpath), split=".RData")[[1]]
+      # print(fname)
+      # Load extended dataframe
+      load(fpath)
+      # Set exceptions
+      if (!edf$is_0) {
+        # METADATA
+        ff_meta <- edf[-c(1:6)]
+        # AGGREGATE TO HOURLY DATA
+        edf <- get_hourly_data(edf)
+        # GET FEATURES
+        ff_feats <- get_features_from_cooked_dataframe(
+          cdf              = edf,
+          type_of_analysis = type_of_analysis
+        )
+        # Incorporate filename as a column
+        o <- cbind(ff_meta, ff_feats)
+      } else {
+        NULL
+      }
+    }
+    
+    # Stop parallelization
+    parallel::stopCluster(cl)
+    
+    cat("\n")
+    
+    # Save results to the CSV file
+    data.table::fwrite(
+      x         = o,
+      file      = paste0(output_path, "feats_", SS_seq[SS+1], ".csv"),
+      sep       = ",",
+      na        = "",
+      quote     = FALSE,
+      append    = FALSE,
+      col.names = TRUE,
+      row.names = FALSE
+    )
+  }
 }
