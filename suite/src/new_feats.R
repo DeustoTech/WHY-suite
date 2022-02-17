@@ -1352,7 +1352,11 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
           type_of_analysis = type_of_analysis
         )
         # Incorporate filename as a column
-        o <- cbind(ff_meta, ff_feats)
+        if (length(ff_meta) == 0) {
+          o <- ff_feats
+        } else {
+          o <- cbind(ff_meta, ff_feats)
+        }
       } else {
         NULL
       }
