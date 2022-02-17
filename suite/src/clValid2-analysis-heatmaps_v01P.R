@@ -42,7 +42,7 @@ set_row_conditions <- function(feats, analysis_type) {
   if (is.null(analysis_type$dd$ref_atr_tariff))
     cond_trf <- TRUE
   else
-    cond_trf <- substr(feats$ref_atr_tariff,1,1) == analysis_type$dd$tariff
+    cond_trf <- substr(feats$ref_atr_tariff,1,1) == analysis_type$dd$ref_atr_tariff
   
   # Mandatory condition
   cond_min <- feats$minimum >= 0

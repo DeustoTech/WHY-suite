@@ -27,9 +27,51 @@ mdata_file_por <- NULL
 # Feature files
 fea_file_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_por.csv"
 
+# Cluster folders (ClValid2)
+clu_dir_por <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
+
+# Instructions for "dd_sel" variable:
+# Each sublist is an OR, each element within the sublist is an AND
+# Each NULL element within the sublist means ALL TRUE
+dd_sel_por <- list(
+  list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
+
 ################################################################################
-operation <- 2
+operation <- 3
 ################################################################################
+
+# 2022.02.17 - fea2rep POR
+if (operation == 3) {
+  fea2clu(
+    fea_file = fea_file_por,
+    clu_dir  = clu_dir_por,
+    ff_sel   = c("sAggrP6", "sAggrDRM"),
+    dd_sel   = dd_sel_por,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(6)
+  )
+  
+  clu2hmp(
+    fea_file = fea_file_por,
+    clu_dir  = clu_dir_por,
+    hmm_dir  = paste0(clu_dir_por, "hmm/"),
+    hmp_dir  = paste0(clu_dir_por, "hmp/"),
+    dset_dir = imp_dir_por,
+    cc       = 6
+  )
+  
+  hmp2rep(
+    rep_title = "Cluster Report: Elergone Energia",
+    rep_file  = paste0(clu_dir_por, "report/report.html"),
+    hmm_dir   = paste0(clu_dir_por, "hmm/"),
+    hmp_dir   = paste0(clu_dir_por, "hmp/"),
+    ff        = c("sAggrP6", "sAggrDRM"),
+    dd        = dd_sel_por,
+    mm        = c("som")
+  )
+}
 
 # 2022.02.17 - imp2fea POR
 if (operation == 2) {
