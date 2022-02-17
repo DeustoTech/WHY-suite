@@ -15,9 +15,11 @@ raw_dir_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/raw/"
 raw_dir_por <- "/home/ubuntu/carlos.quesada/disk/por/raw/"
 
 # Imputation folders
-imp_dir_iss <- "/home/ubuntu/carlos.quesada/disk/iss/imp/"
-imp_dir_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/imp/"
-imp_dir_por <- "/home/ubuntu/carlos.quesada/disk/por/imp/"
+imp_dir <- c(
+  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "por" = "/home/ubuntu/carlos.quesada/disk/por/imp/"
+)
 
 # Metadata files
 mdata_file_iss <- "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv"
@@ -61,7 +63,7 @@ if (operation == 3) {
     clu_dir  = paste0(clu_dir_por, "data/"),
     hmm_dir  = paste0(clu_dir_por, "hmm/"),
     hmp_dir  = paste0(clu_dir_por, "hmp/"),
-    dset_dir = imp_dir_por,
+    dset_dir = imp_dir,
     cc       = 6
   )
   
@@ -79,7 +81,7 @@ if (operation == 3) {
 # 2022.02.17 - imp2fea POR
 if (operation == 2) {
   imp2fea(
-    imp_dir  = imp_dir_por,
+    imp_dir  = imp_dir[["por"]],
     fea_file = fea_dir_por
   )
 }
@@ -88,7 +90,7 @@ if (operation == 2) {
 if (operation == 1) {
   raw2imp(
     raw_dir    = raw_dir_por,
-    imp_dir    = imp_dir_por,
+    imp_dir    = imp_dir[["por"]],
     dset_key   = "por",
     mdata_file = mdata_file_por,
     from_date  = "first",
