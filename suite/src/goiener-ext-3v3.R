@@ -200,7 +200,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   # Elergone Energia ###########################################################
   if (dset_key == "por") {
     # Processed metadata
-    out[["mdata_file_idx"]] <- NA
+    out[["mdata_file_idx"]] <- 0
     out[["country"]] <- "pt"
     out[["is_household"]] <- NA
   }
@@ -483,16 +483,12 @@ extend_dataset_v2 <- function(
             output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData"
           )
           # Extract metadata
-          if (!is.null(metadata_files)) {
-            metadata_list <- extract_metadata(
-              edf      = edf,
-              dfs      = metadata_dataframes,
-              dset_key = dset_key,
-              filename = dset_filename
-            )
-          } else {
-            metadata_list <- NULL
-          }
+          metadata_list <- extract_metadata(
+            edf      = edf,
+            dfs      = metadata_dataframes,
+            dset_key = dset_key,
+            filename = dset_filename
+          )
           # Append metadata
           edf <- append(edf, metadata_list)
           
