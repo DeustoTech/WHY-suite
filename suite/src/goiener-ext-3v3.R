@@ -30,6 +30,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   out <- list()
   
   # Common metadata (depending on the data.frame) ##############################
+  out[["file"]]           <- strsplit(edf$filename, ".csv")[[1]]
   out[["data_set"]]       <- edf$dset_key
   out[["num_of_samples"]] <- length(edf$df$values)
   out[["ts_start_date"]]  <- edf$df$times[1]

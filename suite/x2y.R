@@ -24,6 +24,9 @@ mdata_file_iss <- "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv"
 mdata_file_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv"
 mdata_file_por <- NULL
 
+# Feature folders
+fea_dir_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
+
 # Feature files
 fea_file_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_por.csv"
 
@@ -77,7 +80,7 @@ if (operation == 3) {
 if (operation == 2) {
   imp2fea(
     imp_dir  = imp_dir_por,
-    fea_file = fea_file_por
+    fea_file = fea_dir_por
   )
 }
 
