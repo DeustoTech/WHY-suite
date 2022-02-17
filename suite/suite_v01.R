@@ -130,7 +130,7 @@ hmp2rep <- function(
     mm          = mm
   )
   rmarkdown::render(
-    input       = hmp2rep_src,
+    input       = paste(getwd(), "src", hmp2rep_src, sep="/"),
     output_file = rep_file,
     params      = params_list
   )
