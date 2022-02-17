@@ -10,9 +10,13 @@
 source("suite_v01.R")
 
 # Raw folders
+raw_dir_iss <- "/home/ubuntu/carlos.quesada/disk/iss/raw/"
+raw_dir_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/raw/"
 raw_dir_por <- "/home/ubuntu/carlos.quesada/disk/por/raw/"
 
 # Imputation folders
+imp_dir_iss <- "/home/ubuntu/carlos.quesada/disk/iss/imp/"
+imp_dir_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/imp/"
 imp_dir_por <- "/home/ubuntu/carlos.quesada/disk/por/imp/"
 
 # Metadata files
