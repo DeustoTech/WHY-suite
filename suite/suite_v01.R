@@ -17,7 +17,7 @@ raw2imp <- function(
   min_yrs   = 1,
   wwgen     = FALSE
 ) {
-  source(paste(getwd(), "src", raw2imp_src), sep="/")
+  source(paste(getwd(), "src", raw2imp_src, sep="/"))
   print("## RAW TO IMPUTED ##")
   extend_dataset_v2(
     input_folder            = raw_dir,
@@ -43,7 +43,7 @@ fea2clu <- function(
   vv_sel,
   cc_sel
 ) {
-  source(paste(getwd(), "src", fea2hmp_src), sep="/")
+  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
   print("## CLUSTER ANALYSES ##")
   cluster_features(
     feats_file = fea_file,
@@ -67,7 +67,7 @@ clu2hmp <- function(
   dset_dir,
   cc
 ) {
-  source(paste(getwd(), "src", fea2hmp_src), sep="/")
+  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
   print("## HEATMAP PLOTS ##")
   clValid2_heatmaps(
     feats_file  = fea_file,
