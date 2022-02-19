@@ -119,7 +119,8 @@ hmp2rep <- function(
   hmm_dir,
   ff,
   dd,
-  mm
+  mm,
+  cc
 ) {
   print("## RMarkDown REPORT ##")
   params_list <- list(
@@ -129,7 +130,8 @@ hmp2rep <- function(
     nofile_path = paste(getwd(), "src", no_file_src, sep="/"),
     ff          = ff,
     dd          = dd,
-    mm          = mm
+    mm          = mm,
+    cc          = cc
   )
   rmarkdown::render(
     input       = paste(getwd(), "src", hmp2rep_src, sep="/"),

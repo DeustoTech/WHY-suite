@@ -15,6 +15,7 @@ params:
   ff: ""
   dd: ""
   mm: ""
+  cc: ""
 ---
 
 <style type="text/css">
@@ -192,7 +193,7 @@ for (ff in ff_loop) {
       # Initialization of txt_list
       txt_list <- list(img = rep("", 42), cap = rep("", 42))
       # CLUSTER LOOP
-      cc_loop <- 1:30
+      cc_loop <- 1:params$cc
       
       for (cc in cc_loop) {
         # Get index

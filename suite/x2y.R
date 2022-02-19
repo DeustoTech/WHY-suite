@@ -48,24 +48,24 @@ operation <- 3
 
 # 2022.02.17 - fea2rep POR
 if (operation == 3) {
-  fea2clu(
-    fea_file = fea_file_por,
-    clu_dir  = paste0(clu_dir_por, "data/"),
-    ff_sel   = c("sAggrP6", "sAggrDRM"),
-    dd_sel   = dd_sel_por,
-    mm_sel   = c("som"),
-    vv_sel   = c("internal"),
-    cc_sel   = c(6)
-  )
-  
-  clu2hmp(
-    fea_file = fea_file_por,
-    clu_dir  = paste0(clu_dir_por, "data/"),
-    hmm_dir  = paste0(clu_dir_por, "hmm/"),
-    hmp_dir  = paste0(clu_dir_por, "hmp/"),
-    dset_dir = imp_dir,
-    cc       = 6
-  )
+  # fea2clu(
+  #   fea_file = fea_file_por,
+  #   clu_dir  = paste0(clu_dir_por, "data/"),
+  #   ff_sel   = c("sAggrP6", "sAggrDRM"),
+  #   dd_sel   = dd_sel_por,
+  #   mm_sel   = c("som"),
+  #   vv_sel   = c("internal"),
+  #   cc_sel   = c(6)
+  # )
+  # 
+  # clu2hmp(
+  #   fea_file = fea_file_por,
+  #   clu_dir  = paste0(clu_dir_por, "data/"),
+  #   hmm_dir  = paste0(clu_dir_por, "hmm/"),
+  #   hmp_dir  = paste0(clu_dir_por, "hmp/"),
+  #   dset_dir = imp_dir,
+  #   cc       = 6
+  # )
   
   hmp2rep(
     rep_title = "Cluster Report: Elergone Energia",
@@ -74,7 +74,8 @@ if (operation == 3) {
     hmp_dir   = paste0(clu_dir_por, "hmp/"),
     ff        = c("sAggrP6", "sAggrDRM"),
     dd        = dd_sel_por,
-    mm        = c("som")
+    mm        = c("som"),
+    cc        = 6
   )
 }
 
