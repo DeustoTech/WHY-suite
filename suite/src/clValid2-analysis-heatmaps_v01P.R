@@ -391,7 +391,6 @@ plot_heatmap_matrix <- function(
   }
 }
 
-
 ################################################################################
 # clValid2_heatmaps
 ################################################################################
@@ -403,8 +402,7 @@ clValid2_heatmaps <- function(
   feats <- data.table::fread(
     file   = feats_file,
     header = TRUE,
-    sep    = ",",
-    select = c("data_set", "file", "rel_imputed_na", "is_household", "minimum")
+    sep    = ","
   )
   
   # LOOP
