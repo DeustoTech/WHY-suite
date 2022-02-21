@@ -396,7 +396,8 @@ plot_heatmap_matrix <- function(
 ################################################################################
 
 clValid2_heatmaps <- function(
-  feats_file, clValid_dir, hmm_dir, hmp_dir, dataset_dir, num_cluster, scale_hmm
+  feats_file, clValid_dir, hmm_dir, hmp_dir, dataset_dir, num_cluster, scale_hmm,
+  num_cores = NULL
 ) {
   # Load feats
   feats <- data.table::fread(
@@ -410,7 +411,11 @@ clValid2_heatmaps <- function(
   fun_export <- c("get_heatmap_matrix", "plot_heatmap_matrix", "set_row_conditions")
   
   # Setup parallel backend to use many processors
-  cores <- parallel::detectCores() - 1
+  if (is.null(num_cores)) {
+    cores <- parallel::detectCores() - 1
+  } else {
+    cores <- num_cores
+  }
   cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
   

@@ -22,6 +22,10 @@ imp_dir <- c(
   "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/"
 )
 
+imp_dir_goi4_pst <- c(
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/"
+)
+
 # Metadata files
 mdata_file_iss <- "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv"
 mdata_file_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv"
@@ -31,12 +35,14 @@ mdata_file_por <- NULL
 fea_dir_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
 
 # Feature files
-fea_file_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
+fea_file_por      <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
 fea_file_goi4_pre <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv"
+fea_file_goi4_pst <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv"
 
 # Cluster folders (ClValid2)
-clu_dir_por <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
+clu_dir_por      <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
 clu_dir_goi4_pre <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/"
+clu_dir_goi4_pst <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/"
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
@@ -44,25 +50,59 @@ clu_dir_goi4_pre <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go
 dd_sel_por <- list(
   list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
-dd_sel_goi4_pre <- list(
+dd_sel_goi4 <- list(
   list(key="goi", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
 )
 
 ################################################################################
-operation <- 4
+operation <- 5
 ################################################################################
 
-# 2022.02.21 - go4-pre-20cl-som
-if (operation == 4) {
+# 2022.02.21 - go4-pst-20cl-som
+if (operation == 5) {
   # fea2clu(
-  #   fea_file = fea_file_goi4_pre,
-  #   clu_dir  = paste0(clu_dir_goi4_pre, "data/"),
+  #   fea_file = fea_file_goi4_pst,
+  #   clu_dir  = paste0(clu_dir_goi4_pst, "data/"),
   #   ff_sel   = c("sAggrDRM"),
-  #   dd_sel   = dd_sel_goi4_pre,
+  #   dd_sel   = dd_sel_goi4,
   #   mm_sel   = c("som"),
   #   vv_sel   = c("internal"),
   #   cc_sel   = c(20)
   # )
+  
+  clu2hmp(
+    fea_file = fea_file_goi4_pst,
+    clu_dir  = paste0(clu_dir_goi4_pst, "data/"),
+    hmm_dir  = paste0(clu_dir_goi4_pst, "hmm/"),
+    hmp_dir  = paste0(clu_dir_goi4_pst, "hmp/"),
+    dset_dir = imp_dir_goi4_pst,
+    cc       = 20,
+    cores    = 3
+  )
+  
+  hmp2rep(
+    rep_title = "Cluster Report: GoiEner POST, 20 clusters",
+    rep_file  = paste0(clu_dir_goi4_pst, "report/report.html"),
+    hmm_dir   = paste0(clu_dir_goi4_pst, "hmm/"),
+    hmp_dir   = paste0(clu_dir_goi4_pst, "hmp/"),
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 20
+  )
+}
+
+# 2022.02.21 - go4-pre-20cl-som
+if (operation == 4) {
+  fea2clu(
+    fea_file = fea_file_goi4_pre,
+    clu_dir  = paste0(clu_dir_goi4_pre, "data/"),
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_goi4,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(20)
+  )
   
   clu2hmp(
     fea_file = fea_file_goi4_pre,
@@ -79,7 +119,7 @@ if (operation == 4) {
     hmm_dir   = paste0(clu_dir_goi4_pre, "hmm/"),
     hmp_dir   = paste0(clu_dir_goi4_pre, "hmp/"),
     ff        = c("sAggrDRM"),
-    dd        = dd_sel_goi4_pre,
+    dd        = dd_sel_goi4,
     mm        = c("som"),
     cc        = 20
   )

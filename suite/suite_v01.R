@@ -94,7 +94,8 @@ clu2hmp <- function(
   hmm_dir,
   hmp_dir,
   dset_dir,
-  cc
+  cc,
+  cores = NULL
 ) {
   source(paste(getwd(), "src", fea2hmp_src, sep="/"))
   print("## HEATMAP PLOTS ##")
@@ -105,7 +106,8 @@ clu2hmp <- function(
     hmp_dir     = hmp_dir,
     dataset_dir = dset_dir,
     num_cluster = cc,
-    scale_hmm   = TRUE
+    scale_hmm   = TRUE,
+    num_cores   = cores
   )
 }
 
