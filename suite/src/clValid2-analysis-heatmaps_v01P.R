@@ -114,12 +114,35 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
 }
 
 ################################################################################
+##  check_output_subfolder()
+################################################################################
+
+check_output_subfolder <- function(o) {
+  # All output subfolders
+  o_sub <- c(
+    paste0(o, "data/"),
+    paste0(o, "hmm/"),
+    paste0(o, "hmp/"),
+    paste0(o, "report/")
+  )
+  # Create folders if they do NOT exist
+  for (oo in o_sub) {
+    if (!dir.exists(oo))
+      dir.create(oo)
+  }
+}
+
+################################################################################
 ##  CALL TO THE FUNCTION
 ################################################################################
 
 cluster_features <- function(
   feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel) {
   
+  # Check that all subfolders in "output_dir" exist
+  check_output_subfolder(output_dir)
+  
+  # Open features file
   feats <- data.table::fread(
     file   = feats_file,
     header = TRUE,
@@ -207,13 +230,15 @@ cluster_features <- function(
         # vv: VALIDATION METHODS
         for (vv in vv_sel) {
           # cc: NUMBER OF CLUSTERS
-          cluster_codes[length(cluster_codes)+1] <- list(list(
+          cluster_codes[length(cluster_codes)+1] <- list(
+            list(
             ff = ff,
             dd = dd,
             mm = mm,
             vv = vv,
             cc = cc_sel
-          ))
+            )
+          )
         }
       }
     }
@@ -399,6 +424,9 @@ clValid2_heatmaps <- function(
   feats_file, clValid_dir, hmm_dir, hmp_dir, dataset_dir, num_cluster, scale_hmm,
   num_cores = NULL
 ) {
+  # Check that all subfolders in "output_dir" exist
+  check_output_subfolder(output_dir)
+  
   # Load feats
   feats <- data.table::fread(
     file   = feats_file,

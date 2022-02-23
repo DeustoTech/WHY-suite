@@ -55,36 +55,50 @@ dd_sel_goi4 <- list(
 )
 
 ################################################################################
-operation <- 5
+operation <- 6
 ################################################################################
+
+# 2022.02.21 - pre/post to ALL 20cl
+if (operation == 6) {
+  hmp2rep(
+    rep_type      = "map40",
+    clu_dir       = clu_dir_goi4_pre,
+    new_hmp_fname = c("hmm_sAggrDRM_goi_som_20cl_i-", ".RData"),
+    tag           = "PRE-20cl"
+  )
+  
+  hmp2rep(
+    rep_type      = "map40",
+    clu_dir       = clu_dir_goi4_pst,
+    new_hmp_fname = c("hmm_sAggrDRM_goi_som_20cl_i-", ".RData"),
+    tag           = "POST-20cl"
+  )
+}
 
 # 2022.02.21 - go4-pst-20cl-som
 if (operation == 5) {
-  # fea2clu(
-  #   fea_file = fea_file_goi4_pst,
-  #   clu_dir  = paste0(clu_dir_goi4_pst, "data/"),
-  #   ff_sel   = c("sAggrDRM"),
-  #   dd_sel   = dd_sel_goi4,
-  #   mm_sel   = c("som"),
-  #   vv_sel   = c("internal"),
-  #   cc_sel   = c(20)
-  # )
+  fea2clu(
+    fea_file = fea_file_goi4_pst,
+    clu_dir  = clu_dir_goi4_pst,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_goi4,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(20)
+  )
   
   clu2hmp(
     fea_file = fea_file_goi4_pst,
-    clu_dir  = paste0(clu_dir_goi4_pst, "data/"),
-    hmm_dir  = paste0(clu_dir_goi4_pst, "hmm/"),
-    hmp_dir  = paste0(clu_dir_goi4_pst, "hmp/"),
+    clu_dir  = clu_dir_goi4_pst,
     dset_dir = imp_dir_goi4_pst,
     cc       = 20,
-    cores    = 3
+    cores    = 5
   )
   
   hmp2rep(
     rep_title = "Cluster Report: GoiEner POST, 20 clusters",
-    rep_file  = paste0(clu_dir_goi4_pst, "report/report.html"),
-    hmm_dir   = paste0(clu_dir_goi4_pst, "hmm/"),
-    hmp_dir   = paste0(clu_dir_goi4_pst, "hmp/"),
+    clu_dir   = clu_dir_goi4_pst,
+    rep_fname = "report.html",
     ff        = c("sAggrDRM"),
     dd        = dd_sel_goi4,
     mm        = c("som"),
