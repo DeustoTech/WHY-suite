@@ -47,14 +47,14 @@ raw2imp <- function(
 ###############################
 imp2fea <- function(
   imp_dir,
-  fea_file,
+  fea_dir,
   analysis = "extra"
 ) {
   source(paste(getwd(), "src", imp2fea_src, sep="/"))
   print("## IMPUTED TO FEATURES ##")
   get_features(
     input_folder     = imp_dir,
-    output_path      = fea_file,
+    output_path      = fea_dir,
     type_of_analysis = analysis
   )
 }
@@ -77,7 +77,7 @@ fea2clu <- function(
   print("## CLUSTER ANALYSES ##")
   cluster_features(
     feats_file = fea_file,
-    output_dir = paste0(clu_dir, "data/"),
+    output_dir = clu_dir,
     ff_sel     = ff_sel,
     dd_sel     = dd_sel,
     mm_sel     = mm_sel,

@@ -246,6 +246,80 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
 }
 
 ################################################################################
+# manage_times()
+################################################################################
+
+manage_times <- function(edf) {
+  
+  # NEE
+  if (edf$dset_key == "nee") {
+    # Correct DST (daylight saving time)
+    if (edf$tz_abbr == "PST") tzone <- "US/Pacific"
+    if (edf$tz_abbr == "MST") tzone <- "US/Mountain"
+    edf <- correct_dst(edf, tzone)
+    # Correct TZ (time zone)
+    edf <- correct_tz(edf, edf$tz_utc_offset)
+  }
+  
+  return(edf)
+}
+
+################################################################################
+# correct_dst()
+################################################################################
+
+correct_dst <- function(edf, tzone) {
+  # Generate a new time sequence
+  t <- seq(
+    edf$df$times[1], 
+    edf$df$times[nrow(edf$df)], 
+    by = paste(1440/get_samples_per_day()[[edf$dset_key]], "min") 
+  )
+  # Shifting the time sequence according to the local time zone
+  t_shift <- force_tz(t, tzone = tzone)
+  # Replace the original time sequence by the shifted one
+  edf$df$times <- t_shift
+  
+  # New time sequence accounting for the gaps
+  t <- seq(
+    edf$df$times[1], 
+    edf$df$times[nrow(edf$df)], 
+    by = paste(1440/get_samples_per_day()[[edf$dset_key]], "min") 
+  )
+  # Complete gaps with NAs
+  edf$df <- as.data.frame(tidyr::complete(edf$df, times=t))
+  # Interpolate NAs
+  i_values <- approx(
+    x = 1:nrow(edf$df),
+    y = edf$df$values,
+    xout = which(is.na(edf$df$values))
+  )
+  # Replace NAs with interpolated values
+  edf$df$values[i_values$x] <- i_values$y
+  # Remove NA rows (normally at the end of the data.frame)
+  edf$df <- edf$df[-which(is.na(edf$df$times)),]
+  # Complete "imputed" column
+  edf$df$imputed[i_values$x] <- 1
+
+  # Update stats
+  edf$number_of_na <- sum(edf$df$imputed)
+  edf$abs_imputed_na <- edf$number_of_na
+  edf$num_of_samples <- nrow(edf$df)
+  edf$rel_imputed_na <- edf$number_of_na / edf$num_of_samples
+    
+  return(edf)
+}
+
+################################################################################
+# correct_tz()
+################################################################################
+
+correct_tz <- function(edf, offset) {
+  edf$df$times <- edf$df$times + as.difftime(offset, units="hours")
+  return(edf)
+}
+
+################################################################################
 # cook_raw_dataframe()
 ################################################################################
 
@@ -257,7 +331,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   # Time series ends
   first_ts_date <- raw_df$times[1]
-  last_ts_date <- raw_df$times[nrow(raw_df)] #utils::tail(raw_df, 1)[[1, 1]]
+  last_ts_date <- raw_df$times[nrow(raw_df)]
   
   # Check interval left end
   if (any(class(from_date) == "character")) {
@@ -282,19 +356,17 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   # Chop raw_df
   raw_df <- raw_df[raw_df[,1] >= from_date & raw_df[,1] <= to_date,]
-  
-  # Create time sequence
-  # time_seq <- seq(from_date, to_date, by=paste(86400 / spd, "sec"))
-  # sum_factor <- cut(time_seq, breaks = "1 hour")
 
   # Round all dates towards zero according to the spd
   date_floors <- floor_date(raw_df$times, unit = paste(86400/(spd*60), "min"))
   # Aggregate according to the number of samples per day (spd)
-  aggr_data <- aggregate(
+  raw_df <- aggregate(
     x   = raw_df$values,
     by  = list(times = date_floors),
     FUN = sum
   )
+  names(raw_df)<- c("times", "values")
+  
   # Create time sequence
   time_seq <- seq(
     from = min(date_floors),
@@ -302,9 +374,8 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
     by = paste(86400/(spd*60), "min")
   )
   # Complete data frame
-  cooked_df <- as.data.frame(tidyr::complete(aggr_data, times=time_seq))
+  cooked_df <- as.data.frame(tidyr::complete(raw_df, times=time_seq))
   colnames(cooked_df)<- c("times", "values")
-  # cooked_df <- as.data.frame(raw_df %>% tidyr::complete(times=time_seq))
   
   # Get seasonal periods
   seasonal_periods <- NULL
@@ -437,9 +508,9 @@ extend_dataset_v2 <- function(
     "impute_cooked_dataframe"
   )
   
-  out <- foreach::foreach (
-    x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
-  #for(x in 1:length_fnames) {
+  # out <- foreach::foreach (
+  #   x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
+  for(x in 1:length_fnames) {
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
     
@@ -492,6 +563,9 @@ extend_dataset_v2 <- function(
           )
           # Append metadata
           edf <- append(edf, metadata_list)
+          
+          # MANAGE DST AND TZ
+          edf <- manage_times(edf)
           
           save(edf, file=path)
         }

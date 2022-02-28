@@ -141,6 +141,8 @@ cluster_features <- function(
   
   # Check that all subfolders in "output_dir" exist
   check_output_subfolder(output_dir)
+  # Change dir to "/data"
+  output_dir <- paste0(output_dir, "data/")
   
   # Open features file
   feats <- data.table::fread(
@@ -424,9 +426,6 @@ clValid2_heatmaps <- function(
   feats_file, clValid_dir, hmm_dir, hmp_dir, dataset_dir, num_cluster, scale_hmm,
   num_cores = NULL
 ) {
-  # Check that all subfolders in "output_dir" exist
-  check_output_subfolder(output_dir)
-  
   # Load feats
   feats <- data.table::fread(
     file   = feats_file,

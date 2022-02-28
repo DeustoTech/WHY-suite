@@ -6,20 +6,23 @@
 ##  THE x2y PROCESS:
 ##  raw > imp > fea > clu > hmp > rep
 ################################################################################
-
 source("suite_v01.R")
 
 # Raw folders
-raw_dir_iss <- "/home/ubuntu/carlos.quesada/disk/iss/raw/"
-raw_dir_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/raw/"
-raw_dir_por <- "/home/ubuntu/carlos.quesada/disk/por/raw/"
+raw_dir <- c(
+  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
+  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
+  "por" = "/home/ubuntu/carlos.quesada/disk/por/raw/",
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/raw/"
+)
 
-# Imputation folders
+# Imputation folders # AS IS IN clu2hmp!
 imp_dir <- c(
   "iss" = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
   "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
   "por" = "/home/ubuntu/carlos.quesada/disk/por/imp/",
-  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/"
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/imp/"
 )
 
 imp_dir_goi4_pst <- c(
@@ -27,36 +30,128 @@ imp_dir_goi4_pst <- c(
 )
 
 # Metadata files
-mdata_file_iss <- "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv"
-mdata_file_lcl <- "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv"
-mdata_file_por <- NULL
+mdata_file <- c(
+  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
+  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
+  "por" = NULL,
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv"
+)
 
 # Feature folders
-fea_dir_por <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
+fea_dir <- c(
+  "por" = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
+  "iss" = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
+  "lcl" = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
+  "nee" = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/"
+)
 
 # Feature files
-fea_file_por      <- "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
-fea_file_goi4_pre <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv"
-fea_file_goi4_pst <- "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv"
+fea_file <- c(
+  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv",
+  "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
+  "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
+  "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv"
+)
 
 # Cluster folders (ClValid2)
 clu_dir_por      <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
 clu_dir_goi4_pre <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/"
 clu_dir_goi4_pst <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/"
+clu_dir_nee      <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/"
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
 # Each NULL element within the sublist means ALL TRUE.
-dd_sel_por <- list(
+dd_sel_por  <- list(
   list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 dd_sel_goi4 <- list(
   list(key="goi", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
 )
+dd_sel_nee  <- list(
+  list(key="nee", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 
 ################################################################################
-operation <- 6
+operation <- 9
 ################################################################################
+
+# 2022.02.27 - arreglando NEE
+if (operation == 9) {
+  xdir <- "C:/Users/carlos.quesada/Documents/WHY/2022.02.27 - Arreglando NEE/"
+  raw2imp(
+    raw_dir   = paste0(xdir, "raw/"),
+    imp_dir   = paste0(xdir, "imp/"),
+    dset_key  = "nee",
+    mdata_file= paste0(xdir, "meta/nee_meta.csv"),
+    from_date = "first",
+    to_date   = ymd("2020-03-15"),
+    min_yrs   = 1,
+    wwgen     = FALSE
+  )
+}
+
+# 2022.02.23 - raw2rep NEEA
+if (operation == 8) {
+  # raw2imp(
+  #   raw_dir   = raw_dir[["nee"]],
+  #   imp_dir   = imp_dir[["nee"]],
+  #   dset_key  = "nee",
+  #   mdata_file= mdata_file[["nee"]],
+  #   from_date = "first",
+  #   to_date   = ymd("2020-03-15"),
+  #   min_yrs   = 1,
+  #   wwgen     = FALSE
+  # )
+  # 
+  # imp2fea(
+  #   imp_dir = imp_dir[["nee"]],
+  #   fea_dir = fea_dir[["nee"]]
+  # )
+  
+  fea2clu(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir_nee,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_nee,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(2)
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir_nee,
+    dset_dir = imp_dir,
+    cc       = 2
+  )
+  
+  hmp2rep(
+    rep_title = "Cluster Report: NEEA, 2 clusters",
+    clu_dir   = clu_dir_nee,
+    rep_fname = "cluster_report_neea_2cl.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_nee,
+    mm        = c("som"),
+    cc        = 2
+  )
+}
+
+# 2022.02.23 - features of ISS and LCL
+if (operation == 7) {
+  imp2fea(
+    imp_dir  = imp_dir[["iss"]],
+    fea_dir  = fea_dir[["iss"]]
+  )
+  
+  imp2fea(
+    imp_dir  = imp_dir[["lcl"]],
+    fea_dir  = fea_dir[["lcl"]]
+  )
+}
 
 # 2022.02.21 - pre/post to ALL 20cl
 if (operation == 6) {
