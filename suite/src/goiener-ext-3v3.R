@@ -501,7 +501,10 @@ extend_dataset_v2 <- function(
     "get_raw_dataframe_from_dataset",
     "cook_raw_dataframe",
     "get_samples_per_day",
-    "impute_cooked_dataframe"
+    "impute_cooked_dataframe",
+    "manage_times",
+    "correct_dst",
+    "correct_tz"
   )
   
   out <- foreach::foreach (
