@@ -76,7 +76,7 @@ dd_sel_nee  <- list(
 )
 
 ################################################################################
-operation <- 9
+operation <- 8
 ################################################################################
 
 # 2022.02.27 - arreglando NEE
@@ -96,21 +96,21 @@ if (operation == 9) {
 
 # 2022.02.23 - raw2rep NEEA
 if (operation == 8) {
-  # raw2imp(
-  #   raw_dir   = raw_dir[["nee"]],
-  #   imp_dir   = imp_dir[["nee"]],
-  #   dset_key  = "nee",
-  #   mdata_file= mdata_file[["nee"]],
-  #   from_date = "first",
-  #   to_date   = ymd("2020-03-15"),
-  #   min_yrs   = 1,
-  #   wwgen     = FALSE
-  # )
-  # 
-  # imp2fea(
-  #   imp_dir = imp_dir[["nee"]],
-  #   fea_dir = fea_dir[["nee"]]
-  # )
+  raw2imp(
+    raw_dir   = raw_dir[["nee"]],
+    imp_dir   = imp_dir[["nee"]],
+    dset_key  = "nee",
+    mdata_file= mdata_file[["nee"]],
+    from_date = "first",
+    to_date   = ymd("2020-03-15"),
+    min_yrs   = 1,
+    wwgen     = FALSE
+  )
+
+  imp2fea(
+    imp_dir = imp_dir[["nee"]],
+    fea_dir = fea_dir[["nee"]]
+  )
   
   fea2clu(
     fea_file = fea_file[["nee"]],

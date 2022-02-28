@@ -257,8 +257,9 @@ manage_times <- function(edf) {
     if (edf$tz_abbr == "PST") tzone <- "US/Pacific"
     if (edf$tz_abbr == "MST") tzone <- "US/Mountain"
     edf <- correct_dst(edf, tzone)
-    # Correct TZ (time zone)
-    edf <- correct_tz(edf, edf$tz_utc_offset)
+    
+    # # Correct TZ (time zone)
+    # edf <- correct_tz(edf, edf$tz_utc_offset)
   }
   
   return(edf)
@@ -269,22 +270,19 @@ manage_times <- function(edf) {
 ################################################################################
 
 correct_dst <- function(edf, tzone) {
+  # Convert to appropriate time zone
+  t_new <- with_tz(time=edf$df$times, tzone=tzone)
+  t_shifted <- force_tz(time=t_new, tzone="UTC")
+  edf$df$times <- t_shifted
+  
+  # Remove repeated elements
+  rep_dates_idx <- which(duplicated(edf$df$times))
+  edf$df <- edf$df[-rep_dates_idx,]
   # Generate a new time sequence
   t <- seq(
-    edf$df$times[1], 
-    edf$df$times[nrow(edf$df)], 
-    by = paste(1440/get_samples_per_day()[[edf$dset_key]], "min") 
-  )
-  # Shifting the time sequence according to the local time zone
-  t_shift <- force_tz(t, tzone = tzone)
-  # Replace the original time sequence by the shifted one
-  edf$df$times <- t_shift
-  
-  # New time sequence accounting for the gaps
-  t <- seq(
-    edf$df$times[1], 
-    edf$df$times[nrow(edf$df)], 
-    by = paste(1440/get_samples_per_day()[[edf$dset_key]], "min") 
+    t_shifted[1],
+    t_shifted[length(t_shifted)],
+    by = paste(1440/get_samples_per_day()[[edf$dset_key]], "min")
   )
   # Complete gaps with NAs
   edf$df <- as.data.frame(tidyr::complete(edf$df, times=t))
@@ -296,8 +294,6 @@ correct_dst <- function(edf, tzone) {
   )
   # Replace NAs with interpolated values
   edf$df$values[i_values$x] <- i_values$y
-  # Remove NA rows (normally at the end of the data.frame)
-  edf$df <- edf$df[-which(is.na(edf$df$times)),]
   # Complete "imputed" column
   edf$df$imputed[i_values$x] <- 1
 
@@ -508,9 +504,9 @@ extend_dataset_v2 <- function(
     "impute_cooked_dataframe"
   )
   
-  # out <- foreach::foreach (
-  #   x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
-  for(x in 1:length_fnames) {
+  out <- foreach::foreach (
+    x = 1:length_fnames, .packages = packages, .export = export) %dopar% {
+  # for(x in 1:length_fnames) {
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
     
