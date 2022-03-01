@@ -363,7 +363,7 @@ for (ff in ff_loop) {
           ff, " > ", 
           dd, " > ", 
           mm, " > ", 
-          "σ #", cc, "\n\n",
+          "σ > #", cc, "\n\n",
           sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
         )
         
