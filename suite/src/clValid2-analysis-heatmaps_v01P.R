@@ -500,8 +500,8 @@ clValid2_heatmaps <- function(
       # File paths
       hmm_path   <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
       hmp_path   <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
-      hmmsd_path <- paste0(hmmsd_dir, "hmm_", hm_fname, ".RData")
-      hmpsd_path <- paste0(hmpsd_dir, "hmp_", hm_fname, ".png")
+      hmmsd_path <- paste0(hmmsd_dir, "hmmsd_", hm_fname, ".RData")
+      hmpsd_path <- paste0(hmpsd_dir, "hmpsd_", hm_fname, ".png")
       
       # Save heatmap matrices
       m_avg <- m$avg
