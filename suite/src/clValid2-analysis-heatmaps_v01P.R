@@ -405,8 +405,8 @@ plot_heatmap_matrix <- function(
 ################################################################################
 
 clValid2_heatmaps <- function(
-  feats_file, clValid_dir, hmm_dir, hmp_dir, dataset_dir, num_cluster, scale_hmm,
-  num_cores = NULL
+  feats_file, clValid_dir, hmm_dir, hmp_dir, hmmsd_dir, hmpsd_dir, dataset_dir,
+  num_cluster, scale_hmm, num_cores = NULL
 ) {
   # Load feats
   feats <- data.table::fread(
@@ -498,10 +498,10 @@ clValid2_heatmaps <- function(
       # Cluster loop
       hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
       # File paths
-      hmm_path <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
-      hmp_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
-      hmmsd_path <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
-      hmpsd_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
+      hmm_path   <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
+      hmp_path   <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
+      hmmsd_path <- paste0(hmmsd_dir, "hmm_", hm_fname, ".RData")
+      hmpsd_path <- paste0(hmpsd_dir, "hmp_", hm_fname, ".png")
       
       # Save heatmap matrices
       m_avg <- m$avg

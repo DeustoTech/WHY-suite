@@ -103,6 +103,8 @@ clu2hmp <- function(
     clValid_dir = paste0(clu_dir, "data/"),
     hmm_dir     = paste0(clu_dir, "hmm/"),
     hmp_dir     = paste0(clu_dir, "hmp/"),
+    hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
+    hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
     dataset_dir = dset_dir,
     num_cluster = cc,
     scale_hmm   = TRUE,
