@@ -173,7 +173,7 @@ table_of_cards <- function(txt_list) {
 }
 ```
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=FALSE, results='asis', message=FALSE}
 # Features loop
 ff_loop <- params$ff
 # Dataset loop
@@ -204,7 +204,7 @@ for (ff in ff_loop) {
         # Load variable "idx"
         idx_path <- paste0(hmm_path, "hmm_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".RData")
-        load(file=idx_path)
+        load(idx_path)
         
         # Complete txt_list
         if (file.exists(card_path)) {

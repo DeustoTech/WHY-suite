@@ -123,6 +123,8 @@ check_output_subfolder <- function(o) {
     paste0(o, "data/"),
     paste0(o, "hmm/"),
     paste0(o, "hmp/"),
+    paste0(o, "hmmsd/"),
+    paste0(o, "hmpsd/"),
     paste0(o, "report/")
   )
   # Create folders if they do NOT exist
@@ -270,15 +272,7 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # INPUT: dataframe with pairs dataset-filename
   align_time_series <- function(fname) {
     # Load dataframe
-    load(fname[[1]]) # UNCOMMENT!
-    
-    ##############################################
-    # 	  print(fname)
-    #     # 69abbed24a5685b949114dd5162074c1.RData
-    #     browser()
-    #     load("C:/Users/carlos.quesada/Documents/WHY/2022.01.14 - go4 clValid analysis/go4_pre/69abbed24a5685b949114dd5162074c1.RData")
-    ##############################################
-    
+    load(fname[[1]])
     # By hours
     t_factor <- cut(edf$df$times, breaks = "1 hour")
     # Aggregate by hour
@@ -322,20 +316,6 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
       # Get end index of input vector
       i2 <- i1 + (o2 - o1)
       
-      # THIS PART DOESN'T MATTER BECAUSE IT TAKES NaNs
-      # i2_aux <- i1 + (o2 - o1)
-      # i2 <- ifelse(i2_aux > i_len, i_len, i2_aux)
-      
-      # Complete the output vector
-      # o_times_vect[o1:o2] <- i_times_vect[i1:i2]
-      
-      ##############################################
-      # print(yy)
-      # print(i1)
-      # print(i2)
-      # print("---")
-      ##############################################
-      
       o_value_vect[o1:o2] <- i_value_vect[i1:i2]
       # Out of the loop if the sequence is finished
       if ((i2+1) > i_len) break
@@ -365,16 +345,16 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # Flip matrix
   o_mean_mat <- o_mean_mat[nrow(o_mean_mat):1,]
   
-  # # Create matrix from Sds
-  # o_sd_mat <- matrix(
-  #   data = matrixStats::rowSds(out_list),
-  #   nrow = 24
-  # )
-  # # Flip matrix
-  # o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
+  # Create matrix from standard deviations
+  o_sd_mat <- matrix(
+    data = matrixStats::rowSds(out_list, na.rm = TRUE),
+    nrow = 24
+  )
+  # Flip matrix
+  o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
-  # return(list(mean=o_mean_mat, sd=o_sd_mat))
-  return(o_mean_mat)
+  return(list(mean=o_mean_mat, sd=o_sd_mat))
+  # return(o_mean_mat)
 }
 
 ################################################################################
@@ -382,7 +362,8 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
 ################################################################################
 
 plot_heatmap_matrix <- function(
-  m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600, subtitle=NULL) {
+  m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600, subtitle=NULL,
+  col_palette="YlOrRd") {
   # Format of output files
   if (format_file == "png") {
     png(
@@ -405,8 +386,9 @@ plot_heatmap_matrix <- function(
   # Plot heatmap
   image(
     t(m),
-    useRaster=TRUE,
-    axes=FALSE,
+    useRaster = TRUE,
+    axes      = FALSE,
+    col       = hcl.colors(12, col_palette, rev = TRUE)
   )
   axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
   axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
@@ -513,29 +495,36 @@ clValid2_heatmaps <- function(
       # Get heatmap matrix
       m <- get_heatmap_matrix(data.frame(paths_vector), .scale = scale_hmm)
       
-      # for (type in c("M", "S")) {
-      
       # Cluster loop
       hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
-      # hm_fname_type <- paste0(hm_fname, type)
-      
       # File paths
-      #hm_fname <- paste0(w_fname, "-", num_cluster)
       hmm_path <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
       hmp_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
+      hmmsd_path <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
+      hmpsd_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
       
-      # Save heatmap matrix
-      save(m, idx, file = hmm_path)
+      # Save heatmap matrices
+      save(m[["mean"]], idx, file = hmm_path)
+      save(m[["sd"]], idx, file = hmmsd_path)
       
-      # Generate heatmaps
+      # Generate mean heatmap
       plot_heatmap_matrix(
-        # m           = ifelse(type=="M", m$mean, m$sd),
-        m           = m,
+        m           = m[["mean"]],
         format_file = "png",
         file_path   = hmp_path,
         plot_width  = 1200,
         plot_height = 900,
         subtitle    = hm_fname
+      )
+      # Generate sd heatmap
+      plot_heatmap_matrix(
+        m           = m[["sd"]],
+        format_file = "png",
+        file_path   = hmpsd_path,
+        plot_width  = 1200,
+        plot_height = 900,
+        subtitle    = hm_fname,
+        col_palette = "Blues"
       )
       
       # }

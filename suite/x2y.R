@@ -111,7 +111,7 @@ if (operation == 8) {
     imp_dir = imp_dir[["nee"]],
     fea_dir = fea_dir[["nee"]]
   )
-  
+
   fea2clu(
     fea_file = fea_file[["nee"]],
     clu_dir  = clu_dir_nee,
@@ -121,7 +121,7 @@ if (operation == 8) {
     vv_sel   = c("internal"),
     cc_sel   = c(2)
   )
-  
+
   clu2hmp(
     fea_file = fea_file[["nee"]],
     clu_dir  = clu_dir_nee,
@@ -130,13 +130,14 @@ if (operation == 8) {
   )
   
   hmp2rep(
-    rep_title = "Cluster Report: NEEA, 2 clusters",
-    clu_dir   = clu_dir_nee,
-    rep_fname = "cluster_report_neea_2cl.html",
-    ff        = c("sAggrDRM"),
-    dd        = dd_sel_nee,
-    mm        = c("som"),
-    cc        = 2
+    rep_type      = c("basic"),
+    rep_title     = "Cluster Report: NEEA, 2 clusters",
+    clu_dir       = clu_dir_nee,
+    rep_fname     = "cluster_report_neea_2cl.html",
+    ff            = c("sAggrDRM"),
+    dd            = dd_sel_nee,
+    mm            = c("som"),
+    cc            = 2
   )
 }
 
