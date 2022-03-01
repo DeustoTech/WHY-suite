@@ -122,15 +122,15 @@ if (operation == 8) {
   #   cc_sel   = c(2)
   # )
 
-  clu2hmp(
-    fea_file = fea_file[["nee"]],
-    clu_dir  = clu_dir_nee,
-    dset_dir = imp_dir,
-    cc       = 2
-  )
+  # clu2hmp(
+  #   fea_file = fea_file[["nee"]],
+  #   clu_dir  = clu_dir_nee,
+  #   dset_dir = imp_dir,
+  #   cc       = 2
+  # )
   
   hmp2rep(
-    rep_type      = c("basic"),
+    rep_type      = c("sd"),
     rep_title     = "Cluster Report: NEEA, 2 clusters",
     clu_dir       = clu_dir_nee,
     rep_fname     = "cluster_report_neea_2cl.html",

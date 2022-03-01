@@ -12,6 +12,7 @@ raw2imp_src <- "goiener-ext-3v3.R"
 imp2fea_src <- "new_feats.R"
 fea2hmp_src <- "clValid2-analysis-heatmaps_v01P.R"
 hmp2rep_src <- "clValid2-summary_report_v03.Rmd"
+hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
 hmp2m40_src <- "map40.R"
 no_file_src <- "no-file.png"
 
@@ -116,7 +117,7 @@ clu2hmp <- function(
 ## CREATION OF BASIC REPORT ##
 ##############################
 hmp2rep <- function(
-  rep_type = c("basic", "map40"),
+  rep_type = c("basic", "sd", "map40"),
   rep_title,
   clu_dir,
   rep_fname,
@@ -142,6 +143,27 @@ hmp2rep <- function(
     )
     rmarkdown::render(
       input       = paste(getwd(), "src", hmp2rep_src, sep="/"),
+      output_file = paste0(clu_dir, "report/", rep_fname),
+      params      = params_list
+    )
+  }
+  ## STANDARD DEVIATION ########################################################
+  if ("sd" %in% rep_type) {
+    print("## RMARKDOWN BASIC REPORT ##")
+    params_list <- list(
+      rmd_title   = rep_title,
+      hmp_dir     = paste0(clu_dir, "hmp/"),
+      hmm_dir     = paste0(clu_dir, "hmm/"),
+      hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
+      hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
+      nofile_path = paste(getwd(), "src", no_file_src, sep="/"),
+      ff          = ff,
+      dd          = dd,
+      mm          = mm,
+      cc          = cc
+    )
+    rmarkdown::render(
+      input       = paste(getwd(), "src", hmp2std_src, sep="/"),
       output_file = paste0(clu_dir, "report/", rep_fname),
       params      = params_list
     )

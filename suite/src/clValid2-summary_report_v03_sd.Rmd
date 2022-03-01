@@ -11,6 +11,8 @@ params:
   rmd_title: "Cluster Report"
   hmp_dir: ""
   hmm_dir: ""
+  hmpsd_dir: ""
+  hmmsd_dir: ""
   nofile_path: "no-file.png"
   ff: ""
   dd: ""
@@ -44,6 +46,11 @@ params:
 ##### Clustering methods
 * __som__: self-organizing maps
 
+##### Statistic used
+* __μ__: mean
+* __σ__: standard deviation
+
+
 <hr>
 
 
@@ -52,6 +59,10 @@ params:
 hmp_path <- params$hmp_dir
 # Path to hmm values
 hmm_path <- params$hmm_dir
+# Path to hmp graphs
+hmpsd_path <- params$hmpsd_dir
+# Path to hmm values
+hmmsd_path <- params$hmmsd_dir
 # No file by DEFAULT
 no.file_path  <- params$nofile_path
 no_file <- paste0("![](", no.file_path, ")")
@@ -307,13 +318,11 @@ for (ff in ff_loop) {
     for (mm in mm_loop) {
       cat(paste0("## ", ff, " > ", dd, " > ", mm, "\n\n"))
       # Initialization of txt_list
-      txt_list <- list(img = rep("", 42), cap = rep("", 42))
+      txt_list <- list(img = rep("", 84), cap = rep("", 84))
       # CLUSTER LOOP
       cc_loop <- 1:params$cc
       
       for (cc in cc_loop) {
-        # Get index
-        cc_idx <- cc #(cc - 1) %% 12 + 1
         # Path to file
         card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".png")
@@ -322,21 +331,44 @@ for (ff in ff_loop) {
                             max(cc_loop), "cl_i-", cc, ".RData")
         load(idx_path)
         
-        # Complete txt_list
+        # Complete txt_list (MEAN)
         if (file.exists(card_path)) {
-          txt_list$img[cc_idx] <- paste0("![](", card_path, ")")
+          txt_list$img[2*cc-1] <- paste0("![](", card_path, ")")
         } else {
-          txt_list$img[cc_idx] <- no_file
+          txt_list$img[2*cc-1] <- no_file
         }
-        txt_list$cap[cc_idx] <- paste0(
+        txt_list$cap[2*cc-1] <- paste0(
+          ff, " > ", 
+          dd, " > ", 
+          mm, " > ",
+          "μ > #", cc, "\n\n",
+          sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
+        )
+        
+        # Path to file
+        card_path <- paste0(hmpsd_path, "hmpsd_", ff, "_", dd, "_", mm, "_",
+                            max(cc_loop), "cl_i-", cc, ".png")
+        # Load variable "idx"
+        idx_path <- paste0(hmmsd_path, "hmmsd_", ff, "_", dd, "_", mm, "_",
+                            max(cc_loop), "cl_i-", cc, ".RData")
+        load(idx_path)
+        
+        # Complete txt_list (SD)
+        if (file.exists(card_path)) {
+          txt_list$img[2*cc] <- paste0("![](", card_path, ")")
+        } else {
+          txt_list$img[2*cc] <- no_file
+        }
+        txt_list$cap[2*cc] <- paste0(
           ff, " > ", 
           dd, " > ", 
           mm, " > ", 
-          "#", cc, "\n\n",
+          "σ #", cc, "\n\n",
           sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
         )
+        
         # Print HTML table
-        if (cc_idx == max(cc_loop)) {
+        if (cc == max(cc_loop)) {
           cat(table_of_cards(txt_list))
         }
       }
