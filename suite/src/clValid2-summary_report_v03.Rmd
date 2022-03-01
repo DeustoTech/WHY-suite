@@ -36,6 +36,10 @@ params:
 
 ##### Datasets
 * __goi__: GoiEner (including Megara and La Corriente) [ES]
+* __lcl__: Low Carbon London [GB]
+* __iss__: ISSDA [IE]
+* __por__: Elergone Energia [PT]
+* __nee__: NEEA [US]
 
 ##### Clustering methods
 * __som__: self-organizing maps
@@ -166,6 +170,118 @@ table_of_cards <- function(txt_list) {
 <td><center><small>', txt_list$cap[40], '</small></center></td>
 <td><center><small>', txt_list$cap[41], '</small></center></td>
 <td><center><small>', txt_list$cap[42], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[43], '</td>
+<td>', txt_list$img[44], '</td>
+<td>', txt_list$img[45], '</td>
+<td>', txt_list$img[46], '</td>
+<td>', txt_list$img[47], '</td>
+<td>', txt_list$img[48], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[43], '</small></center></td>
+<td><center><small>', txt_list$cap[44], '</small></center></td>
+<td><center><small>', txt_list$cap[45], '</small></center></td>
+<td><center><small>', txt_list$cap[46], '</small></center></td>
+<td><center><small>', txt_list$cap[47], '</small></center></td>
+<td><center><small>', txt_list$cap[48], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[49], '</td>
+<td>', txt_list$img[50], '</td>
+<td>', txt_list$img[51], '</td>
+<td>', txt_list$img[52], '</td>
+<td>', txt_list$img[53], '</td>
+<td>', txt_list$img[54], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[49], '</small></center></td>
+<td><center><small>', txt_list$cap[50], '</small></center></td>
+<td><center><small>', txt_list$cap[51], '</small></center></td>
+<td><center><small>', txt_list$cap[52], '</small></center></td>
+<td><center><small>', txt_list$cap[53], '</small></center></td>
+<td><center><small>', txt_list$cap[54], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[55], '</td>
+<td>', txt_list$img[56], '</td>
+<td>', txt_list$img[57], '</td>
+<td>', txt_list$img[58], '</td>
+<td>', txt_list$img[59], '</td>
+<td>', txt_list$img[60], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[55], '</small></center></td>
+<td><center><small>', txt_list$cap[56], '</small></center></td>
+<td><center><small>', txt_list$cap[57], '</small></center></td>
+<td><center><small>', txt_list$cap[58], '</small></center></td>
+<td><center><small>', txt_list$cap[59], '</small></center></td>
+<td><center><small>', txt_list$cap[60], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[61], '</td>
+<td>', txt_list$img[62], '</td>
+<td>', txt_list$img[63], '</td>
+<td>', txt_list$img[64], '</td>
+<td>', txt_list$img[65], '</td>
+<td>', txt_list$img[66], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[61], '</small></center></td>
+<td><center><small>', txt_list$cap[62], '</small></center></td>
+<td><center><small>', txt_list$cap[63], '</small></center></td>
+<td><center><small>', txt_list$cap[64], '</small></center></td>
+<td><center><small>', txt_list$cap[65], '</small></center></td>
+<td><center><small>', txt_list$cap[66], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[67], '</td>
+<td>', txt_list$img[68], '</td>
+<td>', txt_list$img[69], '</td>
+<td>', txt_list$img[70], '</td>
+<td>', txt_list$img[71], '</td>
+<td>', txt_list$img[72], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[67], '</small></center></td>
+<td><center><small>', txt_list$cap[68], '</small></center></td>
+<td><center><small>', txt_list$cap[69], '</small></center></td>
+<td><center><small>', txt_list$cap[70], '</small></center></td>
+<td><center><small>', txt_list$cap[71], '</small></center></td>
+<td><center><small>', txt_list$cap[72], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[73], '</td>
+<td>', txt_list$img[74], '</td>
+<td>', txt_list$img[75], '</td>
+<td>', txt_list$img[76], '</td>
+<td>', txt_list$img[77], '</td>
+<td>', txt_list$img[78], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[73], '</small></center></td>
+<td><center><small>', txt_list$cap[74], '</small></center></td>
+<td><center><small>', txt_list$cap[75], '</small></center></td>
+<td><center><small>', txt_list$cap[76], '</small></center></td>
+<td><center><small>', txt_list$cap[77], '</small></center></td>
+<td><center><small>', txt_list$cap[78], '</small></center></td>
+</tr>
+<tr>
+<td>', txt_list$img[79], '</td>
+<td>', txt_list$img[80], '</td>
+<td>', txt_list$img[81], '</td>
+<td>', txt_list$img[82], '</td>
+<td>', txt_list$img[83], '</td>
+<td>', txt_list$img[84], '</td>
+</tr>
+<tr>
+<td><center><small>', txt_list$cap[79], '</small></center></td>
+<td><center><small>', txt_list$cap[80], '</small></center></td>
+<td><center><small>', txt_list$cap[81], '</small></center></td>
+<td><center><small>', txt_list$cap[82], '</small></center></td>
+<td><center><small>', txt_list$cap[83], '</small></center></td>
+<td><center><small>', txt_list$cap[84], '</small></center></td>
 </tr>
 </table>\n\n'
   )

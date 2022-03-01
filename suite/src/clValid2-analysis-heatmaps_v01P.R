@@ -388,7 +388,7 @@ plot_heatmap_matrix <- function(
     t(m),
     useRaster = TRUE,
     axes      = FALSE,
-    col       = hcl.colors(12, col_palette, rev = TRUE)
+    col       = hcl.colors(24, col_palette, rev = TRUE)
   )
   axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
   axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
