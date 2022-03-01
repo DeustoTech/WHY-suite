@@ -96,31 +96,31 @@ if (operation == 9) {
 
 # 2022.02.23 - raw2rep NEEA
 if (operation == 8) {
-  raw2imp(
-    raw_dir   = raw_dir[["nee"]],
-    imp_dir   = imp_dir[["nee"]],
-    dset_key  = "nee",
-    mdata_file= mdata_file[["nee"]],
-    from_date = "first",
-    to_date   = ymd("2020-03-15"),
-    min_yrs   = 1,
-    wwgen     = FALSE
-  )
-
-  imp2fea(
-    imp_dir = imp_dir[["nee"]],
-    fea_dir = fea_dir[["nee"]]
-  )
-
-  fea2clu(
-    fea_file = fea_file[["nee"]],
-    clu_dir  = clu_dir_nee,
-    ff_sel   = c("sAggrDRM"),
-    dd_sel   = dd_sel_nee,
-    mm_sel   = c("som"),
-    vv_sel   = c("internal"),
-    cc_sel   = c(2)
-  )
+  # raw2imp(
+  #   raw_dir   = raw_dir[["nee"]],
+  #   imp_dir   = imp_dir[["nee"]],
+  #   dset_key  = "nee",
+  #   mdata_file= mdata_file[["nee"]],
+  #   from_date = "first",
+  #   to_date   = ymd("2020-03-15"),
+  #   min_yrs   = 1,
+  #   wwgen     = FALSE
+  # )
+  # 
+  # imp2fea(
+  #   imp_dir = imp_dir[["nee"]],
+  #   fea_dir = fea_dir[["nee"]]
+  # )
+  # 
+  # fea2clu(
+  #   fea_file = fea_file[["nee"]],
+  #   clu_dir  = clu_dir_nee,
+  #   ff_sel   = c("sAggrDRM"),
+  #   dd_sel   = dd_sel_nee,
+  #   mm_sel   = c("som"),
+  #   vv_sel   = c("internal"),
+  #   cc_sel   = c(2)
+  # )
 
   clu2hmp(
     fea_file = fea_file[["nee"]],

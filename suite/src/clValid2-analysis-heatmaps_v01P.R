@@ -353,7 +353,7 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # Flip matrix
   o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
-  return(list(mean=o_mean_mat, sd=o_sd_mat))
+  return(list(avg=o_mean_mat, std=o_sd_mat))
   # return(o_mean_mat)
 }
 
@@ -432,7 +432,7 @@ clValid2_heatmaps <- function(
     foreach::foreach(cc = 1:num_cluster, .inorder = FALSE, .export=fun_export) %dopar% {
       
       # for(ff in 1:length(fnames)) {
-      # for(cc in 2:num_cluster) {
+      # for(cc in 1:num_cluster) {
       
       # Working file name
       w_fname <- fnames[ff]
@@ -504,12 +504,14 @@ clValid2_heatmaps <- function(
       hmpsd_path <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
       
       # Save heatmap matrices
-      save(m[["mean"]], idx, file = hmm_path)
-      save(m[["sd"]], idx, file = hmmsd_path)
+      m_avg <- m$avg
+      save(m_avg, idx, file = hmm_path)
+      m_std <- m$std
+      save(m_std, idx, file = hmmsd_path)
       
       # Generate mean heatmap
       plot_heatmap_matrix(
-        m           = m[["mean"]],
+        m           = m_avg,
         format_file = "png",
         file_path   = hmp_path,
         plot_width  = 1200,
@@ -518,7 +520,7 @@ clValid2_heatmaps <- function(
       )
       # Generate sd heatmap
       plot_heatmap_matrix(
-        m           = m[["sd"]],
+        m           = m_std,
         format_file = "png",
         file_path   = hmpsd_path,
         plot_width  = 1200,
