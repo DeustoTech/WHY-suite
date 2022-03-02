@@ -1,6 +1,6 @@
-library(foreach, warn.conflicts=FALSE)
-library(lubridate, warn.conflicts=FALSE)
-library(tidyr, warn.conflicts=FALSE)
+library(foreach,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(lubridate, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(tidyr,     warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
 
 ################################################################################
 # PREVIOUS FUNCTIONS FROM "whyT2.1" PACKAGE
@@ -28,6 +28,10 @@ get_samples_per_day <- function() {
 extract_metadata <- function(edf, dfs, dset_key, filename) {
   # Initialize the output list
   out <- list()
+  
+  # "filename" -> name of the file with the extension
+  # "file"     -> name of the file without the extension
+  # "fname"    -> name used to locate the proper metadata entry
   
   # Common metadata (depending on the data.frame) ##############################
   out[["file"]]           <- strsplit(edf$filename, ".csv")[[1]]
@@ -533,7 +537,7 @@ extend_dataset_v2 <- function(
       dset_key  = dset_key, 
       filename  = dset_filename
     )
-    # If cdf is NULL OR samples are NOT equidistributed in time, SKIP
+    # If cdf is NULL OR samples are NOT equally distributed in time, SKIP
     if (!is.null(cdf) & length(table(diff(cdf$df$times))) == 1) {
       # Get length
       initial_date   <- cdf$df[1,1]

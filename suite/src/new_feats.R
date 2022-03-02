@@ -6,9 +6,9 @@
 # Definitive file for generating a feature file from imputed folders
 ################################################################################
 
-library(tsfeatures)
-library(foreach)
-library(lubridate)
+library(tsfeatures, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(foreach,    warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(lubridate,  warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
 
 ################################################################################
 # stat_moments
@@ -1336,7 +1336,7 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
       
       # Select file name
       fpath <- fpaths[x]
-      fname <- strsplit(basename(fpath), split=".RData")[[1]]
+      # fname <- strsplit(basename(fpath), split=".RData")[[1]]
       # print(fname)
       # Load extended dataframe
       load(fpath)
