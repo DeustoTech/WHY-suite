@@ -1,6 +1,6 @@
-library(foreach)
-library(lubridate)
-library(tidyr)
+library(foreach, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
+library(tidyr, warn.conflicts=FALSE)
 
 ################################################################################
 # PREVIOUS FUNCTIONS FROM "whyT2.1" PACKAGE

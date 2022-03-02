@@ -6,11 +6,11 @@
 # Definitive file for generating analysis and reports from imputed folders
 ################################################################################
 
-library(foreach)
-library(clValid2)
-library(mclust)
-library(lubridate)
-library(rmarkdown)
+library(foreach, warn.conflicts=FALSE)
+library(clValid2, warn.conflicts=FALSE)
+library(mclust, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
+library(rmarkdown, warn.conflicts=FALSE)
 
 set.seed(1981)
 
