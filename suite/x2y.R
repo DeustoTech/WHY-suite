@@ -57,10 +57,13 @@ fea_file <- c(
 )
 
 # Cluster folders (ClValid2)
-clu_dir_por      <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
-clu_dir_goi4_pre <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/"
-clu_dir_goi4_pst <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/"
-clu_dir_nee      <- "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/"
+clu_dir <- c(
+  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
+  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
+  "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_lcl-16cl/"
+)
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
@@ -74,40 +77,48 @@ dd_sel_goi4 <- list(
 dd_sel_nee  <- list(
   list(key="nee", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
+dd_sel_lcl  <- list(
+  list(key="lcl", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 
 ################################################################################
-operation <- 8
+operation <- 10
 ################################################################################
 
 
-# 2022.03.02 - clustering ISS and LCL
+# 2022.03.02 - clustering LCL
 if (operation == 10) {
+  imp2fea(
+    imp_dir = imp_dir[["lcl"]],
+    fea_dir = fea_dir[["lcl"]]
+  )
+  
   fea2clu(
     fea_file = fea_file[["lcl"]],
-    clu_dir  = clu_dir_nee,
+    clu_dir  = clu_dir[["lcl"]],
     ff_sel   = c("sAggrDRM"),
-    dd_sel   = dd_sel_nee,
+    dd_sel   = dd_sel_lcl,
     mm_sel   = c("som"),
     vv_sel   = c("internal"),
-    cc_sel   = c(2)
+    cc_sel   = 16
   )
 
   clu2hmp(
-    fea_file = fea_file[["nee"]],
-    clu_dir  = clu_dir_nee,
+    fea_file = fea_file[["lcl"]],
+    clu_dir  = clu_dir[["lcl"]],
     dset_dir = imp_dir,
-    cc       = 2
+    cc       = 16
   )
   
   hmp2rep(
     rep_type  = c("sd"),
-    rep_title = "Cluster Report: NEEA, 2 clusters",
-    clu_dir   = clu_dir_nee,
-    rep_fname = "cluster_report_neea_2cl.html",
+    rep_title = "Cluster Report: Low Carbon London, 16 clusters",
+    clu_dir   = clu_dir[["lcl"]],
+    rep_fname = "cluster_report_lcl_16cl.html",
     ff        = c("sAggrDRM"),
-    dd        = dd_sel_nee,
+    dd        = dd_sel_lcl,
     mm        = c("som"),
-    cc        = 2
+    cc        = 16
   )
 }
 
