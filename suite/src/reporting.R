@@ -12,9 +12,9 @@ hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
 hmp2m40_src <- "map40.R"
 no_file_src <- "no-file.png"
 
-##################
-## ALL REPORTS! ##
-##################
+####################
+## REPORT MANAGER ##
+####################
 reporting <- function(
   rep_type,
   rep_title,
@@ -50,12 +50,12 @@ reporting <- function(
     )
   }
   
-  ###################
-  ## BASIC WITH SD ##
-  ###################
+  ################
+  ## BASIC + SD ##
+  ################
   if ("sd" %in% rep_type) {
     source(paste(getwd(), "src", hmp2std_src, sep="/"))
-    print("## RMARKDOWN BASIC REPORT ##")
+    print("## RMARKDOWN BASIC+SD REPORT ##")
     params_list <- list(
       rmd_title   = rep_title,
       hmp_dir     = paste0(clu_dir, "hmp/"),
@@ -80,7 +80,9 @@ reporting <- function(
   ############
   if ("map40" %in% rep_type) {
     source(paste(getwd(), "src", hmp2m40_src, sep="/"))
-    print("## MAP TO 40 ##")
+    print("## MAP-TO-40 REPORT ##")
+    # Generate "new_hmp_fname"
+    
     map40(
       new_hmp_dir   = paste0(clu_dir, "hmm/"),
       all_hmp_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.08_km-som-var-cl/hmm/",

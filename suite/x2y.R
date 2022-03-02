@@ -79,7 +79,39 @@ dd_sel_nee  <- list(
 operation <- 8
 ################################################################################
 
-# 2022.02.27 - arreglando NEE
+
+# 2022.03.02 - clustering ISS and LCL
+if (operation == 10) {
+  fea2clu(
+    fea_file = fea_file[["lcl"]],
+    clu_dir  = clu_dir_nee,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_nee,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(2)
+  )
+
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir_nee,
+    dset_dir = imp_dir,
+    cc       = 2
+  )
+  
+  hmp2rep(
+    rep_type  = c("sd"),
+    rep_title = "Cluster Report: NEEA, 2 clusters",
+    clu_dir   = clu_dir_nee,
+    rep_fname = "cluster_report_neea_2cl.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_nee,
+    mm        = c("som"),
+    cc        = 2
+  )
+}
+
+# 2022.02.27 - tidying up NEE
 if (operation == 9) {
   xdir <- "C:/Users/carlos.quesada/Documents/WHY/2022.02.27 - Arreglando NEE/"
   raw2imp(
@@ -96,38 +128,38 @@ if (operation == 9) {
 
 # 2022.02.23 - raw2rep NEEA
 if (operation == 8) {
-  # raw2imp(
-  #   raw_dir   = raw_dir[["nee"]],
-  #   imp_dir   = imp_dir[["nee"]],
-  #   dset_key  = "nee",
-  #   mdata_file= mdata_file[["nee"]],
-  #   from_date = "first",
-  #   to_date   = ymd("2020-03-15"),
-  #   min_yrs   = 1,
-  #   wwgen     = FALSE
-  # )
-  # 
-  # imp2fea(
-  #   imp_dir = imp_dir[["nee"]],
-  #   fea_dir = fea_dir[["nee"]]
-  # )
-  # 
-  # fea2clu(
-  #   fea_file = fea_file[["nee"]],
-  #   clu_dir  = clu_dir_nee,
-  #   ff_sel   = c("sAggrDRM"),
-  #   dd_sel   = dd_sel_nee,
-  #   mm_sel   = c("som"),
-  #   vv_sel   = c("internal"),
-  #   cc_sel   = c(2)
-  # )
+  raw2imp(
+    raw_dir   = raw_dir[["nee"]],
+    imp_dir   = imp_dir[["nee"]],
+    dset_key  = "nee",
+    mdata_file= mdata_file[["nee"]],
+    from_date = "first",
+    to_date   = ymd("2020-03-15"),
+    min_yrs   = 1,
+    wwgen     = FALSE
+  )
 
-  # clu2hmp(
-  #   fea_file = fea_file[["nee"]],
-  #   clu_dir  = clu_dir_nee,
-  #   dset_dir = imp_dir,
-  #   cc       = 2
-  # )
+  imp2fea(
+    imp_dir = imp_dir[["nee"]],
+    fea_dir = fea_dir[["nee"]]
+  )
+
+  fea2clu(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir_nee,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_nee,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = c(2)
+  )
+
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir_nee,
+    dset_dir = imp_dir,
+    cc       = 2
+  )
   
   hmp2rep(
     rep_type      = c("sd"),

@@ -116,15 +116,17 @@ clu2hmp <- function(
 hmp2rep <- function(
   rep_type = c("basic", "sd", "map40"),
   rep_title,
+  rep_title_short = "PRE",
   clu_dir,
   rep_fname,
   ff,
   dd,
   mm,
   cc,
-  new_hmp_fname = NULL,
-  tag = "PRE"
+  new_hmp_fname = NULL
 ) {
+  source(paste(getwd(), "src", hmp2rep_src, sep="/"))
+  print("## REPORTING ##")
   reporting(
     rep_type      = rep_type,
     rep_title     = rep_title,
@@ -134,7 +136,7 @@ hmp2rep <- function(
     dd            = dd,
     mm            = mm,
     cc            = cc,
-    new_hmp_fname = NULL,
-    tag           = "PRE"
+    new_hmp_fname = new_hmp_fname,
+    tag           = rep_title_short
   )
 }

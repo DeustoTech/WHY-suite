@@ -42,6 +42,7 @@ params:
 * __iss__: Irish Social Science Data Archive (ISSDA) [IE]
 * __por__: Elergone Energia [PT]
 * __nee__: Northwest Energy Efficiency Alliance (NEEA) [US]
+* __Nds__: N datasets put together
 
 ##### Clustering methods
 * __som__: self-organizing maps
