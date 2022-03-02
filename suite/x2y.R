@@ -62,7 +62,8 @@ clu_dir <- c(
   "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
-  "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_lcl-16cl/"
+  "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_lcl-16cl/",
+  "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/"
 )
 
 # Instructions for "dd_sel" variable:
@@ -82,12 +83,65 @@ dd_sel_lcl  <- list(
 )
 
 ################################################################################
-operation <- 10
+operation <- 11
 ################################################################################
 
+# 2022.03.02 - clustering ISS
+if (operation == 11) {
+  raw2imp(
+    raw_dir   = raw_dir[["iss"]],
+    imp_dir   = imp_dir[["iss"]],
+    dset_key  = "iss",
+    mdata_file= mdata_file[["iss"]],
+    min_yrs   = 1,
+    wwgen     = FALSE
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["iss"]],
+    fea_dir = fea_dir[["iss"]]
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["iss"]],
+    clu_dir  = clu_dir[["iss"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_lcl,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 16
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["iss"]],
+    clu_dir  = clu_dir[["iss"]],
+    dset_dir = imp_dir,
+    cc       = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("sd"),
+    rep_title = "Cluster Report: ISSDA, 16 clusters",
+    clu_dir   = clu_dir[["iss"]],
+    rep_fname = "cluster_report_iss_16cl.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_lcl,
+    mm        = c("som"),
+    cc        = 16
+  )
+}
 
 # 2022.03.02 - clustering LCL
 if (operation == 10) {
+  raw2imp(
+    raw_dir   = raw_dir[["lcl"]],
+    imp_dir   = imp_dir[["lcl"]],
+    dset_key  = "lcl",
+    mdata_file= mdata_file[["lcl"]],
+    min_yrs   = 1,
+    wwgen     = FALSE
+  )
+  
   imp2fea(
     imp_dir = imp_dir[["lcl"]],
     fea_dir = fea_dir[["lcl"]]
