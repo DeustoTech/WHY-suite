@@ -31,7 +31,6 @@ reporting <- function(
   ## BASIC ##
   ###########
   if ("basic" %in% rep_type) {
-    source(paste(getwd(), "src", hmp2bas_src, sep="/"))
     print("## RMARKDOWN BASIC REPORT ##")
     params_list <- list(
       rmd_title   = rep_title,
@@ -44,7 +43,7 @@ reporting <- function(
       cc          = cc
     )
     rmarkdown::render(
-      input       = paste(getwd(), "src", hmp2rep_src, sep="/"),
+      input       = paste(getwd(), "src", hmp2bas_src, sep="/"),
       output_file = paste0(clu_dir, "report/", rep_fname),
       params      = params_list
     )
@@ -54,7 +53,6 @@ reporting <- function(
   ## BASIC + SD ##
   ################
   if ("sd" %in% rep_type) {
-    source(paste(getwd(), "src", hmp2std_src, sep="/"))
     print("## RMARKDOWN BASIC+SD REPORT ##")
     params_list <- list(
       rmd_title   = rep_title,
@@ -81,8 +79,6 @@ reporting <- function(
   if ("map40" %in% rep_type) {
     source(paste(getwd(), "src", hmp2m40_src, sep="/"))
     print("## MAP-TO-40 REPORT ##")
-    # Generate "new_hmp_fname"
-    
     map40(
       new_hmp_dir   = paste0(clu_dir, "hmm/"),
       all_hmp_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2021.06.08_km-som-var-cl/hmm/",

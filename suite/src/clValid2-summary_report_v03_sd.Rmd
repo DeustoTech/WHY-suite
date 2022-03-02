@@ -296,7 +296,7 @@ table_of_cards <- function(txt_list) {
 <td><center><small>', txt_list$cap[84], '</small></center></td>
 </tr>
 </table>\n\n'
-  )
+)
   return(o)
 }
 ```
