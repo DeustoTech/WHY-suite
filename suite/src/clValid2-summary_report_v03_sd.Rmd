@@ -305,9 +305,10 @@ table_of_cards <- function(txt_list) {
 # Features loop
 ff_loop <- params$ff
 # Dataset loop
-key     <- unique(unlist(lapply(params$dd, `[[`, 1)))
+key     <- unique(sapply(1:length(params$dd),
+                           function(x) params$dd[[x]]$key))
 len_key <- length(key)
-dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds")) 
+dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds"))
 dd_loop <- dd_name
 # Methods loop
 mm_loop <- params$mm
@@ -327,10 +328,18 @@ for (ff in ff_loop) {
         # Path to file
         card_path <- paste0(hmp_path, "hmp_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".png")
-        # Load variable "idx"
+        # Path for loading variable "idx"
         idx_path <- paste0(hmm_path, "hmm_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".RData")
-        load(idx_path)
+        # This loads varible "idx"
+        if (file.exists(idx_path)) {
+          load(idx_path)  
+          sum_idx <- sum(idx)
+          pct_idx <- round(100*sum(idx)/length(idx),1)
+        } else {
+          sum_idx <- "?"
+          pct_idx <- "?"
+        }
         
         # Complete txt_list (MEAN)
         if (file.exists(card_path)) {
@@ -343,7 +352,8 @@ for (ff in ff_loop) {
           dd, " > ", 
           mm, " > ",
           "μ > #", cc, "\n\n",
-          sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
+          sum_idx, " TS (",
+          pct_idx, "%)\n\n"
         )
         
         # Path to file
@@ -352,7 +362,15 @@ for (ff in ff_loop) {
         # Load variable "idx"
         idx_path <- paste0(hmmsd_path, "hmmsd_", ff, "_", dd, "_", mm, "_",
                             max(cc_loop), "cl_i-", cc, ".RData")
-        load(idx_path)
+        # This loads varible "idx"
+        if (file.exists(idx_path)) {
+          load(idx_path)  
+          sum_idx <- sum(idx)
+          pct_idx <- round(100*sum(idx)/length(idx),1)
+        } else {
+          sum_idx <- "?"
+          pct_idx <- "?"
+        }
         
         # Complete txt_list (SD)
         if (file.exists(card_path)) {
@@ -365,7 +383,8 @@ for (ff in ff_loop) {
           dd, " > ", 
           mm, " > ", 
           "σ > #", cc, "\n\n",
-          sum(idx), " TS (", round(100*sum(idx)/length(idx),1), "%)\n\n"
+          sum_idx, " TS (",
+          pct_idx, "%)\n\n"
         )
         
         # Print HTML table

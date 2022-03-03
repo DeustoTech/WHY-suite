@@ -6,11 +6,11 @@
 # Definitive file for generating analysis and reports from imputed folders
 ################################################################################
 
-library(foreach,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(clValid2,  warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(mclust,    warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(lubridate, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(rmarkdown, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(foreach) #,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(clValid2) #,  warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(mclust) #,    warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(lubridate) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(rmarkdown) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
 
 set.seed(1981)
 
@@ -69,7 +69,8 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
   
   # Set file name
   ff_name <- analysis_type$ff
-  key     <- unique(unlist(lapply(analysis_type$dd$key, `[[`, 1)))
+  key     <- unique(sapply(1:length(analysis_type$dd),
+                           function(x) analysis_type$dd[[x]]$key))
   len_key <- length(key)
   dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds")) 
   mm_name <- substr(analysis_type$mm,1,3)
@@ -228,7 +229,7 @@ cluster_features <- function(
   # ff: SETS OF FEATURES
   for (ff in ff_sel) {
     # dd: DATASETS
-    for (dd in dd_sel) {
+    # for (dd in dd_sel) {
       # mm: CLUSTER METHODS
       for (mm in mm_sel) {
         # vv: VALIDATION METHODS
@@ -237,7 +238,7 @@ cluster_features <- function(
           cluster_codes[length(cluster_codes)+1] <- list(
             list(
             ff = ff,
-            dd = dd,
+            dd = dd_sel,
             mm = mm,
             vv = vv,
             cc = cc_sel
@@ -245,7 +246,7 @@ cluster_features <- function(
           )
         }
       }
-    }
+    # }
   }
   
   for (cluster_code_ii in cluster_codes) {

@@ -1,6 +1,6 @@
-library(foreach,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(lubridate, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(tidyr,     warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(foreach) #,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(lubridate) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(tidyr) #,     warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
 
 ################################################################################
 # PREVIOUS FUNCTIONS FROM "whyT2.1" PACKAGE
@@ -251,10 +251,12 @@ get_raw_dataframe_from_dataset <- function(csv_file) {
 
 ################################################################################
 # manage_times()
+# CALLABLE FUNCTIONS:
+#   correct_dst()
+#   correct_tz()
 ################################################################################
 
 manage_times <- function(edf) {
-  
   # NEE
   if (edf$dset_key == "nee") {
     # Correct DST (daylight saving time)
@@ -264,6 +266,11 @@ manage_times <- function(edf) {
     
     # # Correct TZ (time zone)
     # edf <- correct_tz(edf, edf$tz_utc_offset)
+  }
+  
+  # LCL
+  if (edf$dset_key == "lcl") {
+    edf <- correct_dst(edf, "Europe/London")
   }
   
   return(edf)
