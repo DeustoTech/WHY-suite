@@ -29,11 +29,15 @@ map40 <- function(
   df1 <- data.frame(matrix(ncol = 8904, nrow = num_new_hmp+40))
   for (ii in 1:num_new_hmp) {
     load(paste0(pre_path, new_hmp_fname[1], ii, new_hmp_fname[2]))
-    df1[ii,] <- as.vector(m) #-min(m)/(max(m)-min(m))
+    if (!exists("m")) m <- m_avg
+    df1[ii,] <- as.vector(m) -min(m)/(max(m)-min(m))
+    rm(m)
   }
   for (ii in 1:40) {
     load(paste0(all_path, all_hmp_fname[1], ii, all_hmp_fname[2]))
-    df1[ii+num_new_hmp,] <- as.vector(m) #-min(m)/(max(m)-min(m))
+    if (!exists("m")) m <- m_avg
+    df1[ii+num_new_hmp,] <- as.vector(m) -min(m)/(max(m)-min(m))
+    rm(m)
   }
   
   # Matriz de distancias

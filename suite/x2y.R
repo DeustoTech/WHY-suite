@@ -65,7 +65,9 @@ clu_dir <- c(
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
-  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl/"
+  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl/",
+  "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
+  "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/"
 )
 
 # Instructions for "dd_sel" variable:
@@ -94,8 +96,95 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 12
+operation <- 14
 ################################################################################
+
+# 2022.03.03 - Los 40 principales, kmeans, pam
+if (operation == 14) {
+  fea2clu(
+    fea_file = fea_file[["all"]],
+    clu_dir  = clu_dir[["all-km"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_all,
+    mm_sel   = c("kmeans"),
+    vv_sel   = c("internal"),
+    cc_sel   = 40
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["all"]],
+    clu_dir  = clu_dir[["all-km"]],
+    dset_dir = imp_dir,
+    cc       = 40,
+    cores    = 2
+  )
+  
+  hmp2rep(
+    rep_type  = c("sd"),
+    rep_title = "Cluster Report: All (5 datasets), 40 clusters, k-means",
+    clu_dir   = clu_dir[["all-km"]],
+    rep_fname = "cluster_report_5ds_40cl_kme.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_all,
+    mm        = c("som"),
+    cc        = 40
+  )
+  
+  hmp2rep(
+    rep_type        = "map40",
+    clu_dir         = clu_dir["all-km"],
+    hmp_fname_patt  = c("hmm_sAggrDRM_5ds_kme_40cl_i-", ".RData"),
+    rep_title_short = "ALL(km)-40cl"
+  )
+   
+  #---
+  
+    fea2clu(
+    fea_file = fea_file[["all"]],
+    clu_dir  = clu_dir[["all-pam"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_all,
+    mm_sel   = c("pam"),
+    vv_sel   = c("internal"),
+    cc_sel   = 40
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["all"]],
+    clu_dir  = clu_dir[["all-pam"]],
+    dset_dir = imp_dir,
+    cc       = 40,
+    cores    = 2
+  )
+  
+  hmp2rep(
+    rep_type  = c("sd"),
+    rep_title = "Cluster Report: All (5 datasets), 40 clusters, pam",
+    clu_dir   = clu_dir[["all-pam"]],
+    rep_fname = "cluster_report_5ds_40cl_pam.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_all,
+    mm        = c("pam"),
+    cc        = 40
+  )
+  
+  hmp2rep(
+    rep_type        = "map40",
+    clu_dir         = clu_dir["all-pam"],
+    hmp_fname_patt  = c("hmm_sAggrDRM_5ds_pam_40cl_i-", ".RData"),
+    rep_title_short = "ALL(pam)-40cl"
+  )
+}
+
+# 2022.03.03 - map 40 de los 40 ppales
+if (operation == 13) {
+  hmp2rep(
+    rep_type        = "map40",
+    clu_dir         = clu_dir["all"],
+    hmp_fname_patt  = c("hmm_sAggrDRM_5ds_som_40cl_i-", ".RData"),
+    rep_title_short = "ALL(new)-40cl"
+  )
+}
 
 # 2022.03.03 - Los 40 principales
 if (operation == 12) {

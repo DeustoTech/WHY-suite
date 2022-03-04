@@ -123,7 +123,7 @@ hmp2rep <- function(
   dd,
   mm,
   cc,
-  new_hmp_fname = NULL
+  hmp_fname_patt = NULL
 ) {
   source(paste(getwd(), "src", hmp2rep_src, sep="/"))
   print("## REPORTING ##")
@@ -136,7 +136,7 @@ hmp2rep <- function(
     dd            = dd,
     mm            = mm,
     cc            = cc,
-    new_hmp_fname = new_hmp_fname,
+    new_hmp_fname = hmp_fname_patt,
     tag           = rep_title_short
   )
 }
