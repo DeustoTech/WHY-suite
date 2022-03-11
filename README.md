@@ -9,9 +9,11 @@ The scheme followed is as follows:
 The scripts used to move from one stage to the next are described below:
 
 * From original dataset files to raw files: check the `dataset` folder.
-* For the rest of stages, check the `suite` folder. The main file there is `suite_v01.R`. It contains a sequence of chained functions to process each stage.
-** `raw2imp()`: from raw files to imputed (or processed) files.
-** `imp2fea()`: from imputed files to features.
-** `fea2clu()`: from features to cluster analyses.
-** `clu2hmp()`: from clusters to heatmap visualizations.
-** `hmp2rep()`: from heatmaps to reports.
+
+For the rest of stages, check the `suite` folder. The main file there is `suite_v01.R`. It contains a sequence of chained functions to process each stage.
+
+* `raw2imp()`: from raw files to imputed (or processed) files.
+* `imp2fea()`: from imputed files to features.
+* `fea2clu()`: from features to cluster analyses.
+* `clu2hmp()`: from clusters to heatmap visualizations.
+* `hmp2rep()`: from heatmaps to reports.
