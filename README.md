@@ -4,4 +4,4 @@ Here you can find the files that have been implemented for this purpose.
 
 The scheme followed is as follows:
 
-!(https://github.com/DeustoTech/why-T2.1/blob/master/.old/img/data_proc_scheme.png)
+![Data processing scheme](https://github.com/DeustoTech/why-T2.1/blob/master/.old/img/data_proc_scheme.png?raw=true)
