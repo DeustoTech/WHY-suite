@@ -18,4 +18,4 @@ For the rest of stages, check the `suite` folder. The main file there is `suite_
 * `clu2hmp()`: from clusters to heatmap visualizations.
 * `hmp2rep()`: from heatmaps to reports.
 
-File `x2y.R` contains real examples of use.
+File `x2y.R` contains real usage examples.
