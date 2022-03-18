@@ -8,9 +8,9 @@ The scheme followed is as follows:
 
 The scripts used to move from one stage to the next are described below:
 
-* From original dataset files to raw files: check the `dataset` folder.
+* From original dataset files to raw files: check the `datasets` folder.
 
-For the rest of stages, check the `suite` folder. The main file there is `suite_v01.R`. It contains a sequence of chained functions to process each stage.
+For the rest of stages, check the `suite` folder. The main file there is `suite_v01.R`. It contains a sequence of chained functions to process each stage:
 
 * `raw2imp()`: from raw files to imputed (or processed) files.
 * `imp2fea()`: from imputed files to feature extraction.
