@@ -354,8 +354,10 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # Flip matrix
   o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
-  return(list(avg=o_mean_mat, std=o_sd_mat))
-  # return(o_mean_mat)
+  # Create matrix from standard deviations
+  o_rsd_mat <- o_sd_mat / o_mean_mat
+  
+  return(list(avg=o_mean_mat, std=o_sd_mat, rsd=o_rsd_mat))
 }
 
 ################################################################################
@@ -499,16 +501,20 @@ clValid2_heatmaps <- function(
       # Cluster loop
       hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
       # File paths
-      hmm_path   <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
-      hmp_path   <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
-      hmmsd_path <- paste0(hmmsd_dir, "hmmsd_", hm_fname, ".RData")
-      hmpsd_path <- paste0(hmpsd_dir, "hmpsd_", hm_fname, ".png")
+      hmm_path    <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
+      hmp_path    <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
+      hmmsd_path  <- paste0(hmmsd_dir, "hmmsd_", hm_fname, ".RData")
+      hmpsd_path  <- paste0(hmpsd_dir, "hmpsd_", hm_fname, ".png")
+      hmmrsd_path <- paste0(hmmrsd_dir, "hmmrsd_", hm_fname, ".RData")
+      hmprsd_path <- paste0(hmprsd_dir, "hmprsd_", hm_fname, ".png")
       
       # Save heatmap matrices
       m_avg <- m$avg
       save(m_avg, idx, file = hmm_path)
       m_std <- m$std
       save(m_std, idx, file = hmmsd_path)
+      m_rsd <- m$rsd
+      save(m_rsd, idx, file = hmmrsd_path)
       
       # Generate mean heatmap
       plot_heatmap_matrix(
@@ -528,6 +534,16 @@ clValid2_heatmaps <- function(
         plot_height = 900,
         subtitle    = hm_fname,
         col_palette = "Blues"
+      )
+      # Generate sd heatmap
+      plot_heatmap_matrix(
+        m           = m_rsd,
+        format_file = "png",
+        file_path   = hmprsd_path,
+        plot_width  = 1200,
+        plot_height = 900,
+        subtitle    = hm_fname,
+        col_palette = "Greens"
       )
       
       # }

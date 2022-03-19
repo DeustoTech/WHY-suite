@@ -7,8 +7,9 @@
 ################################################################################
 
 # REPORTING FILES IN SUBFOLDER 'src'
-hmp2bas_src <- "clValid2-summary_report_v03.Rmd"
-hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
+# hmp2bas_src <- "clValid2-summary_report_v03.Rmd"
+# hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
+hmp2crd_src <- "clValid2-summary_report_v04.Rmd"
 hmp2m40_src <- "map40.R"
 no_file_src <- "no-file.png"
 
@@ -33,17 +34,18 @@ reporting <- function(
   if ("basic" %in% rep_type) {
     print("## RMARKDOWN BASIC REPORT ##")
     params_list <- list(
-      rmd_title   = rep_title,
-      hmp_dir     = paste0(clu_dir, "hmp/"),
-      hmm_dir     = paste0(clu_dir, "hmm/"),
-      nofile_path = paste(getwd(), "src", no_file_src, sep="/"),
-      ff          = ff,
-      dd          = dd,
-      mm          = mm,
-      cc          = cc
+      rmd_title     = rep_title,
+      no_card_types = 1,
+      hmp_dir       = paste0(clu_dir, "hmp/"),
+      hmm_dir       = paste0(clu_dir, "hmm/"),
+      nofile_path   = paste(getwd(), "src", no_file_src, sep="/"),
+      ff            = ff,
+      dd            = dd,
+      mm            = mm,
+      cc            = cc
     )
     rmarkdown::render(
-      input       = paste(getwd(), "src", hmp2bas_src, sep="/"),
+      input       = paste(getwd(), "src", hmp2crd_src, sep="/"),
       output_file = paste0(clu_dir, "report/", rep_fname),
       params      = params_list
     )
@@ -53,21 +55,49 @@ reporting <- function(
   ## BASIC + SD ##
   ################
   if ("sd" %in% rep_type) {
-    print("## RMARKDOWN BASIC+SD REPORT ##")
+    print("## RMARKDOWN BASIC + SD REPORT ##")
     params_list <- list(
-      rmd_title   = rep_title,
-      hmp_dir     = paste0(clu_dir, "hmp/"),
-      hmm_dir     = paste0(clu_dir, "hmm/"),
-      hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
-      hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
-      nofile_path = paste(getwd(), "src", no_file_src, sep="/"),
-      ff          = ff,
-      dd          = dd,
-      mm          = mm,
-      cc          = cc
+      rmd_title     = rep_title,
+      no_card_types = 2,
+      hmp_dir       = paste0(clu_dir, "hmp/"),
+      hmm_dir       = paste0(clu_dir, "hmm/"),
+      hmpsd_dir     = paste0(clu_dir, "hmpsd/"),
+      hmmsd_dir     = paste0(clu_dir, "hmmsd/"),
+      nofile_path   = paste(getwd(), "src", no_file_src, sep="/"),
+      ff            = ff,
+      dd            = dd,
+      mm            = mm,
+      cc            = cc
     )
     rmarkdown::render(
-      input       = paste(getwd(), "src", hmp2std_src, sep="/"),
+      input       = paste(getwd(), "src", hmp2crd_src, sep="/"),
+      output_file = paste0(clu_dir, "report/", rep_fname),
+      params      = params_list
+    )
+  }
+  
+  ######################
+  ## BASIC + SD + RSD ##
+  ######################
+  if ("sd" %in% rep_type) {
+    print("## RMARKDOWN BASIC + SD + RSD REPORT ##")
+    params_list <- list(
+      rmd_title     = rep_title,
+      no_card_types = 3,
+      hmp_dir       = paste0(clu_dir, "hmp/"),
+      hmm_dir       = paste0(clu_dir, "hmm/"),
+      hmpsd_dir     = paste0(clu_dir, "hmpsd/"),
+      hmmsd_dir     = paste0(clu_dir, "hmmsd/"),
+      hmprsd_dir    = paste0(clu_dir, "hmprsd/"),
+      hmmrsd_dir    = paste0(clu_dir, "hmmrsd/"),
+      nofile_path   = paste(getwd(), "src", no_file_src, sep="/"),
+      ff            = ff,
+      dd            = dd,
+      mm            = mm,
+      cc            = cc
+    )
+    rmarkdown::render(
+      input       = paste(getwd(), "src", hmp2crd_src, sep="/"),
       output_file = paste0(clu_dir, "report/", rep_fname),
       params      = params_list
     )
