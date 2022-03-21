@@ -66,19 +66,16 @@ card_types_p <- c("hmp_", "hmpsd_", "hmprsd_")
 card_types_m <- c("hmm_", "hmmsd_", "hmmrsd_")
 card_types_c <- c("μ", "σ", "σ/μ")
 # Path to hmp graphs
-hmp_path <- params$hmp_dir
+p_path <- c(params$hmp_dir, params$hmpsd_dir, params$hmprsd_dir)
 # Path to hmm values
-hmm_path <- params$hmm_dir
-# Path to hmp graphs
-hmpsd_path <- params$hmpsd_dir
-# Path to hmm values
-hmmsd_path <- params$hmmsd_dir
+m_path <- c(params$hmm_dir, params$hmmsd_dir, params$hmmrsd_dir)
 # No file by DEFAULT
 no_file <- paste0("![](", params$nofile_path, ")")
+
 # Block of cards ("bb" is an integer indicating the desired number of blocks)
-block_of_cards <- function(txt_list, bb){
+block_of_cards <- function(txt_list, blocks){
   o <- ""
-  for (ii in 1:bb) {
+  for (bb in 1:blocks) {
     o <- paste0(o,
 '<tr>
 <td width="16.66%">', txt_list$img[6*bb-5], '</td>
@@ -99,13 +96,16 @@ block_of_cards <- function(txt_list, bb){
 '
     )
   }
+  return(o)
 }
+
 # Table of cards
 table_of_cards <- function(txt_list) {
+  boc <- block_of_cards(txt_list, ceiling(params$no_cards/6))
+  message(txt_list$img)
   o <- paste0(
 '<table border="0">
-',
-block_of_cards(txt_list, ceiling(params$no_cards/6)),
+', boc,
 '</table>\n\n
 '
   )
@@ -143,12 +143,12 @@ for (ff in ff_loop) {
         for (xx in 1:params$no_card_types) {
           # Path to file
           card_path <- paste0(
-            hmp_path, card_types_p[xx], ff, "_", dd, "_", mm, "_",
+            p_path[xx], card_types_p[xx], ff, "_", dd, "_", mm, "_",
             max(cc_loop), "cl_i-", cc, ".png"
           )
           # Path for loading variable "idx"
           idx_path <- paste0(
-            hmm_path, card_types_m[xx], ff, "_", dd, "_", mm, "_",
+            m_path[xx], card_types_m[xx], ff, "_", dd, "_", mm, "_",
             max(cc_loop), "cl_i-", cc, ".RData"
           )
           # This loads varible "idx"
