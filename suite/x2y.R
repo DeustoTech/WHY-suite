@@ -101,13 +101,13 @@ operation <- 15
 
 # 2022.03.21 - Test for generating new reports including RSD
 if (operation == 15) {
-  # clu2hmp(
-  #   fea_file = fea_file[["nee"]],
-  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.21_nee-rsd/",
-  #   dset_dir = imp_dir,
-  #   cc       = 2,
-  #   cores    = 1
-  # )
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.21_nee-rsd/",
+    dset_dir = imp_dir,
+    cc       = 2,
+    cores    = 1
+  )
   
   hmp2rep(
     rep_type  = c("rsd"),

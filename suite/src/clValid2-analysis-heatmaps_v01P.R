@@ -332,7 +332,9 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   }
   # Align time series!
   out_list <- apply(fnames, 1, align_time_series)
-  # Scale each column
+  # Scale columns (each representing a 24x371 block)
+  # Scaling is performed at this point so that columns with high values do NOT
+  # dominate over the rest when computing the mean
   if (.scale) {
     out_list <- apply(out_list, 2, scale)
   }
