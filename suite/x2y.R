@@ -96,8 +96,30 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 14
+operation <- 15
 ################################################################################
+
+# 2022.03.21 - Test for generating new reports including RSD
+if (operation == 15) {
+  # clu2hmp(
+  #   fea_file = fea_file[["nee"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.21_nee-rsd/",
+  #   dset_dir = imp_dir,
+  #   cc       = 2,
+  #   cores    = 1
+  # )
+  
+  hmp2rep(
+    rep_type  = c("rsd"),
+    rep_title = "Cluster Report: NEEA, 2 clusters, including RSD",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.21_nee-rsd/",
+    rep_fname = "cluster_report_nee_2cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_nee,
+    mm        = c("som"),
+    cc        = 2
+  )
+}
 
 # 2022.03.03 - Los 40 principales, kmeans, pam
 if (operation == 14) {
