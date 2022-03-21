@@ -103,6 +103,8 @@ clu2hmp <- function(
     hmp_dir     = paste0(clu_dir, "hmp/"),
     hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
     hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
+    hmmrsd_dir  = paste0(clu_dir, "hmmrsd/"),
+    hmprsd_dir  = paste0(clu_dir, "hmprsd/"),
     dataset_dir = dset_dir,
     num_cluster = cc,
     scale_hmm   = TRUE,
@@ -114,7 +116,7 @@ clu2hmp <- function(
 ## CREATION OF BASIC REPORT ##
 ##############################
 hmp2rep <- function(
-  rep_type = c("basic", "sd", "map40"),
+  rep_type = c("basic", "sd", "rsd", "map40"),
   rep_title,
   rep_title_short = "PRE",
   clu_dir,

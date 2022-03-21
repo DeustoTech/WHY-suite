@@ -79,7 +79,7 @@ reporting <- function(
   ######################
   ## BASIC + SD + RSD ##
   ######################
-  if ("sd" %in% rep_type) {
+  if ("rsd" %in% rep_type) {
     print("## RMARKDOWN BASIC + SD + RSD REPORT ##")
     params_list <- list(
       rmd_title     = rep_title,

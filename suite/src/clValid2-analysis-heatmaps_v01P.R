@@ -259,7 +259,7 @@ cluster_features <- function(
 ################################################################################
 
 get_heatmap_matrix <- function(fnames, .scale=FALSE) {
-  
+
   # FUNCTION FOR GETTING THE INDEX IN THE OUTPUT MATRIX
   get_matrix_index <- function(date) {
     wk <- lubridate::isoweek(date)
@@ -290,7 +290,6 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
         FUN = sum
       )
     }
-    
     # Input vector of dates
     i_times_vect <- lubridate::ymd_hms(aggr_data$date_time, tz="UTC")
     # Input vector of values
@@ -331,7 +330,6 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
     # Return matrix
     return(o_mean_matx)
   }
-  
   # Align time series!
   out_list <- apply(fnames, 1, align_time_series)
   # Scale each column
@@ -408,8 +406,11 @@ plot_heatmap_matrix <- function(
 ################################################################################
 
 clValid2_heatmaps <- function(
-  feats_file, clValid_dir, hmm_dir, hmp_dir, hmmsd_dir, hmpsd_dir, dataset_dir,
-  num_cluster, scale_hmm, num_cores = NULL
+  feats_file, clValid_dir,
+  hmm_dir, hmp_dir,
+  hmmsd_dir, hmpsd_dir,
+  hmmrsd_dir, hmprsd_dir,
+  dataset_dir, num_cluster, scale_hmm, num_cores = NULL
 ) {
   # Load feats
   feats <- data.table::fread(
@@ -535,7 +536,7 @@ clValid2_heatmaps <- function(
         subtitle    = hm_fname,
         col_palette = "Blues"
       )
-      # Generate sd heatmap
+      # Generate rsd heatmap
       plot_heatmap_matrix(
         m           = m_rsd,
         format_file = "png",
