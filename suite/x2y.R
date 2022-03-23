@@ -52,26 +52,27 @@ fea_dir <- list(
 
 # Feature files
 fea_file <- list(
-  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
+  "all"      = "/home/ubuntu/carlos.quesada/disk/features/feats_v2.00.csv",
+  "edrp"     = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/feats.csv",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv",
   "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
-  "all"      = "/home/ubuntu/carlos.quesada/disk/features/feats_v2.00.csv"
+  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
 )
 
 # Cluster folders (ClValid2)
 clu_dir <- list(
-  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
-  "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
-  "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
-  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
-  "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
-  "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl/",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
-  "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/"
+  "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
+  "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
+  "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
+  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
+  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
 )
 
 # Instructions for "dd_sel" variable:
@@ -100,7 +101,7 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 17
+operation <- 16
 ################################################################################
 
 # 2022.03.23 - EDRP test (merging feature files)
@@ -120,10 +121,19 @@ if (operation == 16) {
   #   min_yrs    = 1
   # )
   
-  imp2fea(
-    imp_dir = imp_dir[["edrp"]],
-    fea_dir = fea_dir[["edrp"]],
-    max_feats = 20
+  # imp2fea(
+  #   imp_dir = imp_dir[["edrp"]],
+  #   fea_dir = fea_dir[["edrp"]]
+  # )
+  
+  fea2clu(
+    fea_file = fea_file[["edrp"]],
+    clu_dir  = clu_dir[["all-km"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_all,
+    mm_sel   = c("kmeans"),
+    vv_sel   = c("internal"),
+    cc_sel   = 40
   )
 }
 

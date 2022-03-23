@@ -6,11 +6,11 @@
 # Definitive file for generating analysis and reports from imputed folders
 ################################################################################
 
-library(foreach) #,   warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(clValid2) #,  warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(mclust) #,    warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(lubridate) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(rmarkdown) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(foreach)
+library(clValid2)
+library(mclust)
+library(lubridate) 
+library(rmarkdown)
 
 set.seed(1981)
 
@@ -141,6 +141,9 @@ check_output_subfolder <- function(o) {
 
 cluster_features <- function(
   feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel) {
+  
+  # Create folders if they do NOT exist
+  if (!dir.exists(output_dir)) dir.create(output_dir)
   
   # Check that all subfolders in "output_dir" exist
   check_output_subfolder(output_dir)
