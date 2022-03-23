@@ -10,21 +10,21 @@ source("suite_v01.R")
 
 # Raw folders
 raw_dir <- list(
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw-test/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw-test/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/"
 )
 
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- list(
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
+  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
-  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/"
 )
 
 imp_dir_goi4_pst <- list(
@@ -33,12 +33,12 @@ imp_dir_goi4_pst <- list(
 
 # Metadata files
 mdata_file <- list(
+  "edrp" = NULL,
+  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
-  "por"  = NULL,
-  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
-  "edrp" = NULL
+  "por"  = NULL
 )
 
 # Feature folders
@@ -67,17 +67,21 @@ clu_dir <- list(
   "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl/",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
+  "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
-  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
+  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
 )
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
 # Each NULL element within the sublist means ALL TRUE.
+dd_sel_edrp  <- list(
+  list(key="edrp", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 dd_sel_por  <- list(
   list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
@@ -128,12 +132,31 @@ if (operation == 16) {
   
   fea2clu(
     fea_file = fea_file[["edrp"]],
-    clu_dir  = clu_dir[["all-km"]],
+    clu_dir  = clu_dir[["edrp"]],
     ff_sel   = c("sAggrDRM"),
-    dd_sel   = dd_sel_all,
-    mm_sel   = c("kmeans"),
+    dd_sel   = dd_sel_edrp,
+    mm_sel   = c("som"),
     vv_sel   = c("internal"),
-    cc_sel   = 40
+    cc_sel   = 2
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["edrp"]],
+    clu_dir  = clu_dir[["edrp"]],
+    dset_dir = imp_dir,
+    cc       = 2,
+    cores    = 24
+  )
+  
+  hmp2rep(
+    rep_type  = c("sd"),
+    rep_title = "Cluster Report: EDRP, 2 clusters",
+    clu_dir   = clu_dir[["edrp"]],
+    rep_fname = "cluster_report_edrp_2cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_edrp,
+    mm        = c("som"),
+    cc        = 2
   )
 }
 
