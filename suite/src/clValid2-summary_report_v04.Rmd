@@ -54,9 +54,9 @@ params:
 * __som__: self-organizing maps
 
 ##### Statistic used
-* __μ__: mean
-* __σ__: standard deviation
-* __σ/μ__: relative standard deviation
+* __m__: mean
+* __sd__: standard deviation
+* __rsd__: relative standard deviation
 
 <hr>
 
@@ -64,7 +64,7 @@ params:
 # CARD TYPES
 card_types_p <- c("hmp_", "hmpsd_", "hmprsd_")
 card_types_m <- c("hmm_", "hmmsd_", "hmmrsd_")
-card_types_c <- c("μ", "σ", "σ/μ")
+card_types_c <- c("m", "sd", "rsd")
 # Path to hmp graphs
 p_path <- c(params$hmp_dir, params$hmpsd_dir, params$hmprsd_dir)
 # Path to hmm values
