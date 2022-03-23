@@ -6,9 +6,9 @@
 # Definitive file for generating a feature file from imputed folders
 ################################################################################
 
-library(tsfeatures) #, warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(foreach) #,    warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
-library(lubridate) #,  warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
+library(tsfeatures)
+library(foreach)
+library(lubridate)
 
 ################################################################################
 # stat_moments
@@ -1276,9 +1276,51 @@ get_hourly_data <- function(edf) {
 }
 
 ################################################################################
+# post_features()
+################################################################################
+post_features <- function(o) {
+  # List all subfeat files
+  lof <- list.files(path=o, pattern="feats.+csv")
+  # Sort by number!
+  lof <- lof[order(readr::parse_number(lof))]
+  # Get length
+  len_lof <- length(lof)
+  # If only 1 subfeat file
+  if(len_lof == 1) {
+    # Rename to definitive file
+    file.rename(paste0(o,lof[1]), paste0(o,"feats.csv"))
+  # More than 1 subfeat file
+  } else {
+    # Full-join all subfeat files
+    o_df <- data.table::fread(paste0(o,lof[1]))
+    for(ii in 2:len_lof) {
+      new_df <- data.table::fread(paste0(o,lof[ii]))
+      o_df <- suppressMessages(dplyr::full_join(o_df, new_df))
+    }
+    # Save results to the CSV file
+    data.table::fwrite(
+      x         = o_df,
+      file      = paste0(o, "feats.csv"),
+      sep       = ",",
+      na        = "",
+      quote     = FALSE,
+      append    = FALSE,
+      col.names = TRUE,
+      row.names = FALSE
+    )
+    # Delete all subfeat files
+    file.remove(paste0(o, lof))
+  }
+}
 
-
-get_features <- function(input_folder, output_path, type_of_analysis = "extra") {
+################################################################################
+# get_features()
+################################################################################
+get_features <- function(input_folder, output_path, type_of_analysis = "extra",
+                         max_feats = 7000) {
+  
+  # Create folders if they do NOT exist
+  if (!dir.exists(output_path)) dir.create(output_path)
   
   # List of file paths
   fpaths <- c()
@@ -1292,7 +1334,7 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
   
   # SEQUENCING
   length_fpaths <- length(fpaths)
-  SS_seq <- c(seq(0, length_fpaths, 7000), length_fpaths)
+  SS_seq <- c(seq(0, length_fpaths, max_feats), length_fpaths)
   for (SS in 1:(length(SS_seq)-1)) {
     
     # Setup parallel backend to use many processors
@@ -1379,4 +1421,7 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra") 
       row.names = FALSE
     )
   }
+  
+  # Manage feature output files
+  post_features(output_path)
 }
