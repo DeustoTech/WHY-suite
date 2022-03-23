@@ -488,6 +488,9 @@ extend_dataset_v2 <- function(
   from_date="first", to_date="last", working_with_generation=FALSE, min_years = 1
   ) {
   
+  # Create folders if they do NOT exist
+  if (!dir.exists(output_folder)) dir.create(output_folder)
+  
   # Get list of filenames in dataset folder
   dset_filenames <- list.files(input_folder, pattern = "*.csv")
   # Extract relevant data from metadata files (if any!)
