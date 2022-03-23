@@ -8,7 +8,7 @@
 ################################################################################
 
 # FILES IN SUBFOLDER 'src'
-raw2imp_src <- "goiener-ext-3v3.R"
+raw2imp_src <- c("goiener-ext-3v3.R", "dataset-specific-funs.R")
 imp2fea_src <- "new_feats.R"
 fea2hmp_src <- "clValid2-analysis-heatmaps_v01P.R"
 hmp2rep_src <- "reporting.R"
@@ -26,7 +26,7 @@ raw2imp <- function(
   min_yrs   = 1,
   wwgen     = FALSE
 ) {
-  source(paste(getwd(), "src", raw2imp_src, sep="/"))
+  for(ss in raw2imp_src) source(paste(getwd(), "src", ss, sep="/"))
   print("## RAW TO IMPUTED ##")
   extend_dataset_v2(
     input_folder            = raw_dir,
@@ -58,8 +58,6 @@ imp2fea <- function(
     max_feats        = max_feats
   )
 }
-
-# Bind files together
 
 ######################
 ## CLUSTER ANALYSIS ##
