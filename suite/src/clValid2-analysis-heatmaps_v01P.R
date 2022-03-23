@@ -126,6 +126,8 @@ check_output_subfolder <- function(o) {
     paste0(o, "hmp/"),
     paste0(o, "hmmsd/"),
     paste0(o, "hmpsd/"),
+    paste0(o, "hmmrsd/"),
+    paste0(o, "hmprsd/"),
     paste0(o, "report/")
   )
   # Create folders if they do NOT exist
@@ -333,6 +335,7 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
     # Return matrix
     return(o_mean_matx)
   }
+  
   # Align time series!
   out_list <- apply(fnames, 1, align_time_series)
   # Scale columns (each representing a 24x371 block)
@@ -370,6 +373,7 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
 plot_heatmap_matrix <- function(
   m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600, subtitle=NULL,
   col_palette="YlOrRd") {
+  
   # Format of output files
   if (format_file == "png") {
     png(
@@ -507,10 +511,10 @@ clValid2_heatmaps <- function(
       # Cluster loop
       hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
       # File paths
-      hmm_path    <- paste0(hmm_dir, "hmm_", hm_fname, ".RData")
-      hmp_path    <- paste0(hmp_dir, "hmp_", hm_fname, ".png")
-      hmmsd_path  <- paste0(hmmsd_dir, "hmmsd_", hm_fname, ".RData")
-      hmpsd_path  <- paste0(hmpsd_dir, "hmpsd_", hm_fname, ".png")
+      hmm_path    <- paste0(hmm_dir,    "hmm_",    hm_fname, ".RData")
+      hmp_path    <- paste0(hmp_dir,    "hmp_",    hm_fname, ".png")
+      hmmsd_path  <- paste0(hmmsd_dir,  "hmmsd_",  hm_fname, ".RData")
+      hmpsd_path  <- paste0(hmpsd_dir,  "hmpsd_",  hm_fname, ".png")
       hmmrsd_path <- paste0(hmmrsd_dir, "hmmrsd_", hm_fname, ".RData")
       hmprsd_path <- paste0(hmprsd_dir, "hmprsd_", hm_fname, ".png")
       
