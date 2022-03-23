@@ -9,7 +9,7 @@
 source("suite_v01.R")
 
 # Raw folders
-raw_dir <- c(
+raw_dir <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
@@ -18,7 +18,7 @@ raw_dir <- c(
 )
 
 # Imputation folders # AS IS IN clu2hmp!
-imp_dir <- c(
+imp_dir <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
@@ -27,30 +27,31 @@ imp_dir <- c(
   "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/"
 )
 
-imp_dir_goi4_pst <- c(
+imp_dir_goi4_pst <- list(
   "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/"
 )
 
 # Metadata files
-mdata_file <- c(
-  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
-  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
-  "por" = NULL,
-  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
-  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv"
+mdata_file <- list(
+  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
+  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
+  "por"  = NULL,
+  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
+  "edrp" = NULL
 )
 
 # Feature folders
-fea_dir <- c(
-  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
+fea_dir <- list(
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
 )
 
 # Feature files
-fea_file <- c(
+fea_file <- list(
   "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv",
@@ -61,7 +62,7 @@ fea_file <- c(
 )
 
 # Cluster folders (ClValid2)
-clu_dir <- c(
+clu_dir <- list(
   "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
@@ -99,22 +100,30 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 16
+operation <- 17
 ################################################################################
+
+# 2022.03.23 - EDRP test (merging feature files)
+if (operation == 17) {
+  imp2fea_src <- "new_feats.R"
+  source(paste(getwd(), "src", imp2fea_src, sep="/"))
+  post_features(fea_dir[["edrp"]])
+}
 
 # 2022.03.23 - EDRP test
 if (operation == 16) {
-  raw2imp(
-    raw_dir    = raw_dir[["edrp"]],
-    imp_dir    = imp_dir[["edrp"]],
-    dset_key   = "edrp",
-    mdata_file = NULL,
-    min_yrs    = 1
-  )
+  # raw2imp(
+  #   raw_dir    = raw_dir[["edrp"]],
+  #   imp_dir    = imp_dir[["edrp"]],
+  #   dset_key   = "edrp",
+  #   mdata_file = mdata_file[["edrp"]],
+  #   min_yrs    = 1
+  # )
   
   imp2fea(
     imp_dir = imp_dir[["edrp"]],
-    fea_dir = fea_dir[["edrp"]]
+    fea_dir = fea_dir[["edrp"]],
+    max_feats = 20
   )
 }
 
