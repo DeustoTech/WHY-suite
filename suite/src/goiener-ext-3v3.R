@@ -12,12 +12,13 @@ library(tidyr) #,     warn.conflicts=FALSE, verbose= FALSE, quietly=TRUE)
 
 get_samples_per_day <- function() {
   list(
-    goi = 24, 
-    iss = 48, 
-    lcl = 48, 
-    nee = 96,
-    por = 96,
-    ref = 24
+    goi  = 24, 
+    iss  = 48, 
+    lcl  = 48, 
+    nee  = 96,
+    por  = 96,
+    ref  = 24,
+    edrp = 48
   )
 }
 
@@ -207,6 +208,14 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
     # Processed metadata
     out[["mdata_file_idx"]] <- 0
     out[["country"]] <- "pt"
+    out[["is_household"]] <- NA
+  }
+  
+  # EDRP #######################################################################
+  if (dset_key == "edrp") {
+    # Processed metadata
+    out[["mdata_file_idx"]] <- 0
+    out[["country"]] <- "gb"
     out[["is_household"]] <- NA
   }
   

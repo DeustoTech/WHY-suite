@@ -10,19 +10,21 @@ source("suite_v01.R")
 
 # Raw folders
 raw_dir <- c(
-  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
-  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
-  "por" = "/home/ubuntu/carlos.quesada/disk/por/raw/",
-  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/raw/"
+  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
+  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw-test/"
 )
 
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- c(
-  "iss" = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
-  "lcl" = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
-  "por" = "/home/ubuntu/carlos.quesada/disk/por/imp/",
-  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
-  "nee" = "/home/ubuntu/carlos.quesada/disk/nee/imp/"
+  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
+  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/"
 )
 
 imp_dir_goi4_pst <- c(
@@ -40,10 +42,11 @@ mdata_file <- c(
 
 # Feature folders
 fea_dir <- c(
-  "por" = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
-  "iss" = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
-  "lcl" = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
-  "nee" = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
+  "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
+  "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/"
 )
 
 # Feature files
@@ -96,8 +99,24 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 15
+operation <- 16
 ################################################################################
+
+# 2022.03.23 - EDRP test
+if (operation == 16) {
+  raw2imp(
+    raw_dir    = raw_dir[["edrp"]],
+    imp_dir    = imp_dir[["edrp"]],
+    dset_key   = "edrp",
+    mdata_file = NULL,
+    min_yrs    = 1
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["edrp"]],
+    fea_dir = fea_dir[["edrp"]]
+  )
+}
 
 # 2022.03.21 - Test for generating new reports including RSD
 if (operation == 15) {
