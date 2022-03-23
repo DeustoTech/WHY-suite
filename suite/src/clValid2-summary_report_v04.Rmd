@@ -41,12 +41,13 @@ params:
 * __sAggrP6__: seasonal aggregates v3.0 (6-period time division)
 
 ##### Datasets
+* __edrp__: Energy Demand Research Project (EDRP) [GB]
 * __goi__: GoiEner (including Megara and La Corriente) [ES]
-* __lcl__: Low Carbon London [GB]
 * __iss__: Irish Social Science Data Archive (ISSDA) [IE]
-* __por__: Elergone Energia [PT]
+* __lcl__: Low Carbon London [GB]
 * __nee__: Northwest Energy Efficiency Alliance (NEEA) [US]
-* __Nds__: N datasets put together
+* __por__: Elergone Energia [PT]
+* __Xds__: X datasets put together
 
 ##### Clustering methods
 * __kme__: _k_-means
