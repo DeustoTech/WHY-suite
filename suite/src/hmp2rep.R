@@ -9,8 +9,8 @@
 # REPORTING FILES IN SUBFOLDER 'src'
 # hmp2bas_src <- "clValid2-summary_report_v03.Rmd"
 # hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
-hmp2crd_src <- "clValid2-summary_report_v04.Rmd"
-hmp2m40_src <- "map40.R"
+hmp2crd_src <- "cards-report.Rmd"
+hmp2m40_src <- "map40-report.R"
 no_file_src <- "no-file.png"
 
 ####################

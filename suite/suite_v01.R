@@ -8,10 +8,10 @@
 ################################################################################
 
 # FILES IN SUBFOLDER 'src'
-raw2imp_src <- c("goiener-ext-3v3.R", "dataset-specific-funs.R")
-imp2fea_src <- "new_feats.R"
-fea2hmp_src <- "clValid2-analysis-heatmaps_v01P.R"
-hmp2rep_src <- "reporting.R"
+raw2imp_src <- c("raw2imp.R", "dataset-specific-funs.R")
+imp2fea_src <- "imp2fea.R"
+fea2hmp_src <- "fea2hmp.R"
+hmp2rep_src <- "hmp2rep.R"
 
 ################################
 ## RAW FILES TO IMPUTED FILES ##
