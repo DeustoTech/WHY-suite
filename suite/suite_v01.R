@@ -10,7 +10,7 @@
 # FILES IN SUBFOLDER 'src'
 raw2imp_src <- c("raw2imp.R", "dataset-specific-funs.R")
 imp2fea_src <- "imp2fea.R"
-fea2hmp_src <- "fea2hmp.R"
+fea2hmp_src <- "fea2hmp_v2.R"
 hmp2rep_src <- "hmp2rep.R"
 
 ################################
