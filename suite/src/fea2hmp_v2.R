@@ -277,29 +277,29 @@ get_matrix_index <- function(date) {
 # INPUT: dataframe with pairs dataset-filename
 ################################################################################
 
-align_time_series <- function(fname) {
+align_time_series <- function(fname, .scale) {
   # Load dataframe
-  load(fname[[1]])
+  load(fname)
   # By hours
   t_factor <- cut(edf$df$times, breaks = "1 hour")
   # Aggregate by hour
-  if (.scale) {
-    aggr_data <- stats::aggregate(
-      x   = scale(edf$df$values),
-      by  = list(date_time = t_factor),
-      FUN = sum
-    )
-  } else {
-    aggr_data <- stats::aggregate(
-      x   = edf$df$values,
-      by  = list(date_time = t_factor),
-      FUN = sum
+  aggr_data <- aggregate(
+    x   = edf$df$values,
+    by  = list(date_time = t_factor),
+    FUN = sum
+  )
+  # Scale data
+  if(.scale) {
+    aggr_data$x <- scale(
+      aggr_data$x,
+      center = FALSE,
+      scale  = upper_whisker(aggr_data$x)
     )
   }
   # Input vector of dates
   i_times_vect <- lubridate::ymd_hms(aggr_data$date_time, tz="UTC")
   # Input vector of values
-  i_value_vect <- aggr_data$V1
+  i_value_vect <- aggr_data$x
   # Length of input vector
   i_len <- length(i_value_vect)
   # Number of years to be taken per time series (if "as much as possible" is
@@ -331,10 +331,10 @@ align_time_series <- function(fname) {
   }
   # o_times_matx <- array(as.character(o_times_vect), dim = c(24,53*7,nyears))
   o_value_matx <- array(o_value_vect, dim = c(24,53*7,nyears))
-  # Compute the mean through array slices
-  o_mean_matx <- apply(o_value_matx, 2, rowMeans, na.rm=TRUE)
+  # # Compute the mean through array slices
+  # o_mean_matx <- apply(o_value_matx, 2, rowMeans, na.rm=TRUE)
   # Return matrix
-  return(o_mean_matx)
+  return(o_value_matx)
 }
 
 ################################################################################
@@ -343,16 +343,15 @@ align_time_series <- function(fname) {
 ################################################################################
 
 upper_whisker <- function(x) {
-  return(0.5*(5*(quantile(x,3/4))-3*quantile(x,1/4)))
+  return((5/2*(quantile(x,3/4)[[1]])-3/2*quantile(x,1/4)[[1]]))
 }
 
 ################################################################################
 # get_heatmap_matrix
+# fnames as data.frame
 ################################################################################
 
-get_heatmap_matrix <- function(fnames, .scale=FALSE) {
-  # Align time series!
-  
+get_heatmap_matrix <- function(fnames, .scale=TRUE) {
   # Calcular varianza y ver si sigue chi cuadrado (histogramas media, sd, rsd)
   # ks.test: Kolmogorov-Smirnov Tests
   # https://www.rdocumentation.org/packages/dgof/versions/1.2/topics/ks.test
@@ -374,36 +373,42 @@ get_heatmap_matrix <- function(fnames, .scale=FALSE) {
   # Box.test(x, lag = 24*7) (deberia salir siempre neg, excepto en el coef var)
   # snpar::runs.test(x) <- contraste de hipótesis
   
+  # Align time series!: Get a list of arrays, one list element per file
+  out <- lapply(fnames, align_time_series, .scale)
+  # Turn list of arrays into big array
+  out <- unlist(out)
+  out <- array(out, dim=c(24,371,length(out)/8904))
   
+  browser()
+
+  # # Scale columns (each representing a 24x371 block)
+  # if (.scale) {
+  #   out <- apply(out, 2, scale)
+  #   # out <- apply(
+  #   #   out, 2, scale,
+  #   #   center=FALSE, scale=apply(out, 2, upper_whisker)
+  #   # )
+  # }
   
-  out_list <- apply(fnames, 1, align_time_series)
-  # Scale columns (each representing a 24x371 block)
-  # Scaling is performed at this point so that columns with high values do NOT
-  # dominate over the rest when computing the mean
-  
-  # Modificar esto!
-  # scale(x, center = FALSE, scale = c(max(x)))
-  # En vez del max, poner el 3er cuartil, o 9º decil, whatever
-  if (.scale) {
-    out_list <- apply(out_list, 2, scale)
-  }
   # Create matrix from means
-  o_mean_mat <- matrix(
-    data = rowMeans(out_list, na.rm = TRUE),
-    nrow = 24
-  )
+  o_mean_mat <- apply(out, 2, rowMeans, na.rm=TRUE)
+  # o_mean_mat <- matrix(
+  #   data = rowMeans(out, na.rm = TRUE),
+  #   nrow = 24
+  # )
   # Flip matrix
   o_mean_mat <- o_mean_mat[nrow(o_mean_mat):1,]
   
   # Create matrix from standard deviations
-  o_sd_mat <- matrix(
-    data = matrixStats::rowSds(out_list, na.rm = TRUE),
-    nrow = 24
-  )
+  o_sd_mat <- apply(out, 2, matrixStats::rowSds, na.rm=TRUE)
+  # o_sd_mat <- matrix(
+  #   data = matrixStats::rowSds(out, na.rm = TRUE),
+  #   nrow = 24
+  # )
   # Flip matrix
   o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
-  # Create matrix from standard deviations
+  # Relative variance: just divide! 
   o_rsd_mat <- o_sd_mat / o_mean_mat
   
   return(list(avg=o_mean_mat, std=o_sd_mat, rsd=o_rsd_mat))
@@ -549,7 +554,7 @@ clValid2_heatmaps <- function(
       paths_vector <- paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
       
       # Get heatmap matrix
-      m <- get_heatmap_matrix(data.frame(paths_vector), .scale = scale_hmm)
+      m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
       
       # Cluster loop
       hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
@@ -606,3 +611,6 @@ clValid2_heatmaps <- function(
   # Stop parallelization
   parallel::stopCluster(cl)
 }
+
+dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest", full.names=TRUE)
+get_heatmap_matrix(dir_name)
