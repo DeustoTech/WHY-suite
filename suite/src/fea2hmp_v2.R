@@ -11,6 +11,7 @@ library(clValid2)
 library(mclust)
 library(lubridate) 
 library(rmarkdown)
+library(fitdistrplus)
 
 set.seed(1981)
 
@@ -347,6 +348,21 @@ upper_whisker <- function(x) {
 }
 
 ################################################################################
+# fit_distribution()
+#-------------------------------------------------------------------------------
+# For the following named distributions, reasonable starting values will be
+# computed if start is omitted (i.e. NULL) : "norm", "lnorm", "exp" and "pois",
+# "cauchy", "gamma", "logis", "nbinom" (parametrized by mu and size), "geom",
+# "beta", "weibull" from the stats package; "invgamma", "llogis", "invweibull",
+# "pareto1", "pareto", "lgamma", "trgamma", "invtrgamma" from the actuar package
+################################################################################
+
+fit_distribution <- function(m) {
+  d <- fitdist(as.vector(m), "norm")
+  return(d)
+}
+
+################################################################################
 # get_heatmap_matrix
 # fnames as data.frame
 ################################################################################
@@ -392,32 +408,51 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
 }
 
 ################################################################################
+# plot_histogram()
+################################################################################
+
+plot_histogram <- function(
+  m,
+  format_file = "png",
+  file_path   = paste0(getwd(), "/histogram.png"),
+  plot_width  = 800,
+  plot_height = 600,
+  subtitle    = NULL,
+  col_palette = "YlOrRd"
+) {
+  
+  # Format of output files
+  if (format_file == "png")
+    png(file_path, width = plot_width, height = plot_height)
+  if (format_file == "pdf")
+    pdf(file_path, width = plot_width, height = plot_height)
+
+  hist(as.vector(m), main=subtitle)
+
+  # Shutting down devices
+  while(dev.off() != 1) {}
+}
+
+################################################################################
 # plot_heatmap_matrix
 ################################################################################
 
 plot_heatmap_matrix <- function(
-  m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600, subtitle=NULL,
-  col_palette="YlOrRd") {
+  m,
+  format_file = "png",
+  file_path   = paste0(getwd(), "/heatmap.png"),
+  plot_width  = 800,
+  plot_height = 600,
+  subtitle    = NULL,
+  col_palette = "YlOrRd"
+) {
 
   # Format of output files
-  if (format_file == "png") {
-    png(
-      file_path,
-      width = plot_width,
-      height = plot_height
-    )
-  }
-  if (format_file == "pdf") {
-    pdf(
-      file_path,
-      width = plot_width,
-      height = plot_height
-    )
-  }
+  if (format_file == "png")
+    png(file_path, width = plot_width, height = plot_height)
+  if (format_file == "pdf")
+    pdf(file_path, width = plot_width, height = plot_height)
   
-  # Month labels
-  m_labels <- rep(NA, 371)
-  m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <- month.abb[1:12]
   # Plot heatmap
   image(
     t(m),
@@ -425,8 +460,13 @@ plot_heatmap_matrix <- function(
     axes      = FALSE,
     col       = hcl.colors(24, col_palette, rev = TRUE)
   )
+  # Month labels
+  m_labels <- rep(NA, 371)
+  m_labels[round(seq(1, 371, length.out=25))[seq(2,25,by=2)]] <- month.abb[1:12]
+  # Axis
   axis(1, at=seq(0, 1, length.out=371), labels=m_labels, las=0, tick=F)
   axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
+  # Title
   title(sub=subtitle)
   
   # Shutting down devices
@@ -438,11 +478,15 @@ plot_heatmap_matrix <- function(
 ################################################################################
 
 clValid2_heatmaps <- function(
-  feats_file, clValid_dir,
+  feats_file,
+  clValid_dir,
   hmm_dir, hmp_dir,
   hmmsd_dir, hmpsd_dir,
   hmmrsd_dir, hmprsd_dir,
-  dataset_dir, num_cluster, scale_hmm, num_cores = NULL
+  dataset_dir,
+  num_cluster,
+  scale_hmm,
+  num_cores = NULL
 ) {
   # Load feats
   feats <- data.table::fread(
@@ -586,3 +630,15 @@ clValid2_heatmaps <- function(
   # Stop parallelization
   parallel::stopCluster(cl)
 }
+
+dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest/", full.names=TRUE)
+m <- get_heatmap_matrix(dir_name)
+d <- fit_distribution(m = m$mean)
+# plot_heatmap_matrix(
+#   m           = m$mean,
+#   format_file = "png",
+#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/qqplot.png",
+#   plot_width  = 1200,
+#   plot_height = 900,
+#   subtitle    = "Test"
+# )
