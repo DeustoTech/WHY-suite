@@ -115,10 +115,10 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
 }
 
 ################################################################################
-##  check_output_subfolder()
+##  check_subfolders()
 ################################################################################
 
-check_output_subfolder <- function(o) {
+check_subfolders <- function(o) {
   # All output subfolders
   o_sub <- c(
     paste0(o, "data/"),
@@ -148,7 +148,7 @@ cluster_features <- function(
   if (!dir.exists(output_dir)) dir.create(output_dir)
   
   # Check that all subfolders in "output_dir" exist
-  check_output_subfolder(output_dir)
+  check_subfolders(output_dir)
   # Change dir to "/data"
   output_dir <- paste0(output_dir, "data/")
   
@@ -352,34 +352,11 @@ upper_whisker <- function(x) {
 ################################################################################
 
 get_heatmap_matrix <- function(fnames, .scale=TRUE) {
-  # Calcular varianza y ver si sigue chi cuadrado (histogramas media, sd, rsd)
-  # ks.test: Kolmogorov-Smirnov Tests
-  # https://www.rdocumentation.org/packages/dgof/versions/1.2/topics/ks.test
-  # [-->] Normal: pnorm()
-  # https://www.r-bloggers.com/2019/08/shapiro-wilk-test-for-normality-in-r/
-  # https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/qqnorm
-  # [-->]student t: pt(q, df, ncp, lower.tail = TRUE, log.p = FALSE)
-  # [-->]chi-square: pchisq(q, df, ncp = 0, lower.tail = TRUE, log.p = FALSE)
-  # qqplot --> heatmap medias + histograma
-  # p-valor de las 3 hipotesis
-  # autocorr
-  # https://cran.r-project.org/web/packages/acnr/vignettes/autocorrelation.html
-  # https://otexts.com/fpp2/autocorrelation.html
-  # ggAcf(beer2)
-  # ggAcf(aelec, lag=24*7)
-  # rayas azules: https://otexts.com/fpp2/wn.html   o Ljung-Box test
-  # (ver cuántas muestras salen del intervalo)
-  # https://stat.ethz.ch/R-manual/R-devel/library/stats/html/box.test.html
-  # Box.test(x, lag = 24*7) (deberia salir siempre neg, excepto en el coef var)
-  # snpar::runs.test(x) <- contraste de hipótesis
-  
   # Align time series!: Get a list of arrays, one list element per file
   out <- lapply(fnames, align_time_series, .scale)
   # Turn list of arrays into big array
   out <- unlist(out)
   out <- array(out, dim=c(24,371,length(out)/8904))
-  
-  browser()
 
   # # Scale columns (each representing a 24x371 block)
   # if (.scale) {
@@ -411,7 +388,7 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
   # Relative variance: just divide! 
   o_rsd_mat <- o_sd_mat / o_mean_mat
   
-  return(list(avg=o_mean_mat, std=o_sd_mat, rsd=o_rsd_mat))
+  return(list(mean=o_mean_mat, sd=o_sd_mat, rsd=o_rsd_mat))
 }
 
 ################################################################################
@@ -421,7 +398,7 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
 plot_heatmap_matrix <- function(
   m, format_file=NA, file_path=NA, plot_width=800, plot_height = 600, subtitle=NULL,
   col_palette="YlOrRd") {
-  
+
   # Format of output files
   if (format_file == "png") {
     png(
@@ -452,10 +429,8 @@ plot_heatmap_matrix <- function(
   axis(2, at=seq(0, 1, length.out=24), labels=23:0, las=2, tick=F)
   title(sub=subtitle)
   
-  # Format of output files
-  if (format_file == "png" | format_file == "pdf") {
-    dev.off()
-  }
+  # Shutting down devices
+  while(dev.off() != 1) {}
 }
 
 ################################################################################
@@ -567,10 +542,10 @@ clValid2_heatmaps <- function(
       hmprsd_path <- paste0(hmprsd_dir, "hmprsd_", hm_fname, ".png")
       
       # Save heatmap matrices
-      m_avg <- m$avg
-      save(m_avg, idx, file = hmm_path)
-      m_std <- m$std
-      save(m_std, idx, file = hmmsd_path)
+      m_mean <- m$mean
+      save(m_mean, idx, file = hmm_path)
+      m_sd <- m$sd
+      save(m_sd, idx, file = hmmsd_path)
       m_rsd <- m$rsd
       save(m_rsd, idx, file = hmmrsd_path)
       
@@ -611,6 +586,3 @@ clValid2_heatmaps <- function(
   # Stop parallelization
   parallel::stopCluster(cl)
 }
-
-dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest", full.names=TRUE)
-get_heatmap_matrix(dir_name)
