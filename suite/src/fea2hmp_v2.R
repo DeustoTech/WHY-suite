@@ -11,7 +11,10 @@ library(clValid2)
 library(mclust)
 library(lubridate) 
 library(rmarkdown)
+library(forecast)
+library(ggplot2)
 library(fitdistrplus)
+library(sgt) # skewed generalized t distribution
 
 set.seed(1981)
 
@@ -123,13 +126,22 @@ check_subfolders <- function(o) {
   # All output subfolders
   o_sub <- c(
     paste0(o, "data/"),
-    paste0(o, "hmm/"),
+    # paste0(o, "hmm/"),
     paste0(o, "hmp/"),
-    paste0(o, "hmmsd/"),
-    paste0(o, "hmpsd/"),
-    paste0(o, "hmmrsd/"),
-    paste0(o, "hmprsd/"),
-    paste0(o, "report/")
+    # paste0(o, "hmmsd/"),
+    # paste0(o, "hmpsd/"),
+    # paste0(o, "hmmrsd/"),
+    # paste0(o, "hmprsd/"),
+    paste0(o, "report/"),
+    paste0(o, "acf/"),
+    # paste0(o, "dd/"),    # distribution data
+    # paste0(o, "dp/"),    # distribution plots
+    # paste0(o, "ddsd/"),
+    # paste0(o, "dpsd/"),
+    # paste0(o, "ddrsd/"),
+    # paste0(o, "dprsd/")
+    paste0(o, "dplot/"),
+    paste0(o, "distr/")
   )
   # Create folders if they do NOT exist
   for (oo in o_sub) {
@@ -344,22 +356,10 @@ align_time_series <- function(fname, .scale) {
 ################################################################################
 
 upper_whisker <- function(x) {
-  return((5/2*(quantile(x,3/4)[[1]])-3/2*quantile(x,1/4)[[1]]))
-}
-
-################################################################################
-# fit_distribution()
-#-------------------------------------------------------------------------------
-# For the following named distributions, reasonable starting values will be
-# computed if start is omitted (i.e. NULL) : "norm", "lnorm", "exp" and "pois",
-# "cauchy", "gamma", "logis", "nbinom" (parametrized by mu and size), "geom",
-# "beta", "weibull" from the stats package; "invgamma", "llogis", "invweibull",
-# "pareto1", "pareto", "lgamma", "trgamma", "invtrgamma" from the actuar package
-################################################################################
-
-fit_distribution <- function(m) {
-  d <- fitdist(as.vector(m), "norm")
-  return(d)
+  return(
+    5/2 * quantile(x,3/4)[[1]] -
+    3/2 * quantile(x,1/4)[[1]]
+  )
 }
 
 ################################################################################
@@ -373,31 +373,14 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
   # Turn list of arrays into big array
   out <- unlist(out)
   out <- array(out, dim=c(24,371,length(out)/8904))
-
-  # # Scale columns (each representing a 24x371 block)
-  # if (.scale) {
-  #   out <- apply(out, 2, scale)
-  #   # out <- apply(
-  #   #   out, 2, scale,
-  #   #   center=FALSE, scale=apply(out, 2, upper_whisker)
-  #   # )
-  # }
   
   # Create matrix from means
   o_mean_mat <- apply(out, 2, rowMeans, na.rm=TRUE)
-  # o_mean_mat <- matrix(
-  #   data = rowMeans(out, na.rm = TRUE),
-  #   nrow = 24
-  # )
   # Flip matrix
   o_mean_mat <- o_mean_mat[nrow(o_mean_mat):1,]
   
   # Create matrix from standard deviations
   o_sd_mat <- apply(out, 2, matrixStats::rowSds, na.rm=TRUE)
-  # o_sd_mat <- matrix(
-  #   data = matrixStats::rowSds(out, na.rm = TRUE),
-  #   nrow = 24
-  # )
   # Flip matrix
   o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
@@ -408,17 +391,49 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
 }
 
 ################################################################################
-# plot_histogram()
+# fit_distribution()
+#-------------------------------------------------------------------------------
+# For the following named distributions, reasonable starting values will be
+# computed if start is omitted (i.e. NULL) : "norm", "lnorm", "exp" and "pois",
+# "cauchy", "gamma", "logis", "nbinom" (parametrized by mu and size), "geom",
+# "beta", "weibull" from the stats package; "invgamma", "llogis", "invweibull",
+# "pareto1", "pareto", "lgamma", "trgamma", "invtrgamma" from the actuar package
 ################################################################################
 
-plot_histogram <- function(
-  m,
+fit_distribution <- function(m) {
+  # List of distributions
+  distribs <- c(
+    "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "beta",
+    "weibull"
+  )
+  # Output
+  len_distribs <- length(distribs)
+  out <- vector("list", length = len_distribs)
+  names(out)<- distribs
+  # Vector m
+  vectm <- as.vector(m)
+  # Loop distributions
+  for(ii in 1:len_distribs) {
+    # Compute fitting
+    out[[ii]] <- fitdist(vectm, distribs[ii])
+  }
+  # Skewed generalized t distribution
+  start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=1000)
+  out[["sgt"]] <- fitdist(vectm, "sgt", start=start_params)
+  return(out)
+}
+
+################################################################################
+# plot_distribution
+################################################################################
+
+plot_distribution <- function(
+  d,
   format_file = "png",
-  file_path   = paste0(getwd(), "/histogram.png"),
+  file_path   = paste0(getwd(), "/distrib.png"),
   plot_width  = 800,
   plot_height = 600,
-  subtitle    = NULL,
-  col_palette = "YlOrRd"
+  subtitle    = ""
 ) {
   
   # Format of output files
@@ -426,9 +441,37 @@ plot_histogram <- function(
     png(file_path, width = plot_width, height = plot_height)
   if (format_file == "pdf")
     pdf(file_path, width = plot_width, height = plot_height)
+  
+  # Plot distribution
+  plot(d)
+  title(subtitle, line=3)
+  
+  # Shutting down devices
+  while(dev.off() != 1) {}
+}
 
-  hist(as.vector(m), main=subtitle)
+################################################################################
+# plot_acf
+################################################################################
 
+plot_acf <- function(
+  m,
+  format_file = "png",
+  file_path   = paste0(getwd(), "/acf.png"),
+  plot_width  = 800,
+  plot_height = 600,
+  subtitle    = ""
+) {
+  
+  # Format of output files
+  if (format_file == "png")
+    png(file_path, width = plot_width, height = plot_height)
+  if (format_file == "pdf")
+    pdf(file_path, width = plot_width, height = plot_height)
+  
+  # Plot autocorrelation
+  plot(ggAcf(as.vector(m), lag.max = 168) + ggtitle(subtitle))
+  
   # Shutting down devices
   while(dev.off() != 1) {}
 }
@@ -446,7 +489,7 @@ plot_heatmap_matrix <- function(
   subtitle    = NULL,
   col_palette = "YlOrRd"
 ) {
-
+  
   # Format of output files
   if (format_file == "png")
     png(file_path, width = plot_width, height = plot_height)
@@ -458,7 +501,8 @@ plot_heatmap_matrix <- function(
     t(m),
     useRaster = TRUE,
     axes      = FALSE,
-    col       = hcl.colors(24, col_palette, rev = TRUE)
+    col       = hcl.colors(24, col_palette, rev = TRUE),
+    zlim      = c(0, 1)
   )
   # Month labels
   m_labels <- rep(NA, 371)
@@ -480,9 +524,10 @@ plot_heatmap_matrix <- function(
 clValid2_heatmaps <- function(
   feats_file,
   clValid_dir,
-  hmm_dir, hmp_dir,
-  hmmsd_dir, hmpsd_dir,
-  hmmrsd_dir, hmprsd_dir,
+  dir_names,
+  # hmm_dir, hmp_dir,
+  # hmmsd_dir, hmpsd_dir,
+  # hmmrsd_dir, hmprsd_dir,
   dataset_dir,
   num_cluster,
   scale_hmm,
@@ -574,54 +619,109 @@ clValid2_heatmaps <- function(
       
       # Get heatmap matrix
       m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
+      # Get distributions
+      d <- list()
+      d$mean <- fit_distribution(m$mean)
+      d$sd   <- fit_distribution(m$sd)
+      d$rsd  <- fit_distribution(m$rsd)
       
       # Cluster loop
-      hm_fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
-      # File paths
-      hmm_path    <- paste0(hmm_dir,    "hmm_",    hm_fname, ".RData")
-      hmp_path    <- paste0(hmp_dir,    "hmp_",    hm_fname, ".png")
-      hmmsd_path  <- paste0(hmmsd_dir,  "hmmsd_",  hm_fname, ".RData")
-      hmpsd_path  <- paste0(hmpsd_dir,  "hmpsd_",  hm_fname, ".png")
-      hmmrsd_path <- paste0(hmmrsd_dir, "hmmrsd_", hm_fname, ".RData")
-      hmprsd_path <- paste0(hmprsd_dir, "hmprsd_", hm_fname, ".png")
+      fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
+      # File paths: heatmaps (data)
+      hmm_path    <- paste0(dir_names[["dplot"]], "hmd_", fname, ".RData")
+      # File paths: distributions (data)
+      dd_path     <- paste0(dir_names[["dplot"]], "dd_", fname, ".RData")
+      # File paths: heatmaps (plots)
+      hmp_path    <- c()
+      hmp_path[1] <- paste0(dir_names[["hmp"]], "hmp1_", fname, ".png")
+      hmp_path[2] <- paste0(dir_names[["hmp"]], "hmp2_", fname, ".png")
+      hmp_path[3] <- paste0(dir_names[["hmp"]], "hmp3_", fname, ".png")
+      # File paths: distributions (plots)
+      dp_path      <- list(c(), c(), c())
+      for (jj in 1:9) {
+        dp_path[[1]][jj] <- paste0(dir_names[["distr"]], "dp1_", jj, "_", fname, ".png")
+        dp_path[[2]][jj] <- paste0(dir_names[["distr"]], "dp2_", jj, "_", fname, ".png")
+        dp_path[[3]][jj] <- paste0(dir_names[["distr"]], "dp3_", jj, "_", fname, ".png")
+      }
+      # File paths: autocorrelations (plots)
+      acf_path    <- c()
+      acf_path[1] <- paste0(dir_names[["acf"]], "acf1_", fname, ".png")
+      acf_path[2] <- paste0(dir_names[["acf"]], "acf2_", fname, ".png")
+      acf_path[3] <- paste0(dir_names[["acf"]], "acf3_", fname, ".png")
       
       # Save heatmap matrices
-      m_mean <- m$mean
-      save(m_mean, idx, file = hmm_path)
-      m_sd <- m$sd
-      save(m_sd, idx, file = hmmsd_path)
-      m_rsd <- m$rsd
-      save(m_rsd, idx, file = hmmrsd_path)
+      save(m, idx, file = hmd_path)
+      # Save distribution lists
+      save(d, idx, file = dd_path)
       
-      # Generate mean heatmap
-      plot_heatmap_matrix(
-        m           = m_avg,
-        format_file = "png",
-        file_path   = hmp_path,
-        plot_width  = 1200,
-        plot_height = 900,
-        subtitle    = hm_fname
-      )
-      # Generate sd heatmap
-      plot_heatmap_matrix(
-        m           = m_std,
-        format_file = "png",
-        file_path   = hmpsd_path,
-        plot_width  = 1200,
-        plot_height = 900,
-        subtitle    = hm_fname,
-        col_palette = "Blues"
-      )
-      # Generate rsd heatmap
-      plot_heatmap_matrix(
-        m           = m_rsd,
-        format_file = "png",
-        file_path   = hmprsd_path,
-        plot_width  = 1200,
-        plot_height = 900,
-        subtitle    = hm_fname,
-        col_palette = "Greens"
-      )
+      # Plot heatmaps
+      hm_col <- c("YlOrRd", "Blues", "Greens")
+      for(ii in 1:3) {
+        plot_heatmap_matrix(
+          m           = m[[ii]],
+          format_file = "png",
+          file_path   = hmp_path[ii],
+          plot_width  = 1200,
+          plot_height = 900,
+          subtitle    = fname,
+          col_palette = hm_col[ii]
+        )
+      }
+      # Plot distributions
+      for(ii in 1:3) {
+        for(jj in 1:9) {
+          plot_distribution(
+            d           = d[[ii]][[jj]],
+            format_file = "png",
+            file_path   = dp_path[[ii]][jj],
+            plot_width  = 800,
+            plot_height = 600,
+            subtitle    = fname
+          )
+        }
+      }
+      # Plot autocorrelations
+      for(ii in 1:3) {
+        plot_acf(
+          m           = m[[ii]],
+          format_file = "png",
+          file_path   = acf_path[ii],
+          plot_width  = 800,
+          plot_height = 600,
+          subtitle    = fname
+        )
+      }
+      
+      
+      # # Generate mean heatmap
+      # plot_heatmap_matrix(
+      #   m           = m_avg,
+      #   format_file = "png",
+      #   file_path   = hmp_path,
+      #   plot_width  = 1200,
+      #   plot_height = 900,
+      #   subtitle    = hm_fname
+      # )
+      # # Generate sd heatmap
+      # plot_heatmap_matrix(
+      #   m           = m_std,
+      #   format_file = "png",
+      #   file_path   = hmpsd_path,
+      #   plot_width  = 1200,
+      #   plot_height = 900,
+      #   subtitle    = hm_fname,
+      #   col_palette = "Blues"
+      # )
+      # # Generate rsd heatmap
+      # plot_heatmap_matrix(
+      #   m           = m_rsd,
+      #   format_file = "png",
+      #   file_path   = hmprsd_path,
+      #   plot_width  = 1200,
+      #   plot_height = 900,
+      #   subtitle    = hm_fname,
+      #   col_palette = "Greens"
+      # )
       
       # }
       # }
@@ -631,14 +731,22 @@ clValid2_heatmaps <- function(
   parallel::stopCluster(cl)
 }
 
-dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest/", full.names=TRUE)
-m <- get_heatmap_matrix(dir_name)
-d <- fit_distribution(m = m$mean)
-# plot_heatmap_matrix(
-#   m           = m$mean,
+# dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest/", full.names=TRUE)
+# m <- get_heatmap_matrix(dir_name)
+# d <- fit_distribution(m = m$mean)
+# plot_acf(
+#   m           = m$rsd,
 #   format_file = "png",
-#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/qqplot.png",
+#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/acf.png",
 #   plot_width  = 1200,
 #   plot_height = 900,
-#   subtitle    = "Test"
+#   subtitle    = "Mean"
+# )
+# plot_distribution(
+#   d           = d[[3]],
+#   format_file = "png",
+#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/d1.png",
+#   plot_width  = 1200,
+#   plot_height = 900,
+#   subtitle    = names(d)[3]
 # )

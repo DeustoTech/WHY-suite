@@ -96,15 +96,23 @@ clu2hmp <- function(
 ) {
   source(paste(getwd(), "src", fea2hmp_src, sep="/"))
   print("## HEATMAP PLOTS ##")
+  dirs <- list(
+    dplot  = paste0(clu_dir, "dplot/" ),
+    hmp    = paste0(clu_dir, "hmp/"   ),
+    report = paste0(clu_dir, "report/"),
+    acf    = paste0(clu_dir, "acf/"   ),
+    distr  = paste0(clu_dir, "distr/" )
+  )
   clValid2_heatmaps(
     feats_file  = fea_file,
     clValid_dir = paste0(clu_dir, "data/"),
-    hmm_dir     = paste0(clu_dir, "hmm/"),
-    hmp_dir     = paste0(clu_dir, "hmp/"),
-    hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
-    hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
-    hmmrsd_dir  = paste0(clu_dir, "hmmrsd/"),
-    hmprsd_dir  = paste0(clu_dir, "hmprsd/"),
+    dir_names   = dirs,
+    # hmm_dir     = paste0(clu_dir, "hmm/"),
+    # hmp_dir     = paste0(clu_dir, "hmp/"),
+    # hmmsd_dir   = paste0(clu_dir, "hmmsd/"),
+    # hmpsd_dir   = paste0(clu_dir, "hmpsd/"),
+    # hmmrsd_dir  = paste0(clu_dir, "hmmrsd/"),
+    # hmprsd_dir  = paste0(clu_dir, "hmprsd/"),
     dataset_dir = dset_dir,
     num_cluster = cc,
     scale_hmm   = TRUE,
