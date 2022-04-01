@@ -18,6 +18,11 @@ library(sgt) # skewed generalized t distribution
 
 set.seed(1981)
 
+# List of distributions
+distribs <- c(
+  "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "weibull"
+)
+
 ################################################################################
 ##  Function to select the row conditions (common to analysis and heatmaps)
 ################################################################################
@@ -401,11 +406,6 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
 ################################################################################
 
 fit_distribution <- function(m) {
-  # List of distributions
-  distribs <- c(
-    "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "beta",
-    "weibull"
-  )
   # Output
   len_distribs <- length(distribs)
   out <- vector("list", length = len_distribs)
@@ -418,7 +418,7 @@ fit_distribution <- function(m) {
     out[[ii]] <- fitdist(vectm, distribs[ii])
   }
   # Skewed generalized t distribution
-  start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=1000)
+  start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=100)
   out[["sgt"]] <- fitdist(vectm, "sgt", start=start_params)
   return(out)
 }
@@ -533,6 +533,11 @@ clValid2_heatmaps <- function(
   scale_hmm,
   num_cores = NULL
 ) {
+  # Check subfolders
+  check_subfolders(clValid_dir)
+  # Data dir
+  data_dir <- paste0(clValid_dir, "data/")
+  
   # Load feats
   feats <- data.table::fread(
     file   = feats_file,
@@ -541,8 +546,20 @@ clValid2_heatmaps <- function(
   )
   
   # LOOP
-  fnames <- list.files(path = clValid_dir, pattern = "*.clValid2")
-  fun_export <- c("get_heatmap_matrix", "plot_heatmap_matrix", "set_row_conditions")
+  fnames <- list.files(path = data_dir, pattern = "*.clValid2")
+  fun_export <- c(
+    "align_time_series",
+    "distribs",
+    "fit_distribution",
+    "get_heatmap_matrix",
+    "get_matrix_index",
+    "plot_acf",
+    "plot_distribution",
+    "plot_heatmap_matrix",
+    "set_row_conditions",
+    "upper_whisker"
+  )
+  package_list <- c("fitdistrplus", "sgt", "forecast", "ggplot2")
   
   # Setup parallel backend to use many processors
   if (is.null(num_cores)) {
@@ -553,8 +570,16 @@ clValid2_heatmaps <- function(
   cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
   
-  o <- foreach::foreach(ff = 1:length(fnames), .export=fun_export) %:%
-    foreach::foreach(cc = 1:num_cluster, .inorder = FALSE, .export=fun_export) %dopar% {
+  o <- foreach::foreach(
+    ff        = 1:length(fnames),
+    .export   = fun_export,
+    .packages = package_list
+  ) %:% foreach::foreach(
+    cc        = 1:num_cluster,
+    .inorder  = FALSE,
+    .export   = fun_export,
+    .packages = package_list
+  ) %dopar% {
       
       # for(ff in 1:length(fnames)) {
       # for(cc in 1:num_cluster) {
@@ -564,13 +589,13 @@ clValid2_heatmaps <- function(
       # Working config file name
       w_cname <- paste0(strsplit(w_fname, ".clValid2"), ".config")
       
-      w_cpath <- paste0(clValid_dir, w_cname)
+      w_cpath <- paste0(data_dir, w_cname)
       load(w_cpath)
       
       row_conditions <- set_row_conditions(feats, analysis_type)
       
       w_feats <- feats[row_conditions,]
-      w_fpath <- paste0(clValid_dir, w_fname)
+      w_fpath <- paste0(data_dir, w_fname)
       
       load(w_fpath)
       
@@ -616,7 +641,6 @@ clValid2_heatmaps <- function(
       idx <- cluster_list == cc
       # Set vector of paths
       paths_vector <- paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
-      
       # Get heatmap matrix
       m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
       # Get distributions
@@ -628,29 +652,29 @@ clValid2_heatmaps <- function(
       # Cluster loop
       fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
       # File paths: heatmaps (data)
-      hmm_path    <- paste0(dir_names[["dplot"]], "hmd_", fname, ".RData")
+      hd_path <- paste0(dir_names[["dplot"]], "hd_", fname, ".RData")
       # File paths: distributions (data)
-      dd_path     <- paste0(dir_names[["dplot"]], "dd_", fname, ".RData")
+      dd_path <- paste0(dir_names[["dplot"]], "dd_", fname, ".RData")
       # File paths: heatmaps (plots)
-      hmp_path    <- c()
-      hmp_path[1] <- paste0(dir_names[["hmp"]], "hmp1_", fname, ".png")
-      hmp_path[2] <- paste0(dir_names[["hmp"]], "hmp2_", fname, ".png")
-      hmp_path[3] <- paste0(dir_names[["hmp"]], "hmp3_", fname, ".png")
+      hp_path    <- c()
+      hp_path[1] <- paste0(dir_names[["hmp"]], "hp1_", fname, ".png")
+      hp_path[2] <- paste0(dir_names[["hmp"]], "hp2_", fname, ".png")
+      hp_path[3] <- paste0(dir_names[["hmp"]], "hp3_", fname, ".png")
       # File paths: distributions (plots)
       dp_path      <- list(c(), c(), c())
-      for (jj in 1:9) {
+      for (jj in 1:(length(distribs)+1)) {
         dp_path[[1]][jj] <- paste0(dir_names[["distr"]], "dp1_", jj, "_", fname, ".png")
         dp_path[[2]][jj] <- paste0(dir_names[["distr"]], "dp2_", jj, "_", fname, ".png")
         dp_path[[3]][jj] <- paste0(dir_names[["distr"]], "dp3_", jj, "_", fname, ".png")
       }
       # File paths: autocorrelations (plots)
-      acf_path    <- c()
-      acf_path[1] <- paste0(dir_names[["acf"]], "acf1_", fname, ".png")
-      acf_path[2] <- paste0(dir_names[["acf"]], "acf2_", fname, ".png")
-      acf_path[3] <- paste0(dir_names[["acf"]], "acf3_", fname, ".png")
+      ap_path    <- c()
+      ap_path[1] <- paste0(dir_names[["acf"]], "ap1_", fname, ".png")
+      ap_path[2] <- paste0(dir_names[["acf"]], "ap2_", fname, ".png")
+      ap_path[3] <- paste0(dir_names[["acf"]], "ap3_", fname, ".png")
       
       # Save heatmap matrices
-      save(m, idx, file = hmd_path)
+      save(m, idx, file = hd_path)
       # Save distribution lists
       save(d, idx, file = dd_path)
       
@@ -660,7 +684,7 @@ clValid2_heatmaps <- function(
         plot_heatmap_matrix(
           m           = m[[ii]],
           format_file = "png",
-          file_path   = hmp_path[ii],
+          file_path   = hp_path[ii],
           plot_width  = 1200,
           plot_height = 900,
           subtitle    = fname,
@@ -685,7 +709,7 @@ clValid2_heatmaps <- function(
         plot_acf(
           m           = m[[ii]],
           format_file = "png",
-          file_path   = acf_path[ii],
+          file_path   = ap_path[ii],
           plot_width  = 800,
           plot_height = 600,
           subtitle    = fname
@@ -697,7 +721,7 @@ clValid2_heatmaps <- function(
       # plot_heatmap_matrix(
       #   m           = m_avg,
       #   format_file = "png",
-      #   file_path   = hmp_path,
+      #   file_path   = hp_path,
       #   plot_width  = 1200,
       #   plot_height = 900,
       #   subtitle    = hm_fname

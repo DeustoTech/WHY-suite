@@ -105,8 +105,30 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 16
+operation <- 19
 ################################################################################
+
+# 2022.04.01 - LCL con nuevas graficas
+if (operation == 19) {
+  clu2hmp(
+    fea_file = fea_file[["lcl"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.01_ng_lcl-16cl/",
+    dset_dir = imp_dir,
+    cc       = 16,
+    cores    = 20
+  )
+}
+
+# 2022.04.01 - NEEA test con nuevas graficas
+if (operation == 18) {
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.01_newgraphs_nee/",
+    dset_dir = imp_dir,
+    cc       = 2,
+    cores    = 24
+  )
+}
 
 # 2022.03.23 - EDRP test (merging feature files)
 if (operation == 17) {

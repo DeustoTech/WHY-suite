@@ -105,7 +105,7 @@ clu2hmp <- function(
   )
   clValid2_heatmaps(
     feats_file  = fea_file,
-    clValid_dir = paste0(clu_dir, "data/"),
+    clValid_dir = clu_dir,
     dir_names   = dirs,
     # hmm_dir     = paste0(clu_dir, "hmm/"),
     # hmp_dir     = paste0(clu_dir, "hmp/"),
