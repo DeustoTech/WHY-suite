@@ -114,8 +114,8 @@ if (operation == 19) {
     fea_file = fea_file[["lcl"]],
     clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.01_ng_lcl-16cl/",
     dset_dir = imp_dir,
-    cc       = 16,
-    cores    = 20
+    cc       = 16 #,
+    # cores    = 20
   )
 }
 

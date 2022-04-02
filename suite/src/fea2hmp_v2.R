@@ -19,8 +19,8 @@ library(sgt) # skewed generalized t distribution
 set.seed(1981)
 
 # List of distributions
-distribs <- c(
-  "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "weibull"
+distr_vect <- c(
+  "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "weibull", "sgt"
 )
 
 ################################################################################
@@ -53,7 +53,8 @@ set_row_conditions <- function(feats, analysis_type) {
   if (is.null(analysis_type$dd$ref_atr_tariff))
     cond_trf <- TRUE
   else
-    cond_trf <- substr(feats$ref_atr_tariff,1,1) == analysis_type$dd$ref_atr_tariff
+    cond_trf <-
+      substr(feats$ref_atr_tariff,1,1) == analysis_type$dd$ref_atr_tariff
   
   # Mandatory condition
   cond_min <- feats$minimum >= 0
@@ -131,20 +132,9 @@ check_subfolders <- function(o) {
   # All output subfolders
   o_sub <- c(
     paste0(o, "data/"),
-    # paste0(o, "hmm/"),
     paste0(o, "hmp/"),
-    # paste0(o, "hmmsd/"),
-    # paste0(o, "hmpsd/"),
-    # paste0(o, "hmmrsd/"),
-    # paste0(o, "hmprsd/"),
     paste0(o, "report/"),
     paste0(o, "acf/"),
-    # paste0(o, "dd/"),    # distribution data
-    # paste0(o, "dp/"),    # distribution plots
-    # paste0(o, "ddsd/"),
-    # paste0(o, "dpsd/"),
-    # paste0(o, "ddrsd/"),
-    # paste0(o, "dprsd/")
     paste0(o, "dplot/"),
     paste0(o, "distr/")
   )
@@ -206,14 +196,16 @@ cluster_features <- function(
     ),
     # TYPE 4 -> "cat22"
     cat22 = c(
-      "DN_HistogramMode_5", "DN_HistogramMode_10", "CO_f1ecac", "CO_FirstMin_ac",
-      "CO_HistogramAMI_even_2_5", "CO_trev_1_num", "MD_hrv_classic_pnn40",
-      "SB_BinaryStats_mean_longstretch1", "SB_TransitionMatrix_3ac_sumdiagcov",
-      "PD_PeriodicityWang_th0_01", "CO_Embed2_Dist_tau_d_expfit_meandiff",
-      "IN_AutoMutualInfoStats_40_gaussian_fmmi", "FC_LocalSimple_mean1_tauresrat",
-      "DN_OutlierInclude_p_001_mdrmd", "DN_OutlierInclude_n_001_mdrmd",
-      "SP_Summaries_welch_rect_area_5_1", "SB_BinaryStats_diff_longstretch0",
-      "SB_MotifThree_quantile_hh", "SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1",
+      "DN_HistogramMode_5", "DN_HistogramMode_10", "CO_f1ecac",
+      "CO_FirstMin_ac", "CO_HistogramAMI_even_2_5", "CO_trev_1_num",
+      "MD_hrv_classic_pnn40", "SB_BinaryStats_mean_longstretch1",
+      "SB_TransitionMatrix_3ac_sumdiagcov", "PD_PeriodicityWang_th0_01",
+      "CO_Embed2_Dist_tau_d_expfit_meandiff",
+      "IN_AutoMutualInfoStats_40_gaussian_fmmi",
+      "FC_LocalSimple_mean1_tauresrat", "DN_OutlierInclude_p_001_mdrmd",
+      "DN_OutlierInclude_n_001_mdrmd", "SP_Summaries_welch_rect_area_5_1",
+      "SB_BinaryStats_diff_longstretch0", "SB_MotifThree_quantile_hh",
+      "SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1",
       "SC_FluctAnal_2_dfa_50_1_2_logi_prop_r1",
       "SP_Summaries_welch_rect_centroid", "FC_LocalSimple_mean3_stderr"
     ),
@@ -235,14 +227,18 @@ cluster_features <- function(
     ),
     # TYPE 6 -> "sAggrDRM"
     sAggrDRM = c(
-      "rel_mean_00h04hspr_drm", "rel_mean_04h08hspr_drm", "rel_mean_08h12hspr_drm",
-      "rel_mean_12h16hspr_drm", "rel_mean_16h20hspr_drm", "rel_mean_20h00hspr_drm",
-      "rel_mean_00h04hsum_drm", "rel_mean_04h08hsum_drm", "rel_mean_08h12hsum_drm",
-      "rel_mean_12h16hsum_drm", "rel_mean_16h20hsum_drm", "rel_mean_20h00hsum_drm",
-      "rel_mean_00h04haut_drm", "rel_mean_04h08haut_drm", "rel_mean_08h12haut_drm",
-      "rel_mean_12h16haut_drm", "rel_mean_16h20haut_drm", "rel_mean_20h00haut_drm",
-      "rel_mean_00h04hwin_drm", "rel_mean_04h08hwin_drm", "rel_mean_08h12hwin_drm",
-      "rel_mean_12h16hwin_drm", "rel_mean_16h20hwin_drm", "rel_mean_20h00hwin_drm",
+      "rel_mean_00h04hspr_drm", "rel_mean_04h08hspr_drm",
+      "rel_mean_08h12hspr_drm", "rel_mean_12h16hspr_drm",
+      "rel_mean_16h20hspr_drm", "rel_mean_20h00hspr_drm",
+      "rel_mean_00h04hsum_drm", "rel_mean_04h08hsum_drm",
+      "rel_mean_08h12hsum_drm", "rel_mean_12h16hsum_drm",
+      "rel_mean_16h20hsum_drm", "rel_mean_20h00hsum_drm",
+      "rel_mean_00h04haut_drm", "rel_mean_04h08haut_drm",
+      "rel_mean_08h12haut_drm", "rel_mean_12h16haut_drm",
+      "rel_mean_16h20haut_drm", "rel_mean_20h00haut_drm",
+      "rel_mean_00h04hwin_drm", "rel_mean_04h08hwin_drm",
+      "rel_mean_08h12hwin_drm", "rel_mean_12h16hwin_drm",
+      "rel_mean_16h20hwin_drm", "rel_mean_20h00hwin_drm",
       "rel_mean_weekday_drm"
     )
   )
@@ -306,12 +302,15 @@ align_time_series <- function(fname, .scale) {
     by  = list(date_time = t_factor),
     FUN = sum
   )
+  # Check that upper whisker is not 0
+  upwh <- upper_whisker(aggr_data$x)
+  if(upwh == 0) return(NULL)
   # Scale data
   if(.scale) {
     aggr_data$x <- scale(
       aggr_data$x,
       center = FALSE,
-      scale  = upper_whisker(aggr_data$x)
+      scale  = upwh
     )
   }
   # Input vector of dates
@@ -407,19 +406,36 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
 
 fit_distribution <- function(m) {
   # Output
-  len_distribs <- length(distribs)
-  out <- vector("list", length = len_distribs)
-  names(out)<- distribs
+  out <- vector("list", length = length(distr_vect))
+  names(out)<- distr_vect
+  start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=100)
   # Vector m
   vectm <- as.vector(m)
   # Loop distributions
-  for(ii in 1:len_distribs) {
-    # Compute fitting
-    out[[ii]] <- fitdist(vectm, distribs[ii])
+  for(dd in distr_vect) {
+    if (dd != "sgt") {
+      # Compute fitting
+      tryCatch(
+        {
+          suppressWarnings(
+            out[[dd]] <- fitdist(vectm, dd)
+          )
+        },
+        error = function(e) out[[dd]] <- NULL
+      )
+    } else {
+      # Skewed generalized t distribution
+      tryCatch(
+        {
+          suppressWarnings(
+            out[["sgt"]] <- fitdist(vectm, "sgt", start=start_params)
+          )
+        },
+        error = function(e) out[["sgt"]] <- NULL
+      )
+    }
   }
-  # Skewed generalized t distribution
-  start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=100)
-  out[["sgt"]] <- fitdist(vectm, "sgt", start=start_params)
+  
   return(out)
 }
 
@@ -525,9 +541,6 @@ clValid2_heatmaps <- function(
   feats_file,
   clValid_dir,
   dir_names,
-  # hmm_dir, hmp_dir,
-  # hmmsd_dir, hmpsd_dir,
-  # hmmrsd_dir, hmprsd_dir,
   dataset_dir,
   num_cluster,
   scale_hmm,
@@ -549,7 +562,7 @@ clValid2_heatmaps <- function(
   fnames <- list.files(path = data_dir, pattern = "*.clValid2")
   fun_export <- c(
     "align_time_series",
-    "distribs",
+    "distr_vect",
     "fit_distribution",
     "get_heatmap_matrix",
     "get_matrix_index",
@@ -569,7 +582,7 @@ clValid2_heatmaps <- function(
   }
   cl <- parallel::makeCluster(cores, outfile = "")
   doParallel::registerDoParallel(cl)
-  
+
   o <- foreach::foreach(
     ff        = 1:length(fnames),
     .export   = fun_export,
@@ -581,196 +594,191 @@ clValid2_heatmaps <- function(
     .packages = package_list
   ) %dopar% {
       
-      # for(ff in 1:length(fnames)) {
-      # for(cc in 1:num_cluster) {
-      
-      # Working file name
-      w_fname <- fnames[ff]
-      # Working config file name
-      w_cname <- paste0(strsplit(w_fname, ".clValid2"), ".config")
-      
-      w_cpath <- paste0(data_dir, w_cname)
-      load(w_cpath)
-      
-      row_conditions <- set_row_conditions(feats, analysis_type)
-      
-      w_feats <- feats[row_conditions,]
-      w_fpath <- paste0(data_dir, w_fname)
-      
-      load(w_fpath)
-      
-      ### Get the clustering 
-      # HIERARCHICAL
-      if (analysis_type$mm == "hierarchical") {
-        cluster_list <- cutree(o@clusterObjs[["hierarchical"]], k=num_cluster)
+  # for(ff in 1:length(fnames)) {
+  #   for(cc in 1:num_cluster) {
+    
+    ############################
+    ### INITIALIZATION STUFF ###
+    ############################
+    # Working file name
+    w_fname <- fnames[ff]
+    # Working config file name
+    w_cname <- paste0(strsplit(w_fname, ".clValid2"), ".config")
+    
+    w_cpath <- paste0(data_dir, w_cname)
+    load(w_cpath)
+    
+    row_conditions <- set_row_conditions(feats, analysis_type)
+    
+    w_feats <- feats[row_conditions,]
+    w_fpath <- paste0(data_dir, w_fname)
+    
+    load(w_fpath)
+    
+    ##############################
+    ### GETTING THE CLUSTERING ###
+    ##############################
+    # HIERARCHICAL
+    if (analysis_type$mm == "hierarchical") {
+      cluster_list <-
+        cutree(o@clusterObjs[["hierarchical"]], k=num_cluster)
+    }
+    # K-MEANS
+    if (analysis_type$mm == "kmeans") {
+      cluster_list <-
+        o@clusterObjs[["kmeans"]][[as.character(num_cluster)]][["cluster"]]
+    }
+    # DIANA
+    if (analysis_type$mm == "diana") {
+      cluster_list <-
+        cutree(o@clusterObjs[["diana"]], k=num_cluster)
+    }
+    # FANNY
+    if (analysis_type$mm == "fanny") {
+      cluster_list <-
+        o@clusterObjs[["fanny"]][[as.character(num_cluster)]]$clustering
+    }
+    # SOM
+    if (analysis_type$mm == "som") {
+      cluster_list <-
+        o@clusterObjs[["som"]][[as.character(num_cluster)]]$unit.classif
+    }
+    # PAM
+    if (analysis_type$mm == "pam") {
+      cluster_list <-
+        o@clusterObjs[["pam"]][[as.character(num_cluster)]]$clustering
+    }
+    # SOTA
+    if (analysis_type$mm == "sota") {
+      cluster_list <-
+        o@clusterObjs[["sota"]][[as.character(num_cluster)]]$clust
+    }
+    # CLARA
+    if (analysis_type$mm == "clara") {
+      cluster_list <-
+        o@clusterObjs[["clara"]][[as.character(num_cluster)]]$clustering
+    }
+    # MODEL-BASED
+    if (analysis_type$mm == "model") {
+      cluster_list <-
+        o@clusterObjs[["model"]][[as.character(num_cluster)]]$classification
+    }
+    
+    ###############################################
+    ### GETTING MATRICES AND DATA FOR PLOTTING ###
+    ###############################################
+    # Get cluster indices
+    idx <- cluster_list == cc
+    # Set vector of paths
+    paths_vector <-
+      paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
+    # Get heatmap matrix
+    m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
+    # Get distributions
+    d <- list()
+    d$mean <- fit_distribution(m$mean)
+    d$sd   <- fit_distribution(m$sd)
+    d$rsd  <- fit_distribution(m$rsd)
+    
+    # Cluster loop
+    fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
+    
+    ##############################
+    ### CREATION OF FILE PATHS ###
+    ##############################
+    # File paths: heatmaps (data)
+    hd_path <- paste0(dir_names[["dplot"]], "hd_", fname, ".RData")
+    # File paths: distributions (data)
+    dd_path <- paste0(dir_names[["dplot"]], "dd_", fname, ".RData")
+    # File paths: heatmaps (plots)
+    hp_path <- c() 
+    kp_path <- c()
+    for (ii in 1:3) {
+      hp_path[ii] <- paste0(dir_names[["hmp"]], "hp", ii, "_", fname, ".png")
+      kp_path[ii] <- paste0(dir_names[["hmp"]], "kp", ii, "_", fname, ".png")
+    }
+
+    # File paths: distributions (plots)
+    dp_path <- list(c(), c(), c())
+    for (dd in 1:length(distr_vect)) {
+      for (ii in 1:3) {
+        dp_path[[ii]][dd] <-
+          paste0(dir_names[["distr"]], "dp", ii, "_", dd, "_", fname, ".png")
       }
-      # K-MEANS
-      if (analysis_type$mm == "kmeans") {
-        cluster_list <- o@clusterObjs[["kmeans"]][[as.character(num_cluster)]][["cluster"]]
-      }
-      # DIANA
-      if (analysis_type$mm == "diana") {
-        cluster_list <- cutree(o@clusterObjs[["diana"]], k=num_cluster)
-      }
-      # FANNY
-      if (analysis_type$mm == "fanny") {
-        cluster_list <- o@clusterObjs[["fanny"]][[as.character(num_cluster)]]$clustering
-      }
-      # SOM
-      if (analysis_type$mm == "som") {
-        cluster_list <- o@clusterObjs[["som"]][[as.character(num_cluster)]]$unit.classif
-      }
-      # PAM
-      if (analysis_type$mm == "pam") {
-        cluster_list <- o@clusterObjs[["pam"]][[as.character(num_cluster)]]$clustering
-      }
-      # SOTA
-      if (analysis_type$mm == "sota") {
-        cluster_list <- o@clusterObjs[["sota"]][[as.character(num_cluster)]]$clust
-      }
-      # CLARA
-      if (analysis_type$mm == "clara") {
-        cluster_list <- o@clusterObjs[["clara"]][[as.character(num_cluster)]]$clustering
-      }
-      # MODEL-BASED
-      if (analysis_type$mm == "model") {
-        cluster_list <- o@clusterObjs[["model"]][[as.character(num_cluster)]]$classification
-      }
-      
-      # Get cluster indices
-      idx <- cluster_list == cc
-      # Set vector of paths
-      paths_vector <- paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
-      # Get heatmap matrix
-      m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
-      # Get distributions
-      d <- list()
-      d$mean <- fit_distribution(m$mean)
-      d$sd   <- fit_distribution(m$sd)
-      d$rsd  <- fit_distribution(m$rsd)
-      
-      # Cluster loop
-      fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
-      # File paths: heatmaps (data)
-      hd_path <- paste0(dir_names[["dplot"]], "hd_", fname, ".RData")
-      # File paths: distributions (data)
-      dd_path <- paste0(dir_names[["dplot"]], "dd_", fname, ".RData")
-      # File paths: heatmaps (plots)
-      hp_path    <- c()
-      hp_path[1] <- paste0(dir_names[["hmp"]], "hp1_", fname, ".png")
-      hp_path[2] <- paste0(dir_names[["hmp"]], "hp2_", fname, ".png")
-      hp_path[3] <- paste0(dir_names[["hmp"]], "hp3_", fname, ".png")
-      # File paths: distributions (plots)
-      dp_path      <- list(c(), c(), c())
-      for (jj in 1:(length(distribs)+1)) {
-        dp_path[[1]][jj] <- paste0(dir_names[["distr"]], "dp1_", jj, "_", fname, ".png")
-        dp_path[[2]][jj] <- paste0(dir_names[["distr"]], "dp2_", jj, "_", fname, ".png")
-        dp_path[[3]][jj] <- paste0(dir_names[["distr"]], "dp3_", jj, "_", fname, ".png")
-      }
-      # File paths: autocorrelations (plots)
-      ap_path    <- c()
-      ap_path[1] <- paste0(dir_names[["acf"]], "ap1_", fname, ".png")
-      ap_path[2] <- paste0(dir_names[["acf"]], "ap2_", fname, ".png")
-      ap_path[3] <- paste0(dir_names[["acf"]], "ap3_", fname, ".png")
-      
-      # Save heatmap matrices
-      save(m, idx, file = hd_path)
-      # Save distribution lists
-      save(d, idx, file = dd_path)
-      
-      # Plot heatmaps
-      hm_col <- c("YlOrRd", "Blues", "Greens")
-      for(ii in 1:3) {
-        plot_heatmap_matrix(
-          m           = m[[ii]],
-          format_file = "png",
-          file_path   = hp_path[ii],
-          plot_width  = 1200,
-          plot_height = 900,
-          subtitle    = fname,
-          col_palette = hm_col[ii]
-        )
-      }
-      # Plot distributions
-      for(ii in 1:3) {
-        for(jj in 1:9) {
+    }
+    # File paths: autocorrelations (plots)
+    ap_path <- c()
+    for (ii in 1:3) {
+      ap_path[ii] <- paste0(dir_names[["acf"]], "ap", ii, "_", fname, ".png")
+    }
+
+    ####################################
+    ### CREATION AND SAVING OF PLOTS ###
+    ####################################
+    # Save heatmap matrices
+    save(m, idx, file = hd_path)
+    # Save distribution lists
+    save(d, idx, file = dd_path)
+    
+    # Useful vectors
+    st   <- c("mean", "sd", "cvar")
+    hcol <- c("YlOrRd", "Blues", "Greens")
+    # Plot heatmaps: outliers are left blank
+    for(ii in 1:3) {
+      plot_heatmap_matrix(
+        m           = m[[ii]],
+        format_file = "png",
+        file_path   = hp_path[ii],
+        plot_width  = 1200,
+        plot_height = 900,
+        subtitle    = paste(st[ii], fname),
+        col_palette = hcol[ii]
+      )
+    }
+    # Plot heatmaps: outliers are color-filled
+    for(ii in 1:3) {
+      mm <- m[[ii]]
+      mm[mm > 1] <- 1
+      plot_heatmap_matrix(
+        m           = mm,
+        format_file = "png",
+        file_path   = kp_path[ii],
+        plot_width  = 1200,
+        plot_height = 900,
+        subtitle    = paste(st[ii], fname),
+        col_palette = hcol[ii]
+      )
+    }
+    # Plot distributions
+    for(ii in 1:3) {
+      for(jj in 1:9) {
+        if(!is.null(d[[ii]][[jj]])) {
           plot_distribution(
             d           = d[[ii]][[jj]],
             format_file = "png",
             file_path   = dp_path[[ii]][jj],
             plot_width  = 800,
             plot_height = 600,
-            subtitle    = fname
+            subtitle    = paste(st[ii], distr_vect[jj], fname)
           )
         }
       }
-      # Plot autocorrelations
-      for(ii in 1:3) {
-        plot_acf(
-          m           = m[[ii]],
-          format_file = "png",
-          file_path   = ap_path[ii],
-          plot_width  = 800,
-          plot_height = 600,
-          subtitle    = fname
-        )
-      }
-      
-      
-      # # Generate mean heatmap
-      # plot_heatmap_matrix(
-      #   m           = m_avg,
-      #   format_file = "png",
-      #   file_path   = hp_path,
-      #   plot_width  = 1200,
-      #   plot_height = 900,
-      #   subtitle    = hm_fname
-      # )
-      # # Generate sd heatmap
-      # plot_heatmap_matrix(
-      #   m           = m_std,
-      #   format_file = "png",
-      #   file_path   = hmpsd_path,
-      #   plot_width  = 1200,
-      #   plot_height = 900,
-      #   subtitle    = hm_fname,
-      #   col_palette = "Blues"
-      # )
-      # # Generate rsd heatmap
-      # plot_heatmap_matrix(
-      #   m           = m_rsd,
-      #   format_file = "png",
-      #   file_path   = hmprsd_path,
-      #   plot_width  = 1200,
-      #   plot_height = 900,
-      #   subtitle    = hm_fname,
-      #   col_palette = "Greens"
-      # )
-      
-      # }
-      # }
     }
+    # Plot autocorrelations
+    for(ii in 1:3) {
+      plot_acf(
+        m           = m[[ii]],
+        format_file = "png",
+        file_path   = ap_path[ii],
+        plot_width  = 800,
+        plot_height = 600,
+        subtitle    = paste(st[ii], fname)
+      )
+    }
+
+    # } # CURLY BRACKET FOR FOR-LOOPS
+  }
   
   # Stop parallelization
   parallel::stopCluster(cl)
 }
-
-# dir_name <- list.files("C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/datatest/", full.names=TRUE)
-# m <- get_heatmap_matrix(dir_name)
-# d <- fit_distribution(m = m$mean)
-# plot_acf(
-#   m           = m$rsd,
-#   format_file = "png",
-#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/acf.png",
-#   plot_width  = 1200,
-#   plot_height = 900,
-#   subtitle    = "Mean"
-# )
-# plot_distribution(
-#   d           = d[[3]],
-#   format_file = "png",
-#   file_path   = "C:/Users/carlos.quesada/Documents/WHY/2022.03.29 - Nuevos cálculos por cluster/hmp/d1.png",
-#   plot_width  = 1200,
-#   plot_height = 900,
-#   subtitle    = names(d)[3]
-# )
