@@ -1,0 +1,243 @@
+---
+title: "`r params$rmd_title`"
+author: "Universidad de Deusto (carlos.quesada@deusto.es)"
+date: "`r format(Sys.time())`"
+output:
+  html_document:
+  toc: true
+toc_depth: 1
+theme: united
+params:
+  rmd_title: "Cluster Report"
+  no_cards: 1650
+  no_card_types: 33
+  card_width: "300px"
+  hmp_dir:   ""
+  distr_dir: ""
+  acf_dir:   ""
+  dplot_dir: "" 
+  nofile_path: "no-file.png"
+  ff: ""
+  dd: ""
+  mm: ""
+  cc: ""
+---
+
+```{css, echo=FALSE}
+.main-container {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+```
+
+<hr>
+  
+#### List of abbreviations
+  
+##### Sets of features 
+* __sAggrDRM__: seasonal aggregates v2.0 (day-referenced mean)
+* __sAggrP6__: seasonal aggregates v3.0 (6-period time division)
+
+##### Datasets
+* __edrp__: Energy Demand Research Project (EDRP) [GB]
+* __goi__: GoiEner (including Megara and La Corriente) [ES]
+* __iss__: Irish Social Science Data Archive (ISSDA) [IE]
+* __lcl__: Low Carbon London [GB]
+* __nee__: Northwest Energy Efficiency Alliance (NEEA) [US]
+* __por__: Elergone Energia [PT]
+* __Xds__: X datasets put together
+
+##### Clustering methods
+* __kme__: _k_-means
+* __pam__: partition around medoids
+* __som__: self-organizing maps
+
+##### Statistic used
+* __m__: mean
+* __sd__: standard deviation
+* __rsd__: relative standard deviation
+
+<hr>
+
+```{r, include=FALSE}
+# CARD TYPES
+card_types_p <- c(
+  "kp1_", "kp2_", "kp3_",
+  paste0(c(rep("dp1_",9), rep("dp2_",9), rep("dp3_",9)), 1:9, "_"),
+  "ap1_", "ap2_", "ap3_"
+)
+card_types_m <- c(
+  rep("hd_",3),
+  rep("dd_",27),
+  rep(NA,3)
+)
+stat_vect <- c("mean", "sd", "cvar")
+distr_vect <- c(
+  "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "weibull", "sgt"
+)
+card_types_c <- c(
+  paste("hmp", stat_vect, sep="_"),
+  paste(rep(stat_vect,each=9), rep(distr_vect,3), sep="_"),
+  paste("acf", stat_vect, sep="_")
+)
+# Paths to graphs
+p_path <- c(
+  rep(params$hmp_dir, 3),
+  rep(params$distr_dir, 27),
+  rep(params$acf_dir, 3)
+)
+# Paths to values
+m_path <- c(
+  rep(params$dplot_dir, 30),
+  rep(NA, 3) 
+)
+# No file by DEFAULT
+no_file <- paste0("![](", params$nofile_path, ")")
+
+# Block of cards ("bb" is an integer indicating the desired number of blocks)
+block_of_cards <- function(txt_list, blocks, elems, card_width){
+  o <- ""
+  for (bb in 1:blocks) {
+    # PART 1
+    o <- paste0(o,
+'<tr>')
+    for (ee in 1:elems) {
+      o <- paste0(o,
+'<td width="', card_width, '">', txt_list$img[elems*bb-(elems-ee)], '</td>')
+    }
+    o <- paste0(o,
+'</tr>')
+    # PART 2
+    o <- paste0(o,
+'<tr>')
+    for (ee in 1:elems) {
+      o <- paste0(o,
+'<td><center><small>', txt_list$cap[elems*bb-(elems-ee)], '</small></center></td>')
+    }
+    o <- paste0(o,
+'</tr>')
+  }
+  return(o)
+}
+
+# Table of cards
+table_of_cards <- function(txt_list) {
+  boc <- block_of_cards(
+    txt_list,
+    ceiling(params$no_cards/params$no_card_types),
+    params$no_card_types,
+    params$card_width
+  )
+  o <- paste0(
+'<table border="0" style="width:800%">
+', boc,
+'</table>\n\n
+'
+  )
+  return(o)
+}
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+# Features loop
+ff_loop <- params$ff
+# Dataset loop
+key     <- unique(sapply(1:length(params$dd),
+                           function(x) params$dd[[x]]$key))
+len_key <- length(key)
+dd_name <- ifelse(len_key == 1, key, paste0(len_key, "ds"))
+dd_loop <- dd_name
+# Methods loop
+mm_loop <- params$mm
+# FEATURE LOOP
+for (ff in ff_loop) {
+  # DATASET LOOP
+  for (dd in dd_loop) {
+    # METHOD LOOP
+    for (mm in mm_loop) {
+      # cat(paste0("#### ", ff, " > ", dd, " > ", mm, "\n\n"))
+      # Initialization of txt_list
+      txt_list <- list(
+        img = rep("", params$no_cards),
+        cap = rep("", params$no_cards)
+      )
+      # CLUSTER LOOP
+      cc_loop <- 1:params$cc
+      
+      for (cc in cc_loop) {
+        for (xx in 1:params$no_card_types) {
+          # Path to file
+          card_path <- paste0(
+            p_path[xx], card_types_p[xx], ff, "_", dd, "_", mm, "_",
+            max(cc_loop), "cl_i-", cc, ".png"
+          )
+          # Path for loading variable "idx"
+          idx_path <- paste0(
+            m_path[xx], card_types_m[xx], ff, "_", dd, "_", mm, "_",
+            max(cc_loop), "cl_i-", cc, ".RData"
+          )
+          # This loads variable "idx"
+          if (xx %in% 1:3) {
+            if (file.exists(idx_path)) {
+              load(idx_path)  
+              sum_idx <- sum(idx)
+              pct_idx <- round(100*sum(idx)/length(idx),1)
+            } else {
+              sum_idx <- "?"
+              pct_idx <- "?"
+            }
+          }
+          if (xx %in% 4:30) {
+            if (file.exists(idx_path)) {
+              load(idx_path) 
+              idx1 <- (xx-4) %/% 9 + 1
+              idx2 <- (xx-4) %% 9 + 1
+              loglik <- d[[idx1]][[idx2]]$loglik
+              aic    <- d[[idx1]][[idx2]]$aic
+              bic    <- d[[idx1]][[idx2]]$bic
+              loglik <- ifelse(is.null(loglik), "?", round(loglik))
+              aic    <- ifelse(is.null(aic), "?", round(aic))
+              bic    <- ifelse(is.null(bic), "?", round(bic))
+            } else {
+              loglik <- "?"
+              aic    <- "?"
+              bic    <- "?"
+            }
+          }
+          # Complete txt_list
+          card_idx <- params$no_card_types*cc - (params$no_card_types-xx)
+          if (file.exists(card_path)) {
+            txt_list$img[card_idx] <- paste0("![](", card_path, ")")
+          } else {
+            txt_list$img[card_idx] <- no_file
+          }
+          if (xx %in% 1:3) {
+            txt_list$cap[card_idx] <- paste0(
+              ff, " > ", dd, " > ", mm, " > ", card_types_c[xx], 
+              " > #", cc, "\n\n", sum_idx, " TS (", pct_idx, "%)\n\n"
+            )
+          }
+          if (xx %in% 4:30) {
+            txt_list$cap[card_idx] <- paste0(
+              ff, " > ", dd, " > ", mm, " > ", card_types_c[xx], 
+              " > #", cc, "\n\n", "loglik = ", loglik, " | aic = ", aic, 
+              " | bic = ", bic
+            )
+          }
+          if (xx %in% 31:33) {
+            txt_list$cap[card_idx] <- paste0(
+              ff, " > ", dd, " > ", mm, " > ", card_types_c[xx], " > #", cc
+            )
+          }
+        }
+        
+        # Print HTML table
+        if (cc == max(cc_loop)) {
+          cat(table_of_cards(txt_list))
+        }
+      }
+    }
+  }
+}
+```

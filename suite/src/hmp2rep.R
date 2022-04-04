@@ -7,9 +7,8 @@
 ################################################################################
 
 # REPORTING FILES IN SUBFOLDER 'src'
-# hmp2bas_src <- "clValid2-summary_report_v03.Rmd"
-# hmp2std_src <- "clValid2-summary_report_v03_sd.Rmd"
 hmp2crd_src <- "cards-report.Rmd"
+hmp2sll_src <- "cards-report-scroll.Rmd"
 hmp2m40_src <- "map40-report.R"
 no_file_src <- "no-file.png"
 
@@ -28,6 +27,31 @@ reporting <- function(
   new_hmp_fname,
   tag
 ) {
+  ############
+  ## SCROLL ##
+  ############
+  if ("scroll" %in% rep_type) {
+    print("## RMARKDOWN SCROLL REPORT ##")
+    params_list <- list(
+      rmd_title     = rep_title,
+      no_card_types = 33,
+      hmp_dir       = paste0(clu_dir, "hmp/"),
+      distr_dir     = paste0(clu_dir, "distr/"),
+      acf_dir       = paste0(clu_dir, "acf/"),
+      dplot_dir     = paste0(clu_dir, "dplot/"),
+      nofile_path   = paste(getwd(), "src", no_file_src, sep="/"),
+      ff            = ff,
+      dd            = dd,
+      mm            = mm,
+      cc            = cc
+    )
+    rmarkdown::render(
+      input       = paste(getwd(), "src", hmp2sll_src, sep="/"),
+      output_file = paste0(clu_dir, "report/", rep_fname),
+      params      = params_list
+    )
+  }
+  
   ###########
   ## BASIC ##
   ###########

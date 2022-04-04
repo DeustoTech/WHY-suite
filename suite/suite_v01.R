@@ -118,7 +118,7 @@ clu2hmp <- function(
 ## CREATION OF BASIC REPORT ##
 ##############################
 hmp2rep <- function(
-  rep_type = c("basic", "sd", "rsd", "map40"),
+  rep_type = c("basic", "sd", "rsd", "map40", "scroll"),
   rep_title,
   rep_title_short = "PRE",
   clu_dir,

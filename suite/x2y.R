@@ -105,8 +105,22 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 19
+operation <- 20
 ################################################################################
+
+# 2022.04.04 - Scroll report for LCL
+if (operation == 20) {
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: LCL, 16 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.01_ng_lcl-16cl/",
+    rep_fname = "cluster_report_lcl_2cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_lcl,
+    mm        = c("som"),
+    cc        = 16
+  )
+}
 
 # 2022.04.01 - LCL con nuevas graficas
 if (operation == 19) {
