@@ -62,17 +62,25 @@ params:
 
 ```{r, include=FALSE}
 # CARD TYPES
+### MEANS
+# card_types_p <- c(
+#   "kp1_", "kp2_", "kp3_",
+#   paste0(c(rep("dp1_",9), rep("dp2_",9), rep("dp3_",9)), 1:9, "_"),
+#   "ap1_", "ap2_", "ap3_"
+# )
+### MEDIANS
 card_types_p <- c(
-  "kp1_", "kp2_", "kp3_",
-  paste0(c(rep("dp1_",9), rep("dp2_",9), rep("dp3_",9)), 1:9, "_"),
-  "ap1_", "ap2_", "ap3_"
+  "kp4_", "kp5_", "kp6_",
+  paste0(c(rep("dp4_",9), rep("dp5_",9), rep("dp6_",9)), 1:9, "_"),
+  "ap4_", "ap5_", "ap6_"
 )
 card_types_m <- c(
   rep("hd_",3),
   rep("dd_",27),
   rep(NA,3)
 )
-stat_vect <- c("mean", "sd", "cvar")
+# stat_vect <- c("mean", "sd", "cvar")
+stat_vect <- c("median", "mad", "rmad")
 distr_vect <- c(
   "unif", "norm", "lnorm", "exp", "cauchy", "gamma", "logis", "weibull", "sgt"
 )

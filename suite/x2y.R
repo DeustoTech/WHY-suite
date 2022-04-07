@@ -105,8 +105,243 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 20
+operation <- 22
 ################################################################################
+
+# 2022.04.05 - Re-running all datasets using new clustering (MEDIANS+MAD+RMAD)
+if (operation == 22) {
+  clu2hmp(
+    fea_file = fea_file[["lcl"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_lcl-16cl/",
+    dset_dir = imp_dir,
+    cc       = 16,
+    cores    = 24
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: LCL, 16 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_lcl-16cl/",
+    rep_fname = "cluster_report_lcl_16cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_lcl,
+    mm        = c("som"),
+    cc        = 16
+  )
+  
+  #-----
+  
+  # clu2hmp(
+  #   fea_file = fea_file[["iss"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_iss-16cl/",
+  #   dset_dir = imp_dir,
+  #   cc       = 16,
+  #   cores    = 24
+  # )
+  # 
+  # hmp2rep(
+  #   rep_type  = c("scroll"),
+  #   rep_title = "Cluster Report: ISS, 16 clusters",
+  #   clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_iss-16cl/",
+  #   rep_fname = "cluster_report_iss_16cl_som.html",
+  #   ff        = c("sAggrDRM"),
+  #   dd        = dd_sel_iss,
+  #   mm        = c("som"),
+  #   cc        = 16
+  # )
+  
+  #-----
+  
+  # clu2hmp(
+  #   fea_file = fea_file[["goi4_pre"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_goi-pre-20cl/",
+  #   dset_dir = imp_dir,
+  #   cc       = 20,
+  #   cores    = 8
+  # )
+  # 
+  # hmp2rep(
+  #   rep_type  = c("scroll"),
+  #   rep_title = "Cluster Report: GOI-pre, 20 clusters",
+  #   clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_goi-pre-20cl/",
+  #   rep_fname = "cluster_report_goi-pre_20cl_som.html",
+  #   ff        = c("sAggrDRM"),
+  #   dd        = dd_sel_goi4,
+  #   mm        = c("som"),
+  #   cc        = 20
+  # )
+  
+  #-----
+  
+  # clu2hmp(
+  #   fea_file = fea_file[["goi4_pst"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_goi-pst-20cl/",
+  #   dset_dir = imp_dir_goi4_pst,
+  #   cc       = 20,
+  #   cores    = 8
+  # )
+  # 
+  # hmp2rep(
+  #   rep_type  = c("scroll"),
+  #   rep_title = "Cluster Report: GOI-post, 20 clusters",
+  #   clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_goi-pst-20cl/",
+  #   rep_fname = "cluster_report_goi-pst_20cl_som.html",
+  #   ff        = c("sAggrDRM"),
+  #   dd        = dd_sel_goi4,
+  #   mm        = c("som"),
+  #   cc        = 20
+  # )
+  
+  #-----
+  
+  # clu2hmp(
+  #   fea_file = fea_file[["por"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_por-6cl/",
+  #   dset_dir = imp_dir,
+  #   cc       = 6,
+  #   cores    = 24
+  # )
+  # 
+  # hmp2rep(
+  #   rep_type  = c("scroll"),
+  #   rep_title = "Cluster Report: POR, 6 clusters",
+  #   clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_por-6cl/",
+  #   rep_fname = "cluster_report_por_6cl_som.html",
+  #   ff        = c("sAggrDRM"),
+  #   dd        = dd_sel_por,
+  #   mm        = c("som"),
+  #   cc        = 6
+  # )
+  
+  #-----
+  
+  # clu2hmp(
+  #   fea_file = fea_file[["all"]],
+  #   clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_all-40cl/",
+  #   dset_dir = imp_dir,
+  #   cc       = 40,
+  #   cores    = 8
+  # )
+  # 
+  # hmp2rep(
+  #   rep_type  = c("scroll"),
+  #   rep_title = "Cluster Report: ALL, 40 clusters",
+  #   clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng2_all-40cl/",
+  #   rep_fname = "cluster_report_all_40cl_som.html",
+  #   ff        = c("sAggrDRM"),
+  #   dd        = dd_sel_all,
+  #   mm        = c("som"),
+  #   cc        = 40
+  # )
+}
+
+
+# 2022.04.05 - Re-running all datasets using new clustering
+if (operation == 21) {
+  clu2hmp(
+    fea_file = fea_file[["iss"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_iss-16cl/",
+    dset_dir = imp_dir,
+    cc       = 16,
+    cores    = 24
+  )
+
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: ISS, 16 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_iss-16cl/",
+    rep_fname = "cluster_report_iss_16cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_iss,
+    mm        = c("som"),
+    cc        = 16
+  )
+  
+  #-----
+  
+  clu2hmp(
+    fea_file = fea_file[["goi4_pre"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_goi-pre-20cl/",
+    dset_dir = imp_dir,
+    cc       = 20,
+    cores    = 8
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: GOI-pre, 20 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_goi-pre-20cl/",
+    rep_fname = "cluster_report_goi-pre_20cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 20
+  )
+  
+  #-----
+  
+  clu2hmp(
+    fea_file = fea_file[["goi4_pst"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_goi-pst-20cl/",
+    dset_dir = imp_dir_goi4_pst,
+    cc       = 20,
+    cores    = 8
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: GOI-post, 20 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_goi-pst-20cl/",
+    rep_fname = "cluster_report_goi-pst_20cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 20
+  )
+  
+  #-----
+  
+  clu2hmp(
+    fea_file = fea_file[["por"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_por-6cl/",
+    dset_dir = imp_dir,
+    cc       = 6,
+    cores    = 24
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: POR, 6 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_por-6cl/",
+    rep_fname = "cluster_report_por_6cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_por,
+    mm        = c("som"),
+    cc        = 6
+  )
+  
+  #-----
+  
+  clu2hmp(
+    fea_file = fea_file[["all"]],
+    clu_dir  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_all-40cl/",
+    dset_dir = imp_dir,
+    cc       = 40,
+    cores    = 8
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: ALL, 40 clusters",
+    clu_dir   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.04.05_ng_all-40cl/",
+    rep_fname = "cluster_report_all_40cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_all,
+    mm        = c("som"),
+    cc        = 40
+  )
+}
+
 
 # 2022.04.04 - Scroll report for LCL
 if (operation == 20) {

@@ -383,15 +383,30 @@ get_heatmap_matrix <- function(fnames, .scale=TRUE) {
   # Flip matrix
   o_mean_mat <- o_mean_mat[nrow(o_mean_mat):1,]
   
+  # Create matrix from medians
+  o_median_mat <- apply(out, 2, matrixStats::rowMedians, na.rm=TRUE)
+  # Flip matrix
+  o_median_mat <- o_median_mat[nrow(o_median_mat):1,]
+  
   # Create matrix from standard deviations
   o_sd_mat <- apply(out, 2, matrixStats::rowSds, na.rm=TRUE)
   # Flip matrix
   o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
   
-  # Relative variance: just divide! 
-  o_rsd_mat <- o_sd_mat / o_mean_mat
+  # Create matrix from MADs
+  o_mad_mat <- apply(out, 2, matrixStats::rowMads, na.rm=TRUE)
+  # Flip matrix
+  o_mad_mat <- o_mad_mat[nrow(o_mad_mat):1,]
   
-  return(list(mean=o_mean_mat, sd=o_sd_mat, rsd=o_rsd_mat))
+  # Coefficient of variance: just divide! 
+  o_rsd_mat <- o_sd_mat / o_mean_mat
+  # o_rsd_mat[!is.finite(o_rsd_mat)] <- NA
+  # Coefficient of MAD (or whatever)
+  o_rmad_mat <- o_mad_mat / o_median_mat
+  # o_rmad_mat[!is.finite(o_rmad_mat)] <- NA
+  
+  return(list(mean=o_mean_mat, sd=o_sd_mat, rsd=o_rsd_mat,
+              median=o_median_mat, mad=o_mad_mat, rmad=o_rmad_mat))
 }
 
 ################################################################################
@@ -410,7 +425,8 @@ fit_distribution <- function(m) {
   names(out)<- distr_vect
   start_params <- list(mu=0, sigma=1, lambda=0, p=2, q=100)
   # Vector m
-  vectm <- as.vector(m)
+  vectm <- as.vector(m[is.finite(m)])
+  
   # Loop distributions
   for(dd in distr_vect) {
     if (dd != "sgt") {
@@ -478,7 +494,8 @@ plot_acf <- function(
   plot_height = 600,
   subtitle    = ""
 ) {
-  
+
+#  browser()
   # Format of output files
   if (format_file == "png")
     png(file_path, width = plot_width, height = plot_height)
@@ -486,7 +503,7 @@ plot_acf <- function(
     pdf(file_path, width = plot_width, height = plot_height)
   
   # Plot autocorrelation
-  plot(ggAcf(as.vector(m), lag.max = 168) + ggtitle(subtitle))
+  plot(ggAcf(as.vector(m), lag.max = 168) + ggplot2::ggtitle(subtitle))
   
   # Shutting down devices
   while(dev.off() != 1) {}
@@ -676,9 +693,12 @@ clValid2_heatmaps <- function(
     m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
     # Get distributions
     d <- list()
-    d$mean <- fit_distribution(m$mean)
-    d$sd   <- fit_distribution(m$sd)
-    d$rsd  <- fit_distribution(m$rsd)
+    d$mean   <- fit_distribution(m$mean)
+    d$sd     <- fit_distribution(m$sd)
+    d$rsd    <- fit_distribution(m$rsd)
+    d$median <- fit_distribution(m$median)
+    d$mad    <- fit_distribution(m$mad)
+    d$rmad   <- fit_distribution(m$rmad)
     
     # Cluster loop
     fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
@@ -693,22 +713,22 @@ clValid2_heatmaps <- function(
     # File paths: heatmaps (plots)
     hp_path <- c() 
     kp_path <- c()
-    for (ii in 1:3) {
+    for (ii in 1:6) {
       hp_path[ii] <- paste0(dir_names[["hmp"]], "hp", ii, "_", fname, ".png")
       kp_path[ii] <- paste0(dir_names[["hmp"]], "kp", ii, "_", fname, ".png")
     }
 
     # File paths: distributions (plots)
-    dp_path <- list(c(), c(), c())
+    dp_path <- list(c(), c(), c(), c(), c(), c())
     for (dd in 1:length(distr_vect)) {
-      for (ii in 1:3) {
+      for (ii in 1:6) {
         dp_path[[ii]][dd] <-
           paste0(dir_names[["distr"]], "dp", ii, "_", dd, "_", fname, ".png")
       }
     }
     # File paths: autocorrelations (plots)
     ap_path <- c()
-    for (ii in 1:3) {
+    for (ii in 1:6) {
       ap_path[ii] <- paste0(dir_names[["acf"]], "ap", ii, "_", fname, ".png")
     }
 
@@ -721,22 +741,22 @@ clValid2_heatmaps <- function(
     save(d, idx, file = dd_path)
     
     # Useful vectors
-    st   <- c("mean", "sd", "cvar")
-    hcol <- c("YlOrRd", "Blues", "Greens")
-    # Plot heatmaps: outliers are left blank
-    for(ii in 1:3) {
-      plot_heatmap_matrix(
-        m           = m[[ii]],
-        format_file = "png",
-        file_path   = hp_path[ii],
-        plot_width  = 1200,
-        plot_height = 900,
-        subtitle    = paste(st[ii], fname),
-        col_palette = hcol[ii]
-      )
-    }
+    st   <- c("mean", "sd", "cvar", "median", "mad", "rmad")
+    hcol <- c("YlOrRd", "Blues", "Greens", "YlOrRd", "Blues", "Greens")
+    # # Plot heatmaps: outliers are left blank
+    # for(ii in 1:6) {
+    #   plot_heatmap_matrix(
+    #     m           = m[[ii]],
+    #     format_file = "png",
+    #     file_path   = hp_path[ii],
+    #     plot_width  = 1200,
+    #     plot_height = 900,
+    #     subtitle    = paste(st[ii], fname),
+    #     col_palette = hcol[ii]
+    #   )
+    # }
     # Plot heatmaps: outliers are color-filled
-    for(ii in 1:3) {
+    for(ii in 1:6) {
       mm <- m[[ii]]
       mm[mm > 1] <- 1
       plot_heatmap_matrix(
@@ -750,7 +770,7 @@ clValid2_heatmaps <- function(
       )
     }
     # Plot distributions
-    for(ii in 1:3) {
+    for(ii in 1:6) {
       for(jj in 1:9) {
         if(!is.null(d[[ii]][[jj]])) {
           plot_distribution(
@@ -765,7 +785,7 @@ clValid2_heatmaps <- function(
       }
     }
     # Plot autocorrelations
-    for(ii in 1:3) {
+    for(ii in 1:6) {
       plot_acf(
         m           = m[[ii]],
         format_file = "png",
