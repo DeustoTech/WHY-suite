@@ -253,10 +253,33 @@ extract_metadata_por <- function(out) {
 ################################################################################
 
 extract_metadata_edrp <- function(out) {
+  # Identify current user
+  file_id <- strsplit(filename, ".csv")[[1]]
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$anonID == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["eprofile_class"]] <- dfs[[1]]$eProfileClass[idx]
+  out[["fuel_types"]]     <- dfs[[1]]$fuelTypes[idx]
+  out[["acorn_category"]] <- dfs[[1]]$ACORN_Category[idx]
+  out[["acorn_grouped"]]  <- dfs[[1]]$ACORN_Group[idx]
+  out[["acorn_type"]]     <- dfs[[1]]$ACORN_Type[idx]
+  out[["acorn_code"]]     <- dfs[[1]]$ACORN_Code[idx]
+  out[["acorn_description"]]     <- dfs[[1]]$ACORN_Description[idx]
+  out[["nuts4"]]          <- dfs[[1]]$NUTS4[idx]
+  out[["nuts1"]]          <- dfs[[1]]$NUTS1[idx]
+  out[["la_code"]]        <- dfs[[1]]$LACode[idx]
+  out[["gsp_group"]]      <- dfs[[1]]$gspGroup[idx]
+  out[["ldz"]]            <- dfs[[1]]$LDZ[idx]
+  out[["elec_tout"]]      <- dfs[[1]]$Elec_Tout[idx]
+  out[["gas_tout"]]       <- dfs[[1]]$Gas_Tout[idx]
+
   # Processed metadata
-  out[["mdata_file_idx"]] <- 0
+  out[["mdata_file_idx"]] <- idx
   out[["country"]] <- "gb"
-  out[["is_household"]] <- NA
+  out[["is_household"]] <- 1
   
   return(out)
 }
