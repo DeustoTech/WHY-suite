@@ -284,6 +284,38 @@ extract_metadata_edrp <- function(out) {
   return(out)
 }
 
+
+################################################################################
+# extract_metadata_save()
+################################################################################
+
+extract_metadata_save <- function(out) {
+  # Identify current user
+  # This is done using the final 9 characters of the navetasID variable and the BMG_ID variable from the household survey data.
+  file_id <- strsplit(filename, ".csv")[[1]]
+  file_id <- substr(file_id,3, nchar(file_id))
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$BMG_ID == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["pt1match"]]      <- dfs[[1]]$PT1match[idx]
+  out[["pt1match_new"]]  <- dfs[[1]]$PT1match_NEW[idx]
+  out[["intervention"]]  <- dfs[[1]]$Intervention[idx]
+  out[["outcome_label"]] <- dfs[[1]]$Outcome_Label[idx]
+  out[["opt_out_date"]]  <- dfs[[1]]$OptOutDate[idx]
+  out[["wgt_non_response"]]  <- dfs[[1]]$wgtNonResponse[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]] <- "gb"
+  out[["is_household"]] <- 1
+  
+  return(out)
+}
+
+
 ################################################################################
 # extract_metadata()
 ################################################################################
