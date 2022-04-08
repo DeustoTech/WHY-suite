@@ -24,7 +24,10 @@ get_samples_per_day <- function() {
     lcl  = 48, 
     nee  = 96,
     por  = 96,
-    ref  = 24
+    ref  = 24,
+    edrp = 48,
+    save = 96,
+    nesemp = 288 
   )
 }
 
@@ -306,6 +309,34 @@ extract_metadata_save <- function(out) {
   out[["outcome_label"]] <- dfs[[1]]$Outcome_Label[idx]
   out[["opt_out_date"]]  <- dfs[[1]]$OptOutDate[idx]
   out[["wgt_non_response"]]  <- dfs[[1]]$wgtNonResponse[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]] <- "gb"
+  out[["is_household"]] <- 1
+  
+  return(out)
+}
+
+
+
+################################################################################
+# extract_metadata_nesemp()
+################################################################################
+
+extract_metadata_nesemp <- function(out) {
+  # Identify current user
+  #household_xx_.csv
+  file_id <- strsplit(filename, ".csv")[[1]]
+  file_id <- strsplit(file_id, "household_")[[1]][2]
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$ID == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["zone"]]      <- dfs[[1]]$UR_2[idx]
+  out[["zone_type"]]      <- dfs[[1]]$UR_6[idx]
   
   # Processed metadata
   out[["mdata_file_idx"]] <- idx
