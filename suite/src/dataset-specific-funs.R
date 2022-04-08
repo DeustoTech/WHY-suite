@@ -27,7 +27,8 @@ get_samples_per_day <- function() {
     ref  = 24,
     edrp = 48,
     save = 96,
-    nesemp = 288 
+    nesemp = 288,
+    les = 1440
   )
 }
 
@@ -337,6 +338,34 @@ extract_metadata_nesemp <- function(out) {
   # Retrieve all columns in metadata file
   out[["zone"]]      <- dfs[[1]]$UR_2[idx]
   out[["zone_type"]]      <- dfs[[1]]$UR_6[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]] <- "gb"
+  out[["is_household"]] <- 1
+  
+  return(out)
+}
+
+
+################################################################################
+# extract_metadata_les()
+################################################################################
+
+extract_metadata_les <- function(out) {
+  # Identify current user
+  file_id <- strsplit(filename, ".csv")[[1]]
+  file_id <- strtoi(file_id)
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$METER_NUM == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["house_type"]]      <- dfs[[1]]$HOUSE_TYPE[idx]
+  out[["num_res_2007"]]    <- dfs[[1]]$NUM_RES_END_2007[idx]
+  out[["num_res_2009"]]    <- dfs[[1]]$P1_NUM_RES_START_2009[idx]
+
   
   # Processed metadata
   out[["mdata_file_idx"]] <- idx
