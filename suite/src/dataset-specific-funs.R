@@ -295,7 +295,8 @@ extract_metadata_edrp <- function(out) {
 
 extract_metadata_save <- function(out) {
   # Identify current user
-  # This is done using the final 9 characters of the navetasID variable and the BMG_ID variable from the household survey data.
+  # This is done using the final 9 characters of the navetasID variable and the
+  # BMG_ID variable from the household survey data.
   file_id <- strsplit(filename, ".csv")[[1]]
   file_id <- substr(file_id,3, nchar(file_id))
   out[["fname"]] <- file_id

@@ -10,7 +10,7 @@ source("suite_v01.R")
 
 # Raw folders
 raw_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw-test/",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
@@ -33,7 +33,7 @@ imp_dir_goi4_pst <- list(
 
 # Metadata files
 mdata_file <- list(
-  "edrp" = NULL,
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/meta/edrp_geography_data_v2.csv",
   "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
@@ -388,18 +388,18 @@ if (operation == 17) {
 
 # 2022.03.23 - EDRP test
 if (operation == 16) {
-  # raw2imp(
-  #   raw_dir    = raw_dir[["edrp"]],
-  #   imp_dir    = imp_dir[["edrp"]],
-  #   dset_key   = "edrp",
-  #   mdata_file = mdata_file[["edrp"]],
-  #   min_yrs    = 1
-  # )
-  
-  # imp2fea(
-  #   imp_dir = imp_dir[["edrp"]],
-  #   fea_dir = fea_dir[["edrp"]]
-  # )
+  raw2imp(
+    raw_dir    = raw_dir[["edrp"]],
+    imp_dir    = imp_dir[["edrp"]],
+    dset_key   = "edrp",
+    mdata_file = mdata_file[["edrp"]],
+    min_yrs    = 1
+  )
+
+  imp2fea(
+    imp_dir = imp_dir[["edrp"]],
+    fea_dir = fea_dir[["edrp"]]
+  )
   
   fea2clu(
     fea_file = fea_file[["edrp"]],
@@ -408,22 +408,22 @@ if (operation == 16) {
     dd_sel   = dd_sel_edrp,
     mm_sel   = c("som"),
     vv_sel   = c("internal"),
-    cc_sel   = 2
+    cc_sel   = 18
   )
   
   clu2hmp(
     fea_file = fea_file[["edrp"]],
     clu_dir  = clu_dir[["edrp"]],
     dset_dir = imp_dir,
-    cc       = 2,
-    cores    = 24
+    cc       = 18,
+    cores    = 16
   )
   
   hmp2rep(
-    rep_type  = c("sd"),
-    rep_title = "Cluster Report: EDRP, 2 clusters",
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: EDRP, 16 clusters, SOM",
     clu_dir   = clu_dir[["edrp"]],
-    rep_fname = "cluster_report_edrp_2cl_som.html",
+    rep_fname = "cluster_report_edrp_16cl_som.html",
     ff        = c("sAggrDRM"),
     dd        = dd_sel_edrp,
     mm        = c("som"),
