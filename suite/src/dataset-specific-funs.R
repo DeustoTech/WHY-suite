@@ -28,7 +28,8 @@ get_samples_per_day <- function() {
     edrp = 48,
     save = 96,
     nesemp = 288,
-    les = 1440
+    les = 1440,
+    sgsc = 48
   )
 }
 
@@ -378,6 +379,33 @@ extract_metadata_les <- function(out, dfs, filename) {
 
 
 ################################################################################
+# extract_metadata_sgsc()
+################################################################################
+
+extract_metadata_sgsc <- function(out, dfs, filename) {
+  # Identify current user
+  file_id <- strsplit(filename, ".csv")[[1]]
+  file_id <- strtoi(file_id)
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$CUSTOMER_KEY == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["customer_type"]]   <- dfs[[1]]$TRIAL_CUSTOMER_TYPE[idx]
+  out[["service_type"]]    <- dfs[[1]]$SERVICE_TYPE[idx]
+  out[["climate_zone"]]    <- dfs[[1]]$ASSRTD_CLIMATE_ZONE_DESC[idx]
+  out[["dwelling_type"]]    <- dfs[[1]]$ASSRTD_DWELLING_TYPE_CD[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]] <- "au"
+  out[["is_household"]] <- 1
+  
+  return(out)
+}
+
+################################################################################
 # extract_metadata()
 ################################################################################
 
@@ -410,6 +438,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   if (dset_key == "save") out <- extract_metadata_save(out, dfs, filename)
   if (dset_key == "nesemp") out <- extract_metadata_nesemp(out, dfs, filename)
   if (dset_key == "les")  out <- extract_metadata_les(out, dfs, filename)
+  if (dset_key == "sgsc")  out <- extract_metadata_sgsc(out, dfs, filename)
   
   return(out)
 }
