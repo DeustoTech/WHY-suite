@@ -278,6 +278,15 @@ extend_dataset_v2 <- function(
   packages <- c("tidyr", "lubridate")
   export <- c(
     "extract_metadata",
+    "extract_metadata_les",
+    "extract_metadata_nesemp",
+    "extract_metadata_save",
+    "extract_metadata_edrp",
+    "extract_metadata_por",
+    "extract_metadata_goi",
+    "extract_metadata_nee",
+    "extract_metadata_lcl",
+    "extract_metadata_iss",
     "get_raw_dataframe_from_dataset",
     "cook_raw_dataframe",
     "get_samples_per_day",

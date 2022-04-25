@@ -64,7 +64,7 @@ manage_times <- function(edf) {
 # extract_metadata_iss()
 ################################################################################
 
-extract_metadata_iss <- function(out) {
+extract_metadata_iss <- function(out, dfs, filename) {
   # Identify current user
   file_id <- strsplit(filename, ".csv")[[1]]
   out[["fname"]] <- file_id
@@ -90,7 +90,7 @@ extract_metadata_iss <- function(out) {
 # extract_metadata_lcl()
 ################################################################################
 
-extract_metadata_lcl <- function(out) {
+extract_metadata_lcl <- function(out, dfs, filename) {
   # Identify current user
   file_id <- strsplit(filename, ".csv")[[1]]
   out[["fname"]] <- file_id
@@ -117,7 +117,7 @@ extract_metadata_lcl <- function(out) {
 # extract_metadata_nee()
 ################################################################################
 
-extract_metadata_nee <- function(out) {
+extract_metadata_nee <- function(out, dfs, filename) {
   # Identify current user
   file_id <- strsplit(filename, "-Mains.csv")[[1]]
   out[["fname"]] <- file_id
@@ -146,7 +146,7 @@ extract_metadata_nee <- function(out) {
 # extract_metadata_goi()
 ################################################################################
 
-extract_metadata_goi <- function(out) {
+extract_metadata_goi <- function(out, dfs, filename) {
   # Identify current user
   cups <- strsplit(filename, ".csv")[[1]]
   out[["fname"]] <- cups
@@ -243,7 +243,7 @@ extract_metadata_goi <- function(out) {
 # extract_metadata_por()
 ################################################################################
 
-extract_metadata_por <- function(out) {
+extract_metadata_por <- function(out, dfs, filename) {
   # Processed metadata
   out[["mdata_file_idx"]] <- 0
   out[["country"]] <- "pt"
@@ -256,7 +256,7 @@ extract_metadata_por <- function(out) {
 # extract_metadata_edrp()
 ################################################################################
 
-extract_metadata_edrp <- function(out) {
+extract_metadata_edrp <- function(out, dfs, filename) {
   # Identify current user
   file_id <- strsplit(filename, ".csv")[[1]]
   out[["fname"]] <- file_id
@@ -293,7 +293,7 @@ extract_metadata_edrp <- function(out) {
 # extract_metadata_save()
 ################################################################################
 
-extract_metadata_save <- function(out) {
+extract_metadata_save <- function(out, dfs, filename) {
   # Identify current user
   # This is done using the final 9 characters of the navetasID variable and the
   # BMG_ID variable from the household survey data.
@@ -326,7 +326,7 @@ extract_metadata_save <- function(out) {
 # extract_metadata_nesemp()
 ################################################################################
 
-extract_metadata_nesemp <- function(out) {
+extract_metadata_nesemp <- function(out, dfs, filename) {
   # Identify current user
   #household_xx_.csv
   file_id <- strsplit(filename, ".csv")[[1]]
@@ -353,7 +353,7 @@ extract_metadata_nesemp <- function(out) {
 # extract_metadata_les()
 ################################################################################
 
-extract_metadata_les <- function(out) {
+extract_metadata_les <- function(out, dfs, filename) {
   # Identify current user
   file_id <- strsplit(filename, ".csv")[[1]]
   file_id <- strtoi(file_id)
@@ -395,17 +395,21 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   out[["num_of_samples"]] <- length(edf$df$values)
   out[["ts_start_date"]]  <- edf$df$times[1]
   out[["ts_end_date"]]    <- edf$df$times[nrow(edf$df)]
-  out[["ts_days"]]        <- as.numeric(edf$df$times[nrow(edf$df)] - edf$df$times[1])
+  out[["ts_days"]]        <-
+    as.numeric(edf$df$times[nrow(edf$df)] - edf$df$times[1])
   out[["abs_imputed_na"]] <- edf$number_of_na
   out[["rel_imputed_na"]] <- edf$number_of_na / length(edf$df$values)
   
   # ADD NEW DATASETS HERE!
-  if (dset_key == "lcl")  out <- extract_metadata_lcl(out)
-  if (dset_key == "iss")  out <- extract_metadata_iss(out)
-  if (dset_key == "nee")  out <- extract_metadata_nee(out)
-  if (dset_key == "goi")  out <- extract_metadata_goi(out)
-  if (dset_key == "por")  out <- extract_metadata_por(out)
-  if (dset_key == "edrp") out <- extract_metadata_edrp(out)
+  if (dset_key == "lcl")  out <- extract_metadata_lcl(out, dfs, filename)
+  if (dset_key == "iss")  out <- extract_metadata_iss(out, dfs, filename)
+  if (dset_key == "nee")  out <- extract_metadata_nee(out, dfs, filename)
+  if (dset_key == "goi")  out <- extract_metadata_goi(out, dfs, filename)
+  if (dset_key == "por")  out <- extract_metadata_por(out, dfs, filename)
+  if (dset_key == "edrp") out <- extract_metadata_edrp(out, dfs, filename)
+  if (dset_key == "save") out <- extract_metadata_save(out, dfs, filename)
+  if (dset_key == "nesemp") out <- extract_metadata_nesemp(out, dfs, filename)
+  if (dset_key == "les")  out <- extract_metadata_les(out, dfs, filename)
   
   return(out)
 }

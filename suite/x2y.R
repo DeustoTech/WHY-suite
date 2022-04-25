@@ -105,7 +105,7 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 22
+operation <- 16
 ################################################################################
 
 # 2022.04.05 - Re-running all datasets using new clustering (MEDIANS+MAD+RMAD)
