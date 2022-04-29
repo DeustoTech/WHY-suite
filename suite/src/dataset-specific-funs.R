@@ -29,7 +29,8 @@ get_samples_per_day <- function() {
     save = 96,
     nesemp = 288,
     les = 1440,
-    sgsc = 48
+    sgsc = 48,
+    greengrid = 1440
   )
 }
 
@@ -405,6 +406,35 @@ extract_metadata_sgsc <- function(out, dfs, filename) {
   return(out)
 }
 
+
+################################################################################
+# extract_metadata_greengrid()
+################################################################################
+
+extract_metadata_greengrid <- function(out, dfs, filename) {
+  # Identify current user
+  #rf_XX.csv
+  file_id <- strsplit(filename, ".csv")[[1]]
+  file_id <- strsplit(file_id, "rf_")[[1]][2]
+  file_id <- strtoi(file_id)
+  out[["fname"]] <- file_id
+
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$linkID == file_id)
+
+  # Retrieve all columns in metadata file
+  out[["n_adults"]]   <- dfs[[1]]$nAdults[idx]
+  out[["n_children0_12"]]    <- dfs[[1]]$nChildren0_12[idx]
+  out[["n_children13_18"]]    <- dfs[[1]]$nTeenagers13_18[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]] <- "nz"
+  out[["is_household"]] <- 1
+  
+  return(out)
+}
+
 ################################################################################
 # extract_metadata()
 ################################################################################
@@ -439,6 +469,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   if (dset_key == "nesemp") out <- extract_metadata_nesemp(out, dfs, filename)
   if (dset_key == "les")  out <- extract_metadata_les(out, dfs, filename)
   if (dset_key == "sgsc")  out <- extract_metadata_sgsc(out, dfs, filename)
+  if (dset_key == "greengrid")  out <- extract_metadata_greengrid(out, dfs, filename)
   
   return(out)
 }
