@@ -24,20 +24,35 @@ raw2imp <- function(
   from_date = "first",
   to_date   = "last",
   min_yrs   = 1,
-  wwgen     = FALSE
+  wwgen     = FALSE,
+  parallel  = TRUE
 ) {
   for(ss in raw2imp_src) source(paste(getwd(), "src", ss, sep="/"))
   print("## RAW TO IMPUTED ##")
-  extend_dataset_v2(
-    input_folder            = raw_dir,
-    output_folder           = imp_dir,
-    dset_key                = dset_key,
-    metadata_files          = mdata_file,
-    working_with_generation = wwgen,
-    min_years               = min_yrs,
-    from_date               = from_date,
-    to_date                 = to_date
-  )
+  
+  if (parallel) {
+	  extend_dataset_v2(
+		input_folder            = raw_dir,
+		output_folder           = imp_dir,
+		dset_key                = dset_key,
+		metadata_files          = mdata_file,
+		working_with_generation = wwgen,
+		min_years               = min_yrs,
+		from_date               = from_date,
+		to_date                 = to_date
+	  )
+  } else {
+  	  extend_dataset_v2_non_parallel(
+		input_folder            = raw_dir,
+		output_folder           = imp_dir,
+		dset_key                = dset_key,
+		metadata_files          = mdata_file,
+		working_with_generation = wwgen,
+		min_years               = min_yrs,
+		from_date               = from_date,
+		to_date                 = to_date
+	  )
+  }
 }
 
 ###############################

@@ -365,3 +365,103 @@ extend_dataset_v2 <- function(
   
   cat("\n")
 }
+
+################################################################################
+# extend_dataset_v2_non_parallel() - NON-PARALLEL VERSION!!
+################################################################################
+
+extend_dataset_v2_non_parallel <- function(
+  input_folder, output_folder, dset_key, metadata_files=NULL,
+  from_date="first", to_date="last", working_with_generation=FALSE, min_years = 1
+  ) {
+  
+  # Create folders if they do NOT exist
+  if (!dir.exists(output_folder)) dir.create(output_folder)
+  
+  # Get list of filenames in dataset folder
+  dset_filenames <- list.files(input_folder, pattern = "*.csv")
+  # Extract relevant data from metadata files (if any!)
+  if (!is.null(metadata_files)) {
+    # Load metadata dataframes into a big list
+    metadata_dataframes <- lapply(
+      metadata_files,
+      data.table::fread,
+      header     = TRUE,
+      sep        = ",",
+      na.strings = "",
+      encoding   = "UTF-8"
+    )
+  }
+  
+  # Progress bar
+  pb <- txtProgressBar(style=3)
+  # fnames length
+  length_fnames <- length(dset_filenames)
+  #print(length_fnames)
+  
+  # Analysis loop
+  for(x in 1:length_fnames) {
+    # Set progress bar
+    setTxtProgressBar(pb, x/length_fnames)
+    
+    # File name selection
+    dset_filename <- dset_filenames[x]
+    # Load raw dataframe from dataset and impute
+    file_path <- paste0(input_folder, dset_filename)
+    rdf <- get_raw_dataframe_from_dataset(file_path)
+    # GOIENER DATASETS ONLY
+    if (!working_with_generation) {
+      rdf <- rdf[,1:2]
+    } else {
+      rdf <- rdf[,c(1,3)]
+      names(rdf) <- c("times", "values")
+    }
+	### HERE IS THE tidyr::complete() FUNCTION (Complete gaps with NAs)
+    cdf <- cook_raw_dataframe(
+      raw_df    = rdf,
+      from_date = from_date, 
+      to_date   = to_date, 
+      dset_key  = dset_key, 
+      filename  = dset_filename
+    )
+    # If cdf is NULL OR samples are NOT equally distributed in time, SKIP
+    if (!is.null(cdf) & length(table(diff(cdf$df$times))) == 1) {
+      # Get length
+      initial_date   <- cdf$df[1,1]
+      final_date     <- cdf$df[nrow(cdf$df),1]
+      # length_in_days <- as.numeric(final_date - initial_date)
+      length_in_years <- 
+        lubridate::interval(initial_date,final_date)/lubridate::years(1)
+      # If TS is longer than min_years, impute; ELSE discard
+      if (length_in_years >= min_years) {
+        edf <- impute_cooked_dataframe(
+          cdf       = cdf, 
+          season    = cdf$seasonal_periods[1] * 7, 
+          short_gap = cdf$seasonal_periods[1] / 3
+        )
+        if (!is.null(edf)) {
+          # Save dataframe in output folder
+          path <- paste0(
+            output_folder, strsplit(dset_filename, ".csv")[[1]], ".RData"
+          )
+          # Extract metadata
+          metadata_list <- extract_metadata(
+            edf      = edf,
+            dfs      = metadata_dataframes,
+            dset_key = dset_key,
+            filename = dset_filename
+          )
+          # Append metadata
+          edf <- append(edf, metadata_list)
+          
+          # MANAGE DST AND TZ
+          edf <- manage_times(edf)
+          
+          save(edf, file=path)
+        }
+      }
+    }
+  }
+  
+  cat("\n")
+}

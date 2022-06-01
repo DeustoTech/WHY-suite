@@ -270,7 +270,6 @@ extract_metadata_edrp <- function(out, dfs, filename) {
   out[["acorn_category"]] <- dfs[[1]]$ACORN_Category[idx]
   out[["acorn_grouped"]]  <- dfs[[1]]$ACORN_Group[idx]
   out[["acorn_type"]]     <- dfs[[1]]$ACORN_Type[idx]
-  out[["acorn_code"]]     <- dfs[[1]]$ACORN_Code[idx]
   out[["acorn_description"]]     <- dfs[[1]]$ACORN_Description[idx]
   out[["nuts4"]]          <- dfs[[1]]$NUTS4[idx]
   out[["nuts1"]]          <- dfs[[1]]$NUTS1[idx]

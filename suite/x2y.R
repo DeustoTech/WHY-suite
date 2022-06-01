@@ -11,6 +11,7 @@ source("suite_v01.R")
 # Raw folders
 raw_dir <- list(
   "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw/",
+  "goi4" = "/home/ubuntu/carlos.quesada/disk/goi4/raw/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
@@ -19,22 +20,19 @@ raw_dir <- list(
 
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
-  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
-  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
-  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/"
-)
-
-imp_dir_goi4_pst <- list(
-  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/"
+  "edrp"     = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/",
+  "iss"      = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "lcl"      = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "nee"      = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
+  "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/"
 )
 
 # Metadata files
 mdata_file <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/meta/edrp_geography_data_v2.csv",
-  "goi"  = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/meta/edrp_geography_data_v3.csv",
+  "goi4" = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
@@ -43,7 +41,7 @@ mdata_file <- list(
 
 # Feature folders
 fea_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/",
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.06.01/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
@@ -105,8 +103,26 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 16
+operation <- 31
 ################################################################################
+
+
+# 2022.03.23 - EDRP raw2fea
+if (operation == 31) {
+  # raw2imp(
+  #   raw_dir    = raw_dir[["edrp"]],
+  #   imp_dir    = imp_dir[["edrp"]],
+  #   dset_key   = "edrp",
+  #   mdata_file = mdata_file[["edrp"]],
+  #   min_yrs    = 1
+  # )
+
+  imp2fea(
+    imp_dir = imp_dir[["edrp"]],
+    fea_dir = fea_dir[["edrp"]]
+  )
+}
+
 
 # 2022.04.05 - Re-running all datasets using new clustering (MEDIANS+MAD+RMAD)
 if (operation == 22) {
