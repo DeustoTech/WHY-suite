@@ -287,6 +287,7 @@ extend_dataset_v2 <- function(
     "extract_metadata_nee",
     "extract_metadata_lcl",
     "extract_metadata_iss",
+    "extract_metadata_sgsc",
     "get_raw_dataframe_from_dataset",
     "cook_raw_dataframe",
     "get_samples_per_day",

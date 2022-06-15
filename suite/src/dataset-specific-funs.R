@@ -18,17 +18,17 @@
 
 get_samples_per_day <- function() {
   list(
-    edrp = 48,
-    goi  = 24, 
-    iss  = 48, 
-    lcl  = 48, 
-    nee  = 96,
-    por  = 96,
-    ref  = 24,
-    edrp = 48,
-    save = 96,
+    edrp   = 48,
+    goi    = 24, 
+    iss    = 48, 
+    lcl    = 48,
+    les    = 1440,
+    nee    = 96,
     nesemp = 288,
-    les = 1440
+    por    = 96,
+    ref    = 24,
+    save   = 96,
+    sgsc   = 48
   )
 }
 
@@ -46,6 +46,12 @@ manage_times <- function(edf) {
     edf <- correct_dst(edf, "Europe/London")
   }
   
+  # SGSC
+  if (edf$dset_key == "sgsc") {
+    edf <- correct_dst(edf, "Australia/Sydney")
+    edf$df$times <- edf$df$times + days(182)
+  }
+  
   # NEE 
   if (edf$dset_key == "nee") {
     # Correct DST (daylight saving time)
@@ -58,6 +64,30 @@ manage_times <- function(edf) {
   }
   
   return(edf)
+}
+
+################################################################################
+# extract_metadata_sgsc()
+################################################################################
+
+extract_metadata_sgsc <- function(out, dfs, filename) {
+  # Identify current user
+  file_id <- strsplit(filename, ".csv")[[1]]
+  out[["fname"]] <- file_id
+  
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$customer_key == file_id)
+  
+  # Retrieve all columns in metadata file
+  out[["climate_zone"]]  <- dfs[[1]]$climate_zone[idx]
+  out[["dwelling_type"]] <- dfs[[1]]$dwelling_type[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]]        <- "au"
+  out[["is_household"]]   <- 1
+  
+  return(out)
 }
 
 ################################################################################
@@ -400,6 +430,11 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   out[["rel_imputed_na"]] <- edf$number_of_na / length(edf$df$values)
   
   # ADD NEW DATASETS HERE!
+  
+  ##############################################################################
+  # SUPER IMPORTANT !
+  # INCLUDE FUNCTION NAME ALSO IN "raw2imp.R > extend_dataset_v2" !!!
+  ##############################################################################
   if (dset_key == "lcl")  out <- extract_metadata_lcl(out, dfs, filename)
   if (dset_key == "iss")  out <- extract_metadata_iss(out, dfs, filename)
   if (dset_key == "nee")  out <- extract_metadata_nee(out, dfs, filename)
@@ -409,6 +444,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   if (dset_key == "save") out <- extract_metadata_save(out, dfs, filename)
   if (dset_key == "nesemp") out <- extract_metadata_nesemp(out, dfs, filename)
   if (dset_key == "les")  out <- extract_metadata_les(out, dfs, filename)
+  if (dset_key == "sgsc") out <- extract_metadata_sgsc(out, dfs, filename)
   
   return(out)
 }

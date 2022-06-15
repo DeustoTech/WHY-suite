@@ -15,7 +15,8 @@ raw_dir <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/raw/"
 )
 
 # Imputation folders # AS IS IN clu2hmp!
@@ -26,7 +27,8 @@ imp_dir <- list(
   "iss"      = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
-  "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/"
+  "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/"
 )
 
 # Metadata files
@@ -36,7 +38,8 @@ mdata_file <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
-  "por"  = NULL
+  "por"  = NULL,
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/meta/metadata.csv"
 )
 
 # Feature folders
@@ -45,7 +48,8 @@ fea_dir <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/"
+  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.02/"
 )
 
 # Feature files
@@ -57,7 +61,8 @@ fea_file <- list(
   "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
-  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv"
+  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.02/feats.csv"
 )
 
 # Cluster folders (ClValid2)
@@ -71,12 +76,16 @@ clu_dir <- list(
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
-  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/"
+  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.03_sgsc-australia-check/"
 )
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
 # Each NULL element within the sublist means ALL TRUE.
+dd_sel_sgsc  <- list(
+  list(key="sgsc", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 dd_sel_edrp  <- list(
   list(key="edrp", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
@@ -103,19 +112,66 @@ dd_sel_all  <- list(
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 ################################################################################
-operation <- 31
+operation <- 32
 ################################################################################
+
+
+# 2022.03.23 - SGSC test
+if (operation == 32) {
+  # raw2imp(
+  #   raw_dir    = raw_dir[["sgsc"]],
+  #   imp_dir    = imp_dir[["sgsc"]],
+  #   dset_key   = "sgsc",
+  #   mdata_file = mdata_file[["sgsc"]],
+  #   min_yrs    = 1,
+  #   parallel   = TRUE
+  # )
+
+  imp2fea(
+    imp_dir = imp_dir[["sgsc"]],
+    fea_dir = fea_dir[["sgsc"]]
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["sgsc"]],
+    clu_dir  = clu_dir[["sgsc"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_sgsc,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["sgsc"]],
+    clu_dir  = clu_dir[["sgsc"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: SGSC, 4 TEST clusters, SOM",
+    clu_dir   = clu_dir[["sgsc"]],
+    rep_fname = "cluster_report_sgsc_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_sgsc,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
 
 
 # 2022.03.23 - EDRP raw2fea
 if (operation == 31) {
-  # raw2imp(
-  #   raw_dir    = raw_dir[["edrp"]],
-  #   imp_dir    = imp_dir[["edrp"]],
-  #   dset_key   = "edrp",
-  #   mdata_file = mdata_file[["edrp"]],
-  #   min_yrs    = 1
-  # )
+  raw2imp(
+    raw_dir    = raw_dir[["edrp"]],
+    imp_dir    = imp_dir[["edrp"]],
+    dset_key   = "edrp",
+    mdata_file = mdata_file[["edrp"]],
+    min_yrs    = 1
+  )
 
   imp2fea(
     imp_dir = imp_dir[["edrp"]],
