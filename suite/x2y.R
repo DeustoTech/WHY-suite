@@ -22,13 +22,21 @@ raw_dir <- list(
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- list(
   "edrp"     = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
-  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
-  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/",
   "iss"      = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
   "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/",
   "sgsc"     = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/"
+)
+
+imp_goi_pre <- list(
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/"
+)
+imp_goi_in <- list(
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_in/imp/"
+)
+imp_goi_pst <- list(
+  "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/"
 )
 
 # Metadata files
@@ -49,20 +57,24 @@ fea_dir <- list(
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.02/"
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.28/",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/",
+  "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/"
 )
 
 # Feature files
 fea_file <- list(
   "all"      = "/home/ubuntu/carlos.quesada/disk/features/feats_v2.00.csv",
   "edrp"     = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/feats.csv",
-  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pre.csv",
-  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/feats_go4_pst.csv",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/feats.csv",
+  "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/feats.csv",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/feats.csv",
   "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
   "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.02/feats.csv"
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.28/feats.csv"
 )
 
 # Cluster folders (ClValid2)
@@ -71,13 +83,14 @@ clu_dir <- list(
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
   "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
-  "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pre-20cl-som/",
-  "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.21_go4-pst-20cl-som/",
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.21_goi4_pre_20cl/",
+  "goi4_in"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.21_goi4_in_20cl/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.21_goi4_pst_20cl/",
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
   "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.03_sgsc-australia-check/"
+  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.28_sgsc-australia-check/"
 )
 
 # Instructions for "dd_sel" variable:
@@ -115,17 +128,211 @@ dd_sel_all  <- list(
 operation <- 32
 ################################################################################
 
+# 2022.06.22 - GOI4 - fea2report
+if (operation == 36) {
+  fea2clu(
+    fea_file = fea_file[["goi4_pre"]],
+    clu_dir  = clu_dir[["goi4_pre"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_goi4,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 30
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["goi4_pre"]],
+    clu_dir  = clu_dir[["goi4_pre"]],
+    dset_dir = imp_goi_pre,
+    cc       = 30,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: GoiEner 4 PRE, 30 clusters, SOM",
+    clu_dir   = clu_dir[["goi4_pre"]],
+    rep_fname = "cluster_report_goi4pre_30cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 30
+  )
+  
+  # -----
+  
+  fea2clu(
+    fea_file = fea_file[["goi4_in"]],
+    clu_dir  = clu_dir[["goi4_in"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_goi4,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 30
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["goi4_in"]],
+    clu_dir  = clu_dir[["goi4_in"]],
+    dset_dir = imp_goi_in,
+    cc       = 30,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: GoiEner 4 IN, 30 clusters, SOM",
+    clu_dir   = clu_dir[["goi4_in"]],
+    rep_fname = "cluster_report_goi4in_30cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 30
+  )
+  
+  # -----
+  
+  fea2clu(
+    fea_file = fea_file[["goi4_pst"]],
+    clu_dir  = clu_dir[["goi4_pst"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_goi4,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 30
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["goi4_pst"]],
+    clu_dir  = clu_dir[["goi4_pst"]],
+    dset_dir = imp_goi_pst,
+    cc       = 30,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: GoiEner 4 POST, 30 clusters, SOM",
+    clu_dir   = clu_dir[["goi4_pst"]],
+    rep_fname = "cluster_report_goi4pst_30cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_goi4,
+    mm        = c("som"),
+    cc        = 30
+  )
+}
+
+# 2022.06.22 - GOI4 - imp2fea
+if (operation == 35) {
+  # raw2imp(
+    # raw_dir    = raw_dir[["goi4"]],
+    # imp_dir    = imp_dir[["goi4_in"]],
+    # dset_key   = "goi",
+    # mdata_file = mdata_file[["goi4"]],
+    # from_date  = "2020-03-01",
+    # to_date    = "2021-05-31",
+    # min_yrs    = 1,
+    # wwgen      = FALSE,
+    # parallel   = TRUE
+  # )
+  
+  # raw2imp(
+    # raw_dir    = raw_dir[["goi4"]],
+    # imp_dir    = imp_dir[["goi4_pst"]],
+    # dset_key   = "goi",
+    # mdata_file = mdata_file[["goi4"]],
+    # from_date  = "2021-05-31",
+    # to_date    = "last",
+    # min_yrs    = 1,
+    # wwgen      = FALSE,
+    # parallel   = TRUE
+  # )
+  
+  # imp2fea(
+    # imp_dir = imp_dir[["goi4_in"]],
+    # fea_dir = fea_dir[["goi4_in"]]
+  # )
+  
+  imp2fea(
+    imp_dir = imp_dir[["goi4_pst"]],
+    fea_dir = fea_dir[["goi4_pst"]]
+  )
+}
+
+
+# 2022.06.22 - GOI4 - imp2fea
+if (operation == 34) {
+  raw2imp(
+    raw_dir    = raw_dir[["goi4"]],
+    imp_dir    = imp_dir[["goi4_pst"]],
+    dset_key   = "goi",
+    mdata_file = mdata_file[["goi4"]],
+    from_date  = "2020-03-01",
+    to_date    = "last",
+    min_yrs    = 1,
+    wwgen      = FALSE,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["goi4_pre"]],
+    fea_dir = fea_dir[["goi4_pre"]]
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["goi4_pst"]],
+    fea_dir = fea_dir[["goi4_pst"]]
+  )
+}
+
+# 2022.06.22 - GOI4 - raw2imp
+if (operation == 33) {
+  # raw2imp(
+  #   raw_dir    = raw_dir[["goi4"]],
+  #   imp_dir    = imp_dir[["goi4_pre"]],
+  #   dset_key   = "goi",
+  #   mdata_file = mdata_file[["goi4"]],
+  #   from_date  = "first",
+  #   to_date    = ymd("2020-03-01"),
+  #   min_yrs    = 1,
+  #   wwgen      = FALSE,
+  #   parallel   = TRUE
+  # )
+  
+  # raw2imp(
+    # raw_dir    = raw_dir[["goi4"]],
+    # imp_dir    = imp_dir[["goi4_pst"]],
+    # dset_key   = "goi",
+    # mdata_file = mdata_file[["goi4"]],
+    # from_date  = "2020-03-01",
+    # to_date    = "last",
+    # min_yrs    = 1,
+    # wwgen      = FALSE,
+    # parallel   = TRUE
+  # )
+  
+  # imp2fea(
+    # imp_dir = imp_dir[["goi4_pre"]],
+    # fea_dir = fea_dir[["goi4_pre"]]
+  # )
+  
+  imp2fea(
+    imp_dir = imp_dir[["goi4_pst"]],
+    fea_dir = fea_dir[["goi4_pst"]]
+  )
+}
+
 
 # 2022.03.23 - SGSC test
 if (operation == 32) {
-  # raw2imp(
-  #   raw_dir    = raw_dir[["sgsc"]],
-  #   imp_dir    = imp_dir[["sgsc"]],
-  #   dset_key   = "sgsc",
-  #   mdata_file = mdata_file[["sgsc"]],
-  #   min_yrs    = 1,
-  #   parallel   = TRUE
-  # )
+  raw2imp(
+    raw_dir    = raw_dir[["sgsc"]],
+    imp_dir    = imp_dir[["sgsc"]],
+    dset_key   = "sgsc",
+    mdata_file = mdata_file[["sgsc"]],
+    min_yrs    = 1,
+    parallel   = TRUE
+  )
 
   imp2fea(
     imp_dir = imp_dir[["sgsc"]],

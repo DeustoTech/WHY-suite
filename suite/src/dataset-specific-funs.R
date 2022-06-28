@@ -51,8 +51,9 @@ manage_times <- function(edf) {
   
   # SGSC
   if (edf$dset_key == "sgsc") {
-    edf <- correct_dst(edf, "Australia/Sydney")
+    edf <- correct_dst(edf, "Australia/Melbourne")
     edf$df$times <- edf$df$times + days(182)
+    edf <- correct_tz(edf, 10)
   }
   
   # NEE 
