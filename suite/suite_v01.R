@@ -62,7 +62,8 @@ imp2fea <- function(
   imp_dir,
   fea_dir,
   analysis = "extra",
-  max_feats = 1000
+  max_feats = 1000,
+  limited_to = NULL
 ) {
   source(paste(getwd(), "src", imp2fea_src, sep="/"))
   print("## IMPUTED TO FEATURES ##")
@@ -70,7 +71,8 @@ imp2fea <- function(
     input_folder     = imp_dir,
     output_path      = fea_dir,
     type_of_analysis = analysis,
-    max_feats        = max_feats
+    max_feats        = max_feats,
+    limited_to       = limited_to
   )
 }
 

@@ -1317,7 +1317,7 @@ post_features <- function(o) {
 # get_features()
 ################################################################################
 get_features <- function(input_folder, output_path, type_of_analysis = "extra",
-                         max_feats = 7000) {
+                         max_feats = 7000, limited_to = NULL) {
   
   # Create folders if they do NOT exist
   if (!dir.exists(output_path)) dir.create(output_path)
@@ -1332,8 +1332,25 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra",
     )
   }
   
+  packages <- c(
+    "tsfeatures", "moments", "forecast", "stats", "lubridate", "stringr",
+    "utils"
+  )
+  export <- c(
+    "stat_moments", "quantiles", "stat_data_aggregates", "daily_acf", 
+    "get_bins", "catch22_features", "get_seasonal_features_from_timeseries",
+    "get_feature_names", "get_peak_times", "stat_data_aggregates",
+    "get_expected_bins", "get_timeseries_from_cooked_dataframe",
+    "get_extrema_dates_from_timeseries", "get_features_from_cooked_dataframe",
+    "get_features_from_raw_datasets", "get_hourly_data"
+  )
+  
   # SEQUENCING
-  length_fpaths <- length(fpaths)
+  if (is.null(limited_to)) {
+    length_fpaths <- length(fpaths)
+  } else {
+    length_fpaths <- limited_to
+  }
   SS_seq <- c(seq(0, length_fpaths, max_feats), length_fpaths)
   for (SS in 1:(length(SS_seq)-1)) {
     
@@ -1344,19 +1361,6 @@ get_features <- function(input_folder, output_path, type_of_analysis = "extra",
     
     # Progress bar
     pb <- txtProgressBar(style=3)
-    
-    packages <- c(
-      "tsfeatures", "moments", "forecast", "stats", "lubridate", "stringr",
-      "utils"
-    )
-    export <- c(
-      "stat_moments", "quantiles", "stat_data_aggregates", "daily_acf", 
-      "get_bins", "catch22_features", "get_seasonal_features_from_timeseries",
-      "get_feature_names", "get_peak_times", "stat_data_aggregates",
-      "get_expected_bins", "get_timeseries_from_cooked_dataframe",
-      "get_extrema_dates_from_timeseries", "get_features_from_cooked_dataframe",
-      "get_features_from_raw_datasets", "get_hourly_data"
-    )
     
     o <- foreach::foreach(
       x         = (SS_seq[SS]+1):SS_seq[SS+1],

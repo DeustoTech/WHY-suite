@@ -53,7 +53,7 @@ manage_times <- function(edf) {
   if (edf$dset_key == "sgsc") {
     edf <- correct_dst(edf, "Australia/Melbourne")
     edf$df$times <- edf$df$times + days(182)
-    edf <- correct_tz(edf, 10)
+    edf <- correct_tz(edf, -9)
   }
   
   # NEE 
@@ -80,7 +80,7 @@ extract_metadata_sgsc <- function(out, dfs, filename) {
   out[["fname"]] <- file_id
   
   # Retrieve index in metadata file
-  idx <- which(dfs[[1]]$customer_key == file_id)
+  idx <- which(dfs[[1]]$customer_key == as.numeric(file_id))
   
   # Retrieve all columns in metadata file
   out[["climate_zone"]]  <- dfs[[1]]$climate_zone[idx]
@@ -354,7 +354,6 @@ extract_metadata_save <- function(out, dfs, filename) {
 }
 
 
-
 ################################################################################
 # extract_metadata_nesemp()
 ################################################################################
@@ -414,28 +413,28 @@ extract_metadata_les <- function(out, dfs, filename) {
 # extract_metadata_sgsc()
 ################################################################################
 
-extract_metadata_sgsc <- function(out, dfs, filename) {
-  # Identify current user
-  file_id <- strsplit(filename, ".csv")[[1]]
-  file_id <- strtoi(file_id)
-  out[["fname"]] <- file_id
-
-  # Retrieve index in metadata file
-  idx <- which(dfs[[1]]$CUSTOMER_KEY == file_id)
-
-  # Retrieve all columns in metadata file
-  out[["customer_type"]]   <- dfs[[1]]$TRIAL_CUSTOMER_TYPE[idx]
-  out[["service_type"]]    <- dfs[[1]]$SERVICE_TYPE[idx]
-  out[["climate_zone"]]    <- dfs[[1]]$ASSRTD_CLIMATE_ZONE_DESC[idx]
-  out[["dwelling_type"]]    <- dfs[[1]]$ASSRTD_DWELLING_TYPE_CD[idx]
-  
-  # Processed metadata
-  out[["mdata_file_idx"]] <- idx
-  out[["country"]] <- "au"
-  out[["is_household"]] <- 1
-  
-  return(out)
-}
+# extract_metadata_sgsc <- function(out, dfs, filename) {
+#   # Identify current user
+#   file_id <- strsplit(filename, ".csv")[[1]]
+#   file_id <- strtoi(file_id)
+#   out[["fname"]] <- file_id
+# 
+#   # Retrieve index in metadata file
+#   idx <- which(dfs[[1]]$CUSTOMER_KEY == file_id)
+# 
+#   # Retrieve all columns in metadata file
+#   out[["customer_type"]]   <- dfs[[1]]$TRIAL_CUSTOMER_TYPE[idx]
+#   out[["service_type"]]    <- dfs[[1]]$SERVICE_TYPE[idx]
+#   out[["climate_zone"]]    <- dfs[[1]]$ASSRTD_CLIMATE_ZONE_DESC[idx]
+#   out[["dwelling_type"]]    <- dfs[[1]]$ASSRTD_DWELLING_TYPE_CD[idx]
+#   
+#   # Processed metadata
+#   out[["mdata_file_idx"]] <- idx
+#   out[["country"]] <- "au"
+#   out[["is_household"]] <- 1
+#   
+#   return(out)
+# }
 
 
 ################################################################################

@@ -16,17 +16,19 @@ raw_dir <- list(
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
+  "save" = "/home/ubuntu/carlos.quesada/disk/save/raw/",
   "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/raw/"
 )
 
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- list(
-  "edrp"     = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
-  "iss"      = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
-  "lcl"      = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
-  "nee"      = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
-  "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/"
+  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
+  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
+  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
+  "save" = "/home/ubuntu/carlos.quesada/disk/save/imp/",
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/"
 )
 
 imp_goi_pre <- list(
@@ -47,6 +49,7 @@ mdata_file <- list(
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
   "por"  = NULL,
+  "save" = "/home/ubuntu/carlos.quesada/disk/save/meta/metadata.csv",
   "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/meta/metadata.csv"
 )
 
@@ -57,7 +60,8 @@ fea_dir <- list(
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.28/",
+  "save" = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/",
+  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/",
   "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/"
@@ -74,7 +78,8 @@ fea_file <- list(
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
   "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.28/feats.csv"
+  "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/feats.csv",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv"
 )
 
 # Cluster folders (ClValid2)
@@ -90,12 +95,16 @@ clu_dir <- list(
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
   "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.28_sgsc-australia-check/"
+  "save"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.30_save-4cl/",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.29_sgsc-australia-check/"
 )
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
 # Each NULL element within the sublist means ALL TRUE.
+dd_sel_save  <- list(
+  list(key="save", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 dd_sel_sgsc  <- list(
   list(key="sgsc", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
@@ -124,9 +133,56 @@ dd_sel_all  <- list(
   list(key="lcl", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
+
+###############################################################################
+operation <- 37
 ################################################################################
-operation <- 32
-################################################################################
+
+# 2022.06.30 - SAVE
+if (operation == 37) {
+  raw2imp(
+    raw_dir    = raw_dir[["save"]],
+    imp_dir    = imp_dir[["save"]],
+    dset_key   = "save",
+    mdata_file = mdata_file[["save"]],
+    min_yrs    = 1,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["save"]],
+    fea_dir = fea_dir[["save"]]
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["save"]],
+    clu_dir  = clu_dir[["save"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_save,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["save"]],
+    clu_dir  = clu_dir[["save"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: SAVE, 4 clusters, SOM",
+    clu_dir   = clu_dir[["save"]],
+    rep_fname = "cluster_report_save_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_save,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
 
 # 2022.06.22 - GOI4 - fea2report
 if (operation == 36) {
