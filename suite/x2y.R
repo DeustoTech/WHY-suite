@@ -13,6 +13,7 @@ raw_dir <- list(
   "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw/",
   "goi4" = "/home/ubuntu/carlos.quesada/disk/goi4/raw/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
+  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/raw/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
@@ -24,6 +25,7 @@ raw_dir <- list(
 imp_dir <- list(
   "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/imp/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
@@ -49,6 +51,7 @@ mdata_file <- list(
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
   "por"  = NULL,
+  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/meta/metadata.csv",
   "save" = "/home/ubuntu/carlos.quesada/disk/save/meta/metadata.csv",
   "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/meta/metadata.csv"
 )
@@ -57,6 +60,7 @@ mdata_file <- list(
 fea_dir <- list(
   "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.06.01/",
   "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
+  "kag"  = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
   "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
   "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
@@ -79,7 +83,8 @@ fea_file <- list(
   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
   "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
   "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/feats.csv",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv"
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv",
+  "kag"      = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/feats.csv",
 )
 
 # Cluster folders (ClValid2)
@@ -92,6 +97,7 @@ clu_dir <- list(
   "goi4_in"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.21_goi4_in_20cl/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.21_goi4_pst_20cl/",
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
+  "kag"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.02_kag-4cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
   "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
   "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
@@ -101,7 +107,10 @@ clu_dir <- list(
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
-# Each NULL element within the sublist means ALL TRUE.
+# Each NULL element within the sublist means ALL TRUE
+dd_sel_kag  <- list(
+  list(key="kag", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 dd_sel_save  <- list(
   list(key="save", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
@@ -135,25 +144,77 @@ dd_sel_all  <- list(
 )
 
 ###############################################################################
-operation <- 37
+operation <- 38
 ################################################################################
 
-# 2022.06.30 - SAVE
-if (operation == 37) {
+# 2022.07.02 - Kaggle
+if (operation == 38) {
   raw2imp(
-    raw_dir    = raw_dir[["save"]],
-    imp_dir    = imp_dir[["save"]],
-    dset_key   = "save",
-    mdata_file = mdata_file[["save"]],
+    raw_dir    = raw_dir[["kag"]],
+    imp_dir    = imp_dir[["kag"]],
+    dset_key   = "kag",
+    mdata_file = mdata_file[["kag"]],
     min_yrs    = 1,
     parallel   = TRUE
   )
-  
+
   imp2fea(
-    imp_dir = imp_dir[["save"]],
-    fea_dir = fea_dir[["save"]],
-	  max_feats = 1000
+    imp_dir = imp_dir[["kag"]],
+    fea_dir = fea_dir[["kag"]],
+    max_feats = 1000
   )
+  
+  fea2clu(
+    fea_file = fea_file[["kag"]],
+    clu_dir  = clu_dir[["kag"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_kag,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["kag"]],
+    clu_dir  = clu_dir[["kag"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: Kaggle, 4 clusters, SOM",
+    clu_dir   = clu_dir[["kag"]],
+    rep_fname = "cluster_report_kag_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_kag,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
+
+
+# 2022.06.30 - SAVE
+if (operation == 37) {
+  # raw2imp(
+    # raw_dir    = raw_dir[["save"]],
+    # imp_dir    = imp_dir[["save"]],
+    # dset_key   = "save",
+    # mdata_file = mdata_file[["save"]],
+    # min_yrs    = 1,
+    # parallel   = TRUE
+  # )
+  
+  # imp2fea(
+    # imp_dir = imp_dir[["save"]],
+    # fea_dir = fea_dir[["save"]],
+	  # max_feats = 1000
+  # )
+  
+  source("src/imp2fea.R")
+  library(dplyr)
+  post_features(fea_dir[["save"]])
   
   fea2clu(
     fea_file = fea_file[["save"]],

@@ -18,20 +18,19 @@
 
 get_samples_per_day <- function() {
   list(
-    edrp   = 48,
-    goi    = 24,
+    edrp      = 48,
+    goi       = 24,
     greengrid = 1440,
-    iss    = 48, 
-    lcl    = 48,
-    les    = 1440,
-    nee    = 96,
-    nesemp = 288,
-    por    = 96,
-    ref    = 24,
-    save   = 96,
-    sgsc   = 48,
-    les    = 1440,
-    sgsc   = 48
+    iss       = 48, 
+    kag       = 24, 
+    lcl       = 48,
+    les       = 1440,
+    nee       = 96,
+    nesemp    = 288,
+    por       = 96,
+    ref       = 24,
+    save      = 96,
+    sgsc      = 48,
   )
 }
 
@@ -68,6 +67,33 @@ manage_times <- function(edf) {
   }
   
   return(edf)
+}
+
+################################################################################
+# extract_metadata_kag()
+################################################################################
+
+extract_metadata_kag <- function(out, dfs, filename) {
+  # Identify current user
+  file_id <- strsplit(filename, ".csv")[[1]]
+  out[["fname"]] <- file_id
+  
+  # Retrieve index in metadata file
+  idx <- which(dfs[[1]]$building_id == as.numeric(file_id))
+  
+  # Retrieve all columns in metadata file
+  out[["site_id"]]      <- dfs[[1]]$site_id[idx]
+  out[["primary_use"]]  <- dfs[[1]]$primary_use[idx]
+  out[["square_feet"]]  <- dfs[[1]]$square_feet[idx]
+  out[["year_built"]]   <- dfs[[1]]$year_built[idx]
+  out[["floor_count"]]  <- dfs[[1]]$floor_count[idx]
+  
+  # Processed metadata
+  out[["mdata_file_idx"]] <- idx
+  out[["country"]]        <- NA
+  out[["is_household"]]   <- 0
+  
+  return(out)
 }
 
 ################################################################################
@@ -332,7 +358,7 @@ extract_metadata_save <- function(out, dfs, filename) {
   # BMG_ID variable from the household survey data.
   file_id <- strsplit(filename, ".csv")[[1]]
   file_id <- substr(file_id, 3, nchar(file_id))
-  out[["fname"]] <- file_id
+  out[["fname"]] <- as.character(file_id)
 
   # Retrieve index in metadata file
   idx <- which(dfs[[1]]$BMG_ID == as.numeric(file_id))
@@ -359,7 +385,7 @@ extract_metadata_save <- function(out, dfs, filename) {
   # Processed metadata
 
   out[["country"]] <- "gb"
-  out[["is_household"]] <- 1
+  out[["is_household"]] <- 1L
   
   return(out)
 }
@@ -507,6 +533,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   ##############################################################################
   if (dset_key == "lcl")  out <- extract_metadata_lcl(out, dfs, filename)
   if (dset_key == "iss")  out <- extract_metadata_iss(out, dfs, filename)
+  if (dset_key == "kag")  out <- extract_metadata_kag(out, dfs, filename)
   if (dset_key == "nee")  out <- extract_metadata_nee(out, dfs, filename)
   if (dset_key == "goi")  out <- extract_metadata_goi(out, dfs, filename)
   if (dset_key == "por")  out <- extract_metadata_por(out, dfs, filename)
@@ -515,7 +542,7 @@ extract_metadata <- function(edf, dfs, dset_key, filename) {
   if (dset_key == "nesemp") out <- extract_metadata_nesemp(out, dfs, filename)
   if (dset_key == "les")  out <- extract_metadata_les(out, dfs, filename)
   if (dset_key == "sgsc") out <- extract_metadata_sgsc(out, dfs, filename)
-  if (dset_key == "greengrid")  out <- extract_metadata_greengrid(out, dfs, filename)
+  if (dset_key == "greengrid") out <- extract_metadata_greengrid(out, dfs, filename)
   
   return(out)
 }

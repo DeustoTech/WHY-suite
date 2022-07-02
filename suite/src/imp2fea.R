@@ -9,6 +9,7 @@
 library(tsfeatures)
 library(foreach)
 library(lubridate)
+library(dplyr)
 
 ################################################################################
 # stat_moments
@@ -1294,7 +1295,10 @@ post_features <- function(o) {
     o_df <- data.table::fread(paste0(o,lof[1]))
     for(ii in 2:len_lof) {
       new_df <- data.table::fread(paste0(o,lof[ii]))
-      o_df <- suppressMessages(dplyr::full_join(o_df, new_df))
+      # Converting "fname" to character
+      o_df   <- o_df   %>% mutate(fname = as.character(fname))
+      new_df <- new_df %>% mutate(fname = as.character(fname))
+      o_df   <- suppressMessages(full_join(o_df, new_df))
     }
     # Save results to the CSV file
     data.table::fwrite(
