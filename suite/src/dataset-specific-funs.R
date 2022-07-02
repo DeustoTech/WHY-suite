@@ -45,7 +45,7 @@ get_samples_per_day <- function() {
 manage_times <- function(edf) {
   
   # EDRP & LCL 
-  if (edf$dset_key %in% c("lcl", "edrp")) {
+  if (edf$dset_key %in% c("lcl", "edrp", "save")) {
     edf <- correct_dst(edf, "Europe/London")
   }
   
@@ -331,22 +331,33 @@ extract_metadata_save <- function(out, dfs, filename) {
   # This is done using the final 9 characters of the navetasID variable and the
   # BMG_ID variable from the household survey data.
   file_id <- strsplit(filename, ".csv")[[1]]
-  file_id <- substr(file_id,3, nchar(file_id))
+  file_id <- substr(file_id, 3, nchar(file_id))
   out[["fname"]] <- file_id
 
   # Retrieve index in metadata file
-  idx <- which(dfs[[1]]$BMG_ID == file_id)
+  idx <- which(dfs[[1]]$BMG_ID == as.numeric(file_id))
 
   # Retrieve all columns in metadata file
-  out[["pt1match"]]      <- dfs[[1]]$PT1match[idx]
-  out[["pt1match_new"]]  <- dfs[[1]]$PT1match_NEW[idx]
-  out[["intervention"]]  <- dfs[[1]]$Intervention[idx]
-  out[["outcome_label"]] <- dfs[[1]]$Outcome_Label[idx]
-  out[["opt_out_date"]]  <- dfs[[1]]$OptOutDate[idx]
-  out[["wgt_non_response"]]  <- dfs[[1]]$wgtNonResponse[idx]
+  if (length(idx) == 1) {
+    out[["pt1match"]]      <- as.character(dfs[[1]]$PT1match[idx])
+    out[["pt1match_new"]]  <- as.character(dfs[[1]]$PT1match_NEW[idx])
+    out[["intervention"]]  <- as.integer(dfs[[1]]$Intervention[idx])
+    out[["outcome_label"]] <- as.character(dfs[[1]]$Outcome_Label[idx])
+    out[["opt_out_date"]]  <- as.character(dfs[[1]]$OptOutDate[idx])
+    out[["wgt_non_response"]] <- as.numeric(dfs[[1]]$wgtNonResponse[idx])
+    out[["mdata_file_idx"]] <- as.integer(idx)
+  } else {
+    out[["pt1match"]]      <- as.character(NA)
+    out[["pt1match_new"]]  <- as.character(NA)
+    out[["intervention"]]  <- as.integer(NA)
+    out[["outcome_label"]] <- as.character(NA)
+    out[["opt_out_date"]]  <- as.character(NA)
+    out[["wgt_non_response"]] <- as.numeric(NA)
+    out[["mdata_file_idx"]] <- as.integer(NA)
+  }
   
   # Processed metadata
-  out[["mdata_file_idx"]] <- idx
+
   out[["country"]] <- "gb"
   out[["is_household"]] <- 1
   

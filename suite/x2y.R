@@ -151,7 +151,8 @@ if (operation == 37) {
   
   imp2fea(
     imp_dir = imp_dir[["save"]],
-    fea_dir = fea_dir[["save"]]
+    fea_dir = fea_dir[["save"]],
+	  max_feats = 1000
   )
   
   fea2clu(

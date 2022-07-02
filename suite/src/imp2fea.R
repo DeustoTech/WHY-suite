@@ -1180,7 +1180,6 @@ get_features_from_raw_datasets <- function(folder_path, from_date, to_date, dset
   # Analysis loop
   for (dset_filename in dset_filenames) {
     # Load raw dataframe from dataset
-    print(dset_filename)
     file_path <- paste(folder_path, dset_filename, sep="")
     raw_df    <- get_raw_dataframe_from_dataset(file_path)
     # Get cooked dataframe from raw dataframe
