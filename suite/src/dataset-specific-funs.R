@@ -30,7 +30,7 @@ get_samples_per_day <- function() {
     por       = 96,
     ref       = 24,
     save      = 96,
-    sgsc      = 48,
+    sgsc      = 48
   )
 }
 
@@ -44,7 +44,7 @@ get_samples_per_day <- function() {
 manage_times <- function(edf) {
   
   # EDRP & LCL 
-  if (edf$dset_key %in% c("lcl", "edrp", "save")) {
+  if (edf$dset_key %in% c("lcl", "edrp", "save", "nesemp")) {
     edf <- correct_dst(edf, "Europe/London")
   }
   
@@ -396,21 +396,21 @@ extract_metadata_save <- function(out, dfs, filename) {
 ################################################################################
 
 extract_metadata_nesemp <- function(out, dfs, filename) {
-  # Identify current user
-  #household_xx_.csv
-  file_id <- strsplit(filename, ".csv")[[1]]
-  file_id <- strsplit(file_id, "household_")[[1]][2]
-  out[["fname"]] <- file_id
-
-  # Retrieve index in metadata file
-  idx <- which(dfs[[1]]$ID == file_id)
-
-  # Retrieve all columns in metadata file
-  out[["zone"]]      <- dfs[[1]]$UR_2[idx]
-  out[["zone_type"]]      <- dfs[[1]]$UR_6[idx]
+  # # Identify current user
+  # #household_xx_.csv
+  # file_id <- strsplit(filename, ".csv")[[1]]
+  # file_id <- strsplit(file_id, "household_")[[1]][2]
+  # out[["fname"]] <- file_id
+  # 
+  # # Retrieve index in metadata file
+  # idx <- which(dfs[[1]]$ID == file_id)
+  # 
+  # # Retrieve all columns in metadata file
+  # out[["zone"]]      <- dfs[[1]]$UR_2[idx]
+  # out[["zone_type"]]      <- dfs[[1]]$UR_6[idx]
   
   # Processed metadata
-  out[["mdata_file_idx"]] <- idx
+  out[["mdata_file_idx"]] <- 0 #idx
   out[["country"]] <- "gb"
   out[["is_household"]] <- 1
   

@@ -146,6 +146,83 @@ check_subfolders <- function(o) {
 }
 
 ################################################################################
+##  SETS OF FEATIURES
+################################################################################
+
+feats_set <- list(
+  # TYPE 1 -> "sAggr"
+  sAggr = c(
+    "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
+    "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
+    "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
+    "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
+    "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
+    "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
+    "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
+    "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
+    "rel_mean_weekday_pday"
+  ),
+  # TYPE 2 -> "peaks"
+  peaks = c(
+    "peak_hour_1", "off_peak_hour_1", "peak_month", "off_peak_month",
+    "peak_weekday_pday"
+  ),
+  # TYPE 3 -> "tsfAC"
+  tsfAC = c(
+    "mean", "entropy", "seasonal_strength1", "seasonal_strength2",
+    "seasonal_strength3", "ac_day_1", "ac_day_7", "ac_day_28"
+  ),
+  # TYPE 4 -> "cat22"
+  cat22 = c(
+    "DN_HistogramMode_5", "DN_HistogramMode_10", "CO_f1ecac",
+    "CO_FirstMin_ac", "CO_HistogramAMI_even_2_5", "CO_trev_1_num",
+    "MD_hrv_classic_pnn40", "SB_BinaryStats_mean_longstretch1",
+    "SB_TransitionMatrix_3ac_sumdiagcov", "PD_PeriodicityWang_th0_01",
+    "CO_Embed2_Dist_tau_d_expfit_meandiff",
+    "IN_AutoMutualInfoStats_40_gaussian_fmmi",
+    "FC_LocalSimple_mean1_tauresrat", "DN_OutlierInclude_p_001_mdrmd",
+    "DN_OutlierInclude_n_001_mdrmd", "SP_Summaries_welch_rect_area_5_1",
+    "SB_BinaryStats_diff_longstretch0", "SB_MotifThree_quantile_hh",
+    "SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1",
+    "SC_FluctAnal_2_dfa_50_1_2_logi_prop_r1",
+    "SP_Summaries_welch_rect_centroid", "FC_LocalSimple_mean3_stderr"
+  ),
+  # TYPE 5 -> "sAggrP6"
+  sAggrP6 = c(
+    "rel_mean_td2.0_p6_00h08h_spr", "rel_mean_td2.0_p6_08h10h_spr",
+    "rel_mean_td2.0_p6_10h14h_spr", "rel_mean_td2.0_p6_14h18h_spr", 
+    "rel_mean_td2.0_p6_18h22h_spr", "rel_mean_td2.0_p6_22h00h_spr", 
+    "rel_mean_td2.0_p6_00h08h_sum", "rel_mean_td2.0_p6_08h10h_sum",
+    "rel_mean_td2.0_p6_10h14h_sum", "rel_mean_td2.0_p6_14h18h_sum", 
+    "rel_mean_td2.0_p6_18h22h_sum", "rel_mean_td2.0_p6_22h00h_sum", 
+    "rel_mean_td2.0_p6_00h08h_aut", "rel_mean_td2.0_p6_08h10h_aut",
+    "rel_mean_td2.0_p6_10h14h_aut", "rel_mean_td2.0_p6_14h18h_aut", 
+    "rel_mean_td2.0_p6_18h22h_aut", "rel_mean_td2.0_p6_22h00h_aut", 
+    "rel_mean_td2.0_p6_00h08h_win", "rel_mean_td2.0_p6_08h10h_win",
+    "rel_mean_td2.0_p6_10h14h_win", "rel_mean_td2.0_p6_14h18h_win", 
+    "rel_mean_td2.0_p6_18h22h_win", "rel_mean_td2.0_p6_22h00h_win", 
+    "rel_mean_weekday_drm"
+  ),
+  # TYPE 6 -> "sAggrDRM"
+  sAggrDRM = c(
+    "rel_mean_00h04hspr_drm", "rel_mean_04h08hspr_drm",
+    "rel_mean_08h12hspr_drm", "rel_mean_12h16hspr_drm",
+    "rel_mean_16h20hspr_drm", "rel_mean_20h00hspr_drm",
+    "rel_mean_00h04hsum_drm", "rel_mean_04h08hsum_drm",
+    "rel_mean_08h12hsum_drm", "rel_mean_12h16hsum_drm",
+    "rel_mean_16h20hsum_drm", "rel_mean_20h00hsum_drm",
+    "rel_mean_00h04haut_drm", "rel_mean_04h08haut_drm",
+    "rel_mean_08h12haut_drm", "rel_mean_12h16haut_drm",
+    "rel_mean_16h20haut_drm", "rel_mean_20h00haut_drm",
+    "rel_mean_00h04hwin_drm", "rel_mean_04h08hwin_drm",
+    "rel_mean_08h12hwin_drm", "rel_mean_12h16hwin_drm",
+    "rel_mean_16h20hwin_drm", "rel_mean_20h00hwin_drm",
+    "rel_mean_weekday_drm"
+  )
+)
+
+
+################################################################################
 ##  CALL TO THE FUNCTION
 ################################################################################
 
@@ -170,78 +247,6 @@ cluster_features <- function(
   ########################
   ##  SETS OF FEATURES  ##
   ########################
-  
-  feats_set <- list(
-    # TYPE 1 -> "sAggr"
-    sAggr = c(
-      "rel_mean_00h04hspr", "rel_mean_04h08hspr", "rel_mean_08h12hspr",
-      "rel_mean_12h16hspr", "rel_mean_16h20hspr", "rel_mean_20h00hspr",
-      "rel_mean_00h04hsum", "rel_mean_04h08hsum", "rel_mean_08h12hsum",
-      "rel_mean_12h16hsum", "rel_mean_16h20hsum", "rel_mean_20h00hsum",
-      "rel_mean_00h04haut", "rel_mean_04h08haut", "rel_mean_08h12haut",
-      "rel_mean_12h16haut", "rel_mean_16h20haut", "rel_mean_20h00haut",
-      "rel_mean_00h04hwin", "rel_mean_04h08hwin", "rel_mean_08h12hwin",
-      "rel_mean_12h16hwin", "rel_mean_16h20hwin", "rel_mean_20h00hwin",
-      "rel_mean_weekday_pday"
-    ),
-    # TYPE 2 -> "peaks"
-    peaks = c(
-      "peak_hour_1", "off_peak_hour_1", "peak_month", "off_peak_month",
-      "peak_weekday_pday"
-    ),
-    # TYPE 3 -> "tsfAC"
-    tsfAC = c(
-      "mean", "entropy", "seasonal_strength1", "seasonal_strength2",
-      "seasonal_strength3", "ac_day_1", "ac_day_7", "ac_day_28"
-    ),
-    # TYPE 4 -> "cat22"
-    cat22 = c(
-      "DN_HistogramMode_5", "DN_HistogramMode_10", "CO_f1ecac",
-      "CO_FirstMin_ac", "CO_HistogramAMI_even_2_5", "CO_trev_1_num",
-      "MD_hrv_classic_pnn40", "SB_BinaryStats_mean_longstretch1",
-      "SB_TransitionMatrix_3ac_sumdiagcov", "PD_PeriodicityWang_th0_01",
-      "CO_Embed2_Dist_tau_d_expfit_meandiff",
-      "IN_AutoMutualInfoStats_40_gaussian_fmmi",
-      "FC_LocalSimple_mean1_tauresrat", "DN_OutlierInclude_p_001_mdrmd",
-      "DN_OutlierInclude_n_001_mdrmd", "SP_Summaries_welch_rect_area_5_1",
-      "SB_BinaryStats_diff_longstretch0", "SB_MotifThree_quantile_hh",
-      "SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1",
-      "SC_FluctAnal_2_dfa_50_1_2_logi_prop_r1",
-      "SP_Summaries_welch_rect_centroid", "FC_LocalSimple_mean3_stderr"
-    ),
-    # TYPE 5 -> "sAggrP6"
-    sAggrP6 = c(
-      "rel_mean_td2.0_p6_00h08h_spr", "rel_mean_td2.0_p6_08h10h_spr",
-      "rel_mean_td2.0_p6_10h14h_spr", "rel_mean_td2.0_p6_14h18h_spr", 
-      "rel_mean_td2.0_p6_18h22h_spr", "rel_mean_td2.0_p6_22h00h_spr", 
-      "rel_mean_td2.0_p6_00h08h_sum", "rel_mean_td2.0_p6_08h10h_sum",
-      "rel_mean_td2.0_p6_10h14h_sum", "rel_mean_td2.0_p6_14h18h_sum", 
-      "rel_mean_td2.0_p6_18h22h_sum", "rel_mean_td2.0_p6_22h00h_sum", 
-      "rel_mean_td2.0_p6_00h08h_aut", "rel_mean_td2.0_p6_08h10h_aut",
-      "rel_mean_td2.0_p6_10h14h_aut", "rel_mean_td2.0_p6_14h18h_aut", 
-      "rel_mean_td2.0_p6_18h22h_aut", "rel_mean_td2.0_p6_22h00h_aut", 
-      "rel_mean_td2.0_p6_00h08h_win", "rel_mean_td2.0_p6_08h10h_win",
-      "rel_mean_td2.0_p6_10h14h_win", "rel_mean_td2.0_p6_14h18h_win", 
-      "rel_mean_td2.0_p6_18h22h_win", "rel_mean_td2.0_p6_22h00h_win", 
-      "rel_mean_weekday_drm"
-    ),
-    # TYPE 6 -> "sAggrDRM"
-    sAggrDRM = c(
-      "rel_mean_00h04hspr_drm", "rel_mean_04h08hspr_drm",
-      "rel_mean_08h12hspr_drm", "rel_mean_12h16hspr_drm",
-      "rel_mean_16h20hspr_drm", "rel_mean_20h00hspr_drm",
-      "rel_mean_00h04hsum_drm", "rel_mean_04h08hsum_drm",
-      "rel_mean_08h12hsum_drm", "rel_mean_12h16hsum_drm",
-      "rel_mean_16h20hsum_drm", "rel_mean_20h00hsum_drm",
-      "rel_mean_00h04haut_drm", "rel_mean_04h08haut_drm",
-      "rel_mean_08h12haut_drm", "rel_mean_12h16haut_drm",
-      "rel_mean_16h20haut_drm", "rel_mean_20h00haut_drm",
-      "rel_mean_00h04hwin_drm", "rel_mean_04h08hwin_drm",
-      "rel_mean_08h12hwin_drm", "rel_mean_12h16hwin_drm",
-      "rel_mean_16h20hwin_drm", "rel_mean_20h00hwin_drm",
-      "rel_mean_weekday_drm"
-    )
-  )
   
   cluster_codes <- list()
   

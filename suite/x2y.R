@@ -10,27 +10,29 @@ source("suite_v01.R")
 
 # Raw folders
 raw_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/raw/",
-  "goi4" = "/home/ubuntu/carlos.quesada/disk/goi4/raw/",
-  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
-  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/raw/",
-  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/raw/",
-  "save" = "/home/ubuntu/carlos.quesada/disk/save/raw/",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/raw/"
+  "edrp"   = "/home/ubuntu/carlos.quesada/disk/edrp/raw/",
+  "goi4"   = "/home/ubuntu/carlos.quesada/disk/goi4/raw/",
+  "iss"    = "/home/ubuntu/carlos.quesada/disk/iss/raw/",
+  "kag"    = "/home/ubuntu/carlos.quesada/disk/kag/raw/",
+  "lcl"    = "/home/ubuntu/carlos.quesada/disk/lcl/raw/",
+  "nee"    = "/home/ubuntu/carlos.quesada/disk/nee/raw/",
+  "por"    = "/home/ubuntu/carlos.quesada/disk/por/raw/",
+  "save"   = "/home/ubuntu/carlos.quesada/disk/save/raw/",
+  "sgsc"   = "/home/ubuntu/carlos.quesada/disk/sgsc/raw/",
+  "nesemp" = "/home/ubuntu/carlos.quesada/disk/nesemp/raw/"
 )
 
 # Imputation folders # AS IS IN clu2hmp!
 imp_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
-  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
-  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/imp/",
-  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/por/imp/",
-  "save" = "/home/ubuntu/carlos.quesada/disk/save/imp/",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/"
+  "edrp"   = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
+  "iss"    = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "kag"    = "/home/ubuntu/carlos.quesada/disk/kag/imp/",
+  "lcl"    = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "nee"    = "/home/ubuntu/carlos.quesada/disk/nee/imp/",
+  "por"    = "/home/ubuntu/carlos.quesada/disk/por/imp/",
+  "save"   = "/home/ubuntu/carlos.quesada/disk/save/imp/",
+  "sgsc"   = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/",
+  "nesemp" = "/home/ubuntu/carlos.quesada/disk/nesemp/imp/"
 )
 
 imp_goi_pre <- list(
@@ -45,15 +47,16 @@ imp_goi_pst <- list(
 
 # Metadata files
 mdata_file <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/edrp/meta/edrp_geography_data_v3.csv",
-  "goi4" = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
-  "iss"  = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
-  "lcl"  = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/nee/meta/nee_meta.csv",
-  "por"  = NULL,
-  "kag"  = "/home/ubuntu/carlos.quesada/disk/kag/meta/metadata.csv",
-  "save" = "/home/ubuntu/carlos.quesada/disk/save/meta/metadata.csv",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/sgsc/meta/metadata.csv"
+  "edrp"   = "/home/ubuntu/carlos.quesada/disk/edrp/meta/edrp_geography_data_v3.csv",
+  "goi4"   = "/home/ubuntu/carlos.quesada/disk/goi4/meta/goi4_meta.csv",
+  "iss"    = "/home/ubuntu/carlos.quesada/disk/iss/meta/iss_meta.csv",
+  "lcl"    = "/home/ubuntu/carlos.quesada/disk/lcl/meta/lcl_meta.csv",
+  "nee"    = "/home/ubuntu/carlos.quesada/disk/nee/meta/sites.csv",
+  "por"    = NULL,
+  "kag"    = "/home/ubuntu/carlos.quesada/disk/kag/meta/metadata.csv",
+  "save"   = "/home/ubuntu/carlos.quesada/disk/save/meta/metadata.csv",
+  "sgsc"   = "/home/ubuntu/carlos.quesada/disk/sgsc/meta/metadata.csv",
+  "nesemp" = NULL
 )
 
 # Feature folders
@@ -62,10 +65,11 @@ fea_dir <- list(
   "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
   "kag"  = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/",
   "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/",
+  "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.07.05/",
+  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/",
   "save" = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/",
   "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/",
+  "nesemp"   = "/home/ubuntu/carlos.quesada/disk/features/nesemp_22.07.05/",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/",
   "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/"
@@ -80,11 +84,12 @@ fea_file <- list(
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/feats.csv",
   "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
-  "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.02.23/feats_64.csv",
-  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.02.17/feats_351.csv",
+  "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.07.05/feats.csv",
+  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/feats.csv",
   "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/feats.csv",
   "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv",
   "kag"      = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/feats.csv",
+  "nesemp"   = "/home/ubuntu/carlos.quesada/disk/features/nesemp_22.07.05/feats.csv"
 )
 
 # Cluster folders (ClValid2)
@@ -99,15 +104,19 @@ clu_dir <- list(
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "kag"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.02_kag-4cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
-  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.23_nee/",
-  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.02.17_por-6cl/",
+  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.05_nee/",
+  "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.05_por-4cl/",
   "save"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.30_save-4cl/",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.29_sgsc-australia-check/"
+  "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.29_sgsc-australia-check/",
+  "nesemp"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.05_nesemp-4cl/"
 )
 
 # Instructions for "dd_sel" variable:
 # Each sublist is an OR, each element within the sublist is an AND
 # Each NULL element within the sublist means ALL TRUE
+dd_sel_nesemp  <- list(
+  list(key="nesemp", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 dd_sel_kag  <- list(
   list(key="kag", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
@@ -144,8 +153,153 @@ dd_sel_all  <- list(
 )
 
 ###############################################################################
-operation <- 38
+operation <- 41
 ################################################################################
+
+# 2022.02.23 - raw2rep NEEA
+if (operation == 41) {
+  raw2imp(
+    raw_dir    = raw_dir[["nee"]],
+    imp_dir    = imp_dir[["nee"]],
+    dset_key   = "nee",
+    mdata_file = mdata_file[["nee"]],
+    from_date = "first",
+    to_date   = ymd("2020-03-15"),
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["nee"]],
+    fea_dir = fea_dir[["nee"]],
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir[["nee"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_nee,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["nee"]],
+    clu_dir  = clu_dir[["nee"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 31
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: nee, 4 clusters, SOM",
+    clu_dir   = clu_dir[["nee"]],
+    rep_fname = "cluster_report_nee_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_nee,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
+
+# 2022.07.05 - NESEMP
+if (operation == 40) {
+  raw2imp(
+    raw_dir    = raw_dir[["nesemp"]],
+    imp_dir    = imp_dir[["nesemp"]],
+    dset_key   = "nesemp",
+    mdata_file = mdata_file[["nesemp"]],
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir = imp_dir[["nesemp"]],
+    fea_dir = fea_dir[["nesemp"]],
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["nesemp"]],
+    clu_dir  = clu_dir[["nesemp"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_nesemp,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["nesemp"]],
+    clu_dir  = clu_dir[["nesemp"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: nesemp, 4 clusters, SOM",
+    clu_dir   = clu_dir[["nesemp"]],
+    rep_fname = "cluster_report_nesemp_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_nesemp,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
+
+
+# 2022.07.05 - Kaggle
+if (operation == 39) {
+  raw2imp(
+    raw_dir    = raw_dir[["por"]],
+    imp_dir    = imp_dir[["por"]],
+    dset_key   = "por",
+    mdata_file = mdata_file[["por"]],
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+
+  imp2fea(
+    imp_dir = imp_dir[["por"]],
+    fea_dir = fea_dir[["por"]],
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_file = fea_file[["por"]],
+    clu_dir  = clu_dir[["por"]],
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel_por,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = 4
+  )
+  
+  clu2hmp(
+    fea_file = fea_file[["por"]],
+    clu_dir  = clu_dir[["por"]],
+    dset_dir = imp_dir,
+    cc       = 4,
+    cores    = 16
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = "Cluster Report: Elergone Energia, 4 clusters, SOM",
+    clu_dir   = clu_dir[["por"]],
+    rep_fname = "cluster_report_por_4cl_som.html",
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel_por,
+    mm        = c("som"),
+    cc        = 4
+  )
+}
+
 
 # 2022.07.02 - Kaggle
 if (operation == 38) {
@@ -154,7 +308,7 @@ if (operation == 38) {
     imp_dir    = imp_dir[["kag"]],
     dset_key   = "kag",
     mdata_file = mdata_file[["kag"]],
-    min_yrs    = 1,
+    min_yrs    = 0.99988,
     parallel   = TRUE
   )
 
