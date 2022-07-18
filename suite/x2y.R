@@ -228,6 +228,7 @@ if (operation == 54) {
   
   clu2hmp(
     fea_dir  = fea_dir,
+    fea_file = fea_file,
     clu_dir  = clu_dir,
     dset_dir = imp_dir,
     cc       = no_cluster,
