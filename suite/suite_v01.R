@@ -27,8 +27,15 @@ raw2imp <- function(
   wwgen     = FALSE,
   parallel  = TRUE
 ) {
-  for(ss in raw2imp_src) source(paste(getwd(), "src", ss, sep="/"))
+  print("####################")
+  print("####################")
+  print("####################")
   print("## RAW TO IMPUTED ##")
+  print("####################")
+  print("####################")
+  print("####################")
+  
+  for(ss in raw2imp_src) source(paste(getwd(), "src", ss, sep="/"))
   
   if (parallel) {
 	  extend_dataset_v2(
@@ -65,8 +72,16 @@ imp2fea <- function(
   max_feats = 1000,
   limited_to = NULL
 ) {
-  source(paste(getwd(), "src", imp2fea_src, sep="/"))
+  print("#########################")
+  print("#########################")
+  print("#########################")
   print("## IMPUTED TO FEATURES ##")
+  print("#########################")
+  print("#########################")
+  print("#########################")
+  
+  source(paste(getwd(), "src", imp2fea_src, sep="/"))
+  
   get_features(
     input_folder     = imp_dir,
     output_path      = fea_dir,
@@ -80,7 +95,8 @@ imp2fea <- function(
 ## CLUSTER ANALYSIS ##
 ######################
 fea2clu <- function(
-  fea_file,
+  fea_dir,
+  fea_file = NULL,
   clu_dir,
   ff_sel,
   dd_sel,
@@ -88,10 +104,22 @@ fea2clu <- function(
   vv_sel,
   cc_sel
 ) {
-  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
+  print("######################")
+  print("######################")
+  print("######################")
   print("## CLUSTER ANALYSES ##")
+  print("######################")
+  print("######################")
+  print("######################")
+  
+  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
+  
   cluster_features(
-    feats_file = fea_file,
+    feats_file = ifelse(
+      is.null(fea_file),
+      paste0(fea_dir, "feats.csv"),
+      paste0(fea_dir, fea_file)
+    ),
     output_dir = clu_dir,
     ff_sel     = ff_sel,
     dd_sel     = dd_sel,
@@ -105,14 +133,22 @@ fea2clu <- function(
 ## GENERATION OF HEATMAPS ##
 ############################
 clu2hmp <- function(
-  fea_file,
+  fea_dir,
   clu_dir,
   dset_dir,
   cc,
   cores = NULL
 ) {
-  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
+  print("###################")
+  print("###################")
+  print("###################")
   print("## HEATMAP PLOTS ##")
+  print("###################")
+  print("###################")
+  print("###################")
+  
+  source(paste(getwd(), "src", fea2hmp_src, sep="/"))
+  
   dirs <- list(
     dplot  = paste0(clu_dir, "dplot/" ),
     hmp    = paste0(clu_dir, "hmp/"   ),
@@ -121,7 +157,7 @@ clu2hmp <- function(
     distr  = paste0(clu_dir, "distr/" )
   )
   clValid2_heatmaps(
-    feats_file  = fea_file,
+    feats_file  = paste0(fea_dir, "feats.csv"),
     clValid_dir = clu_dir,
     dir_names   = dirs,
     dataset_dir = dset_dir,
@@ -146,8 +182,16 @@ hmp2rep <- function(
   cc,
   hmp_fname_patt = NULL
 ) {
-  source(paste(getwd(), "src", hmp2rep_src, sep="/"))
+  print("###############")
+  print("###############")
+  print("###############")
   print("## REPORTING ##")
+  print("###############")
+  print("###############")
+  print("###############")
+  
+  source(paste(getwd(), "src", hmp2rep_src, sep="/"))
+  
   reporting(
     rep_type      = rep_type,
     rep_title     = rep_title,

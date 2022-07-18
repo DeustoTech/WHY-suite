@@ -75,7 +75,7 @@ set_row_conditions <- function(feats, analysis_type) {
 ##  R file with the analysis functions of the Rmd file
 ################################################################################
 
-call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
+call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clValid2) {
   
   # Set file name
   ff_name <- analysis_type$ff
@@ -100,23 +100,28 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set) {
   row_conditions <- set_row_conditions(feats, analysis_type)
   
   row_names <- paste0(feats$data_set, "_", feats$file)
-  feats_aux <- feats[row_conditions,]
-  feats_aux <- subset(feats_aux, select = feats_set[[analysis_type$ff]])
+  feats_aux <- feats[row_conditions, feats_set[[analysis_type$ff]]]
+  # feats_aux <- subset(feats_aux, select = feats_set[[analysis_type$ff]])
   feats_aux <- as.matrix(feats_aux)
   # SCALE
   feats_aux <- scale(feats_aux)
   row.names(feats_aux) <- row_names[row_conditions]
   
-  o <- clValid2::clValid(
-    obj        = feats_aux,
-    nClust     = analysis_type$cc,
-    clMethods  = analysis_type$mm,
-    validation = analysis_type$vv,
-    maxitems   = nrow(feats_aux) + 1
-  )
+  o <- if (use_clValid2) {
+    clValid2::clValid(
+      obj        = feats_aux,
+      nClust     = analysis_type$cc,
+      clMethods  = analysis_type$mm,
+      validation = analysis_type$vv,
+      maxitems   = nrow(feats_aux) + 1
+    )
+  } else {
+    kohonen::som(feats_aux, grid=kohonen::somgrid(1, analysis_type$cc))
+  }
   
   # ANALYSIS FILE
-  filename <- paste0(output_dir, final_name, ".clValid2")
+  fname_extens <- ifelse(use_clValid2, ".clValid2", ".somObj")
+  filename <- paste0(output_dir, final_name, fname_extens)
   save("o", file = filename)
   # CONFIGURATION FILE
   filename <- paste0(output_dir, final_name, ".config")
@@ -227,7 +232,7 @@ feats_set <- list(
 ################################################################################
 
 cluster_features <- function(
-  feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel) {
+  feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, use_clValid2=TRUE) {
   
   # Create folders if they do NOT exist
   if (!dir.exists(output_dir)) dir.create(output_dir)
@@ -238,11 +243,19 @@ cluster_features <- function(
   output_dir <- paste0(output_dir, "data/")
   
   # Open features file
-  feats <- data.table::fread(
-    file   = feats_file,
-    header = TRUE,
-    sep    = ","
-  )
+  feats_ext <- substr(feats_file, nchar(feats_file)-2, nchar(feats_file))
+  
+  if (tolower(feats_ext) == "csv") {
+    feats <- data.frame(
+      data.table::fread(
+        file   = feats_file,
+        header = TRUE,
+        sep    = ","
+      )
+    )
+  } else {
+    load(feats_file)
+  }
   
   ########################
   ##  SETS OF FEATURES  ##
@@ -274,7 +287,7 @@ cluster_features <- function(
   }
   
   for (cluster_code_ii in cluster_codes) {
-    call_clValid2(output_dir, cluster_code_ii, feats, feats_set)
+    call_clValid2(output_dir, cluster_code_ii, feats, feats_set, use_clValid2)
   }
 }
 
@@ -581,7 +594,7 @@ clValid2_heatmaps <- function(
   )
   
   # LOOP
-  fnames <- list.files(path = data_dir, pattern = "*.clValid2")
+  fnames <- list.files(path = data_dir, pattern="clValid2$|somObj$") #"*.clValid2")
   fun_export <- c(
     "align_time_series",
     "distr_vect",
@@ -625,7 +638,12 @@ clValid2_heatmaps <- function(
     # Working file name
     w_fname <- fnames[ff]
     # Working config file name
-    w_cname <- paste0(strsplit(w_fname, ".clValid2"), ".config")
+    w_cname <- gsub(
+      pattern     = "clValid2$|somObj$",
+      x           = w_fname,
+      replacement = "config"
+    )
+      #paste0(strsplit(w_fname, ".clValid2"), ".config")
     
     w_cpath <- paste0(data_dir, w_cname)
     load(w_cpath)
@@ -662,8 +680,12 @@ clValid2_heatmaps <- function(
     }
     # SOM
     if (analysis_type$mm == "som") {
-      cluster_list <-
-        o@clusterObjs[["som"]][[as.character(num_cluster)]]$unit.classif
+      if (class(o) == "kohonen") {
+        cluster_list <- o$unit.classif
+      } else {
+        cluster_list <-
+          o@clusterObjs[["som"]][[as.character(num_cluster)]]$unit.classif
+      }
     }
     # PAM
     if (analysis_type$mm == "pam") {
@@ -694,6 +716,7 @@ clValid2_heatmaps <- function(
     # Set vector of paths
     paths_vector <-
       paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
+    
     # Get heatmap matrix
     m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
     # Get distributions

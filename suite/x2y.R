@@ -44,6 +44,32 @@ imp_goi_in <- list(
 imp_goi_pst <- list(
   "goi" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/"
 )
+imp_nee_pre <- list(
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee_pre/imp/"
+)
+imp_nee_in <- list(
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee_in/imp/"
+)
+imp_nee_pst <- list(
+  "nee" = "/home/ubuntu/carlos.quesada/disk/nee_pst/imp/"
+)
+
+imp_all <- list(
+  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/goi4_pre/imp/",
+  "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/goi4_in/imp/",
+  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/goi4_pst/imp/",
+  "edrp"     = "/home/ubuntu/carlos.quesada/disk/edrp/imp/",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/sgsc/imp/",
+  "iss"      = "/home/ubuntu/carlos.quesada/disk/iss/imp/",
+  "save"     = "/home/ubuntu/carlos.quesada/disk/save/imp/",
+  "lcl"      = "/home/ubuntu/carlos.quesada/disk/lcl/imp/",
+  "kag"      = "/home/ubuntu/carlos.quesada/disk/kag/imp/",
+  "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/",
+  "nesemp"   = "/home/ubuntu/carlos.quesada/disk/nesemp/imp/",
+  "nee7_pre" = "/home/ubuntu/carlos.quesada/disk/nee_pre/imp/",
+  "nee7_in"  = "/home/ubuntu/carlos.quesada/disk/nee_in/imp/",
+  "nee7_pst" = "/home/ubuntu/carlos.quesada/disk/nee_pst/imp/"
+)
 
 # Metadata files
 mdata_file <- list(
@@ -61,40 +87,43 @@ mdata_file <- list(
 
 # Feature folders
 fea_dir <- list(
-  "edrp" = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.06.01/",
-  "iss"  = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
-  "kag"  = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/",
-  "lcl"  = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
-  "nee"  = "/home/ubuntu/carlos.quesada/disk/features/nee_22.07.05/",
-  "por"  = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/",
-  "save" = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/",
-  "sgsc" = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/",
+  "all"      = "/home/ubuntu/carlos.quesada/disk/features/",
+  "edrp"     = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.06.01/",
+  "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/",
+  "kag"      = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/",
+  "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/",
+  "nee_pre"  = "/home/ubuntu/carlos.quesada/disk/features/nee_pre_22.07.08/",
+  "nee_in"   = "/home/ubuntu/carlos.quesada/disk/features/nee_in_22.07.08/",
+  "nee_pst"  = "/home/ubuntu/carlos.quesada/disk/features/nee_pst_22.07.08/",
+  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/",
+  "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/",
+  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/",
   "nesemp"   = "/home/ubuntu/carlos.quesada/disk/features/nesemp_22.07.05/",
   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/",
   "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/",
   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/"
 )
 
-# Feature files
-fea_file <- list(
-  "all"      = "/home/ubuntu/carlos.quesada/disk/features/feats_v2.00.csv",
-  "edrp"     = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/feats.csv",
-  "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/feats.csv",
-  "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/feats.csv",
-  "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/feats.csv",
-  "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
-  "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
-  "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.07.05/feats.csv",
-  "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/feats.csv",
-  "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/feats.csv",
-  "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv",
-  "kag"      = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/feats.csv",
-  "nesemp"   = "/home/ubuntu/carlos.quesada/disk/features/nesemp_22.07.05/feats.csv"
-)
+# # Feature files
+# fea_file <- list(
+#   "all"      = "/home/ubuntu/carlos.quesada/disk/features/feats_v2.00.csv",
+#   "edrp"     = "/home/ubuntu/carlos.quesada/disk/features/edrp_22.03.23/feats.csv",
+#   "goi4_pre" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pre_22.06.21/feats.csv",
+#   "goi4_in"  = "/home/ubuntu/carlos.quesada/disk/features/goi4_in_22.06.21/feats.csv",
+#   "goi4_pst" = "/home/ubuntu/carlos.quesada/disk/features/goi4_pst_22.06.21/feats.csv",
+#   "iss"      = "/home/ubuntu/carlos.quesada/disk/features/iss_22.02.23/feats_6084.csv",
+#   "lcl"      = "/home/ubuntu/carlos.quesada/disk/features/lcl_22.02.23/feats_5270.csv",
+#   "nee"      = "/home/ubuntu/carlos.quesada/disk/features/nee_22.07.05/feats.csv",
+#   "por"      = "/home/ubuntu/carlos.quesada/disk/features/por_22.07.05/feats.csv",
+#   "save"     = "/home/ubuntu/carlos.quesada/disk/features/save_22.06.30/feats.csv",
+#   "sgsc"     = "/home/ubuntu/carlos.quesada/disk/features/sgsc_22.06.29/feats.csv",
+#   "kag"      = "/home/ubuntu/carlos.quesada/disk/features/kag_22.07.02/feats.csv",
+#   "nesemp"   = "/home/ubuntu/carlos.quesada/disk/features/nesemp_22.07.05/feats.csv"
+# )
 
 # Cluster folders (ClValid2)
 clu_dir <- list(
-  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl/",
+  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.11_all-40cl/",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
   "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
@@ -104,7 +133,9 @@ clu_dir <- list(
   "iss"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02_iss-16cl/",
   "kag"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.02_kag-4cl/",
   "lcl"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.02.2_lcl-16cl/",
-  "nee"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.05_nee/",
+  "nee_pre"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.08_nee_pre/",
+  "nee_in"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.08_nee_in/",
+  "nee_pst"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.08_nee_pst/",
   "por"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.05_por-4cl/",
   "save"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.30_save-4cl/",
   "sgsc"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.06.29_sgsc-australia-check/",
@@ -151,12 +182,321 @@ dd_sel_all  <- list(
   list(key="lcl", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
   list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
+dd_sel_all2 <- list(
+  list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="goi4_pre", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2"),
+  list(key="goi4_in", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2"),
+  list(key="goi4_pst", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2"),
+  list(key="nee7_pre", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="nee7_in", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="nee7_pst", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="lcl", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="iss", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="edrp", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="sgsc", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="save", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="kag", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL),
+  list(key="nesemp", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
 
 ###############################################################################
-operation <- 41
+operation <- 54
 ################################################################################
 
-# 2022.02.23 - raw2rep NEEA
+# 2022.07.11 - TOP 40 with feats v3.00
+if (operation == 54) {
+  fea_dir    <- fea_dir[["all"]]
+  fea_file   <- "feats_v3.00.RData"
+  imp_dir    <- imp_all
+  clu_dir    <- clu_dir[["all"]]
+  dd_sel     <- dd_sel_all2
+  no_cluster <- 40
+  rep_title  <- "Cluster Report: Final TOP 40, SOM"
+  rep_fname  <- "cluster_report_final_top_40_som.html"
+  
+  fea2clu(
+    fea_dir  = fea_dir,
+    fea_file = fea_file,
+    clu_dir  = clu_dir,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = no_cluster
+  )
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 24
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = rep_title,
+    clu_dir   = clu_dir,
+    rep_fname = rep_fname,
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel,
+    mm        = c("som"),
+    cc        = no_cluster
+  )
+}
+
+# 2022.07.07 - raw2rep NEEA PRE
+if (operation == 53) {
+  dset_key   <- "nee"
+  mdata_file <- mdata_file
+  raw_dir    <- raw_dir
+  imp_dir    <- imp_nee_pst
+  fea_dir    <- fea_dir[["nee_pst"]]
+  clu_dir    <- clu_dir[["nee_pst"]]
+  dd_sel     <- dd_sel_nee
+  no_cluster <- 4
+  rep_title  <- "Cluster Report: NEEA POST, 4 clusters, SOM"
+  rep_fname  <- "cluster_report_nee_post_4cl_som.html"
+  from_date  <- lubridate::ymd_hms("2021-03-23 00:00:00")
+  to_date    <- "last"
+  
+  raw2imp(
+    raw_dir    = raw_dir[[dset_key]],
+    imp_dir    = imp_dir[[dset_key]],
+    dset_key   = dset_key,
+    mdata_file = mdata_file[[dset_key]],
+    from_date  = from_date,
+    to_date    = to_date,
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir   = imp_dir[[dset_key]],
+    fea_dir   = fea_dir,
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = no_cluster
+  )
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 31
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = rep_title,
+    clu_dir   = clu_dir,
+    rep_fname = rep_fname,
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel,
+    mm        = c("som"),
+    cc        = no_cluster
+  )
+}
+
+# 2022.07.07 - raw2rep NEEA PRE
+if (operation == 52) {
+  dset_key   <- "nee"
+  mdata_file <- mdata_file
+  raw_dir    <- raw_dir
+  imp_dir    <- imp_nee_in
+  fea_dir    <- fea_dir[["nee_in"]]
+  clu_dir    <- clu_dir[["nee_in"]]
+  dd_sel     <- dd_sel_nee
+  no_cluster <- 4
+  rep_title  <- "Cluster Report: NEEA IN, 4 clusters, SOM"
+  rep_fname  <- "cluster_report_nee_in_4cl_som.html"
+  from_date  <- lubridate::ymd_hms("2020-03-15 00:00:00")
+  to_date    <- lubridate::ymd_hms("2021-03-23 00:00:00")
+  
+  raw2imp(
+    raw_dir    = raw_dir[[dset_key]],
+    imp_dir    = imp_dir[[dset_key]],
+    dset_key   = dset_key,
+    mdata_file = mdata_file[[dset_key]],
+    from_date  = from_date,
+    to_date    = to_date,
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir   = imp_dir[[dset_key]],
+    fea_dir   = fea_dir,
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = no_cluster
+  )
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 31
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = rep_title,
+    clu_dir   = clu_dir,
+    rep_fname = rep_fname,
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel,
+    mm        = c("som"),
+    cc        = no_cluster
+  )
+}
+
+# 2022.07.07 - raw2rep NEEA PRE
+if (operation == 51) {
+  dset_key   <- "nee"
+  mdata_file <- mdata_file
+  raw_dir    <- raw_dir
+  imp_dir    <- imp_nee_pre
+  fea_dir    <- fea_dir[["nee_pre"]]
+  clu_dir    <- clu_dir[["nee_pre"]]
+  dd_sel     <- dd_sel_nee
+  no_cluster <- 4
+  rep_title  <- "Cluster Report: NEEA PRE, 4 clusters, SOM"
+  rep_fname  <- "cluster_report_nee_pre_4cl_som.html"
+  from_date  <- "first"
+  to_date    <- lubridate::ymd_hms("2020-03-15 00:00:00")
+  
+  raw2imp(
+    raw_dir    = raw_dir[[dset_key]],
+    imp_dir    = imp_dir[[dset_key]],
+    dset_key   = dset_key,
+    mdata_file = mdata_file[[dset_key]],
+    from_date  = from_date,
+    to_date    = to_date,
+    min_yrs    = 0.99988,
+    parallel   = TRUE
+  )
+  
+  imp2fea(
+    imp_dir   = imp_dir[[dset_key]],
+    fea_dir   = fea_dir,
+    max_feats = 1000
+  )
+  
+  fea2clu(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    ff_sel   = c("sAggrDRM"),
+    dd_sel   = dd_sel,
+    mm_sel   = c("som"),
+    vv_sel   = c("internal"),
+    cc_sel   = no_cluster
+  )
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 31
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = rep_title,
+    clu_dir   = clu_dir,
+    rep_fname = rep_fname,
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel,
+    mm        = c("som"),
+    cc        = no_cluster
+  )
+}
+
+
+
+# 2022.07.07 - raw2rep NEEA IN
+if (operation == 42) {
+  dset_key   <- "nee"
+  mdata_file <- mdata_file
+  raw_dir    <- raw_dir
+  imp_dir    <- imp_nee_in
+  fea_dir    <- fea_dir[["nee_in"]]
+  clu_dir    <- clu_dir[["nee_in"]]
+  dd_sel     <- dd_sel_nee
+  no_cluster <- 4
+  rep_title  <- "Cluster Report: NEEA IN, 4 clusters, SOM"
+  rep_fname  <- "cluster_report_nee_in_4cl_som.html"
+  from_date  <- lubridate::ymd_hms("2020-03-15 00:00:00")
+  to_date    <- lubridate::ymd_hms("2021-03-23 00:00:00")
+  
+  # raw2imp(
+  #   raw_dir    = raw_dir[[dset_key]],
+  #   imp_dir    = imp_dir[[dset_key]],
+  #   dset_key   = dset_key,
+  #   mdata_file = mdata_file[[dset_key]],
+  #   from_date  = from_date,
+  #   to_date    = to_date,
+  #   min_yrs    = 0.99988,
+  #   parallel   = TRUE
+  # )
+  # 
+  # imp2fea(
+  #   imp_dir   = imp_dir[[dset_key]],
+  #   fea_dir   = fea_dir,
+  #   max_feats = 1000
+  # )
+  # 
+  # fea2clu(
+  #   fea_dir  = fea_dir,
+  #   clu_dir  = clu_dir,
+  #   ff_sel   = c("sAggrDRM"),
+  #   dd_sel   = dd_sel,
+  #   mm_sel   = c("som"),
+  #   vv_sel   = c("internal"),
+  #   cc_sel   = no_cluster
+  # )
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 31
+  )
+  
+  hmp2rep(
+    rep_type  = c("scroll"),
+    rep_title = rep_title,
+    clu_dir   = clu_dir,
+    rep_fname = rep_fname,
+    ff        = c("sAggrDRM"),
+    dd        = dd_sel,
+    mm        = c("som"),
+    cc        = no_cluster
+  )
+}
+
+
+# 2022.07.05 - raw2rep NEEA
 if (operation == 41) {
   raw2imp(
     raw_dir    = raw_dir[["nee"]],

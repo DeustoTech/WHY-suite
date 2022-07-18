@@ -129,6 +129,7 @@ cook_raw_dataframe <- function(raw_df, from_date, to_date, dset_key, filename=NU
   
   # Chop raw_df
   raw_df <- raw_df[raw_df[,1] >= from_date & raw_df[,1] <= to_date,]
+  if(nrow(raw_df) == 0) return(NULL)
 
   # Round all dates towards zero according to the spd
   date_floors <- floor_date(raw_df$times, unit = paste(86400/(spd*60), "min"))
@@ -399,10 +400,10 @@ extend_dataset_v2_non_parallel <- function(
   pb <- txtProgressBar(style=3)
   # fnames length
   length_fnames <- length(dset_filenames)
-  #print(length_fnames)
   
   # Analysis loop
   for(x in 1:length_fnames) {
+    print(dset_filenames[x])
     # Set progress bar
     setTxtProgressBar(pb, x/length_fnames)
     
