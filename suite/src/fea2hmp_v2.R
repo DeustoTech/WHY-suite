@@ -587,12 +587,27 @@ clValid2_heatmaps <- function(
   # Data dir
   data_dir <- paste0(clValid_dir, "data/")
   
-  # Load feats
-  feats <- data.table::fread(
-    file   = feats_file,
-    header = TRUE,
-    sep    = ","
-  )
+  # # Load feats
+  # feats <- data.table::fread(
+  #   file   = feats_file,
+  #   header = TRUE,
+  #   sep    = ","
+  # )
+  
+  # Open features file
+  feats_ext <- substr(feats_file, nchar(feats_file)-2, nchar(feats_file))
+  
+  if (tolower(feats_ext) == "csv") {
+    feats <- data.frame(
+      data.table::fread(
+        file   = feats_file,
+        header = TRUE,
+        sep    = ","
+      )
+    )
+  } else {
+    load(feats_file)
+  }
   
   # LOOP
   fnames <- list.files(path = data_dir, pattern="clValid2$|somObj$") #"*.clValid2")
