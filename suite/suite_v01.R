@@ -102,7 +102,8 @@ fea2clu <- function(
   dd_sel,
   mm_sel,
   vv_sel,
-  cc_sel
+  cc_sel,
+  use_clValid2 = TRUE
 ) {
   print("######################")
   print("######################")
@@ -120,12 +121,13 @@ fea2clu <- function(
       paste0(fea_dir, "feats.csv"),
       paste0(fea_dir, fea_file)
     ),
-    output_dir = clu_dir,
-    ff_sel     = ff_sel,
-    dd_sel     = dd_sel,
-    mm_sel     = mm_sel,
-    vv_sel     = vv_sel,
-    cc_sel     = cc_sel
+    output_dir   = clu_dir,
+    ff_sel       = ff_sel,
+    dd_sel       = dd_sel,
+    mm_sel       = mm_sel,
+    vv_sel       = vv_sel,
+    cc_sel       = cc_sel,
+    use_clValid2 = use_clValid2
   )
 }
 

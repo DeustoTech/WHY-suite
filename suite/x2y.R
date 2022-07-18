@@ -215,14 +215,15 @@ if (operation == 54) {
   rep_fname  <- "cluster_report_final_top_40_som.html"
   
   fea2clu(
-    fea_dir  = fea_dir,
-    fea_file = fea_file,
-    clu_dir  = clu_dir,
-    ff_sel   = c("sAggrDRM"),
-    dd_sel   = dd_sel,
-    mm_sel   = c("som"),
-    vv_sel   = c("internal"),
-    cc_sel   = no_cluster
+    fea_dir      = fea_dir,
+    fea_file     = fea_file,
+    clu_dir      = clu_dir,
+    ff_sel       = c("sAggrDRM"),
+    dd_sel       = dd_sel,
+    mm_sel       = c("som"),
+    vv_sel       = c("internal"),
+    cc_sel       = no_cluster,
+    use_clValid2 = FALSE
   )
   
   clu2hmp(

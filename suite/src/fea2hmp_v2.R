@@ -116,6 +116,7 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clVal
       maxitems   = nrow(feats_aux) + 1
     )
   } else {
+    print("NOT USING clValid2!")
     kohonen::som(feats_aux, grid=kohonen::somgrid(1, analysis_type$cc))
   }
   
