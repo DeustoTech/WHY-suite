@@ -745,7 +745,7 @@ clValid2_heatmaps <- function(
     d$rmad   <- fit_distribution(m$rmad)
     
     # Cluster loop
-    fname <- print(paste0(strsplit(w_fname, ".clValid2"), "-", cc))
+    fname <- print(paste0(tools::file_path_sans_ext(w_fname), "-", cc))
     
     ##############################
     ### CREATION OF FILE PATHS ###

@@ -123,7 +123,7 @@ fea_dir <- list(
 
 # Cluster folders (ClValid2)
 clu_dir <- list(
-  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.11_all-40cl/",
+  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.19_all-40cl/",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
   "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
@@ -214,17 +214,17 @@ if (operation == 54) {
   rep_title  <- "Cluster Report: Final TOP 40, SOM"
   rep_fname  <- "cluster_report_final_top_40_som.html"
   
-  fea2clu(
-    fea_dir      = fea_dir,
-    fea_file     = fea_file,
-    clu_dir      = clu_dir,
-    ff_sel       = c("sAggrDRM"),
-    dd_sel       = dd_sel,
-    mm_sel       = c("som"),
-    vv_sel       = c("internal"),
-    cc_sel       = no_cluster,
-    use_clValid2 = FALSE
-  )
+  # fea2clu(
+  #   fea_dir      = fea_dir,
+  #   fea_file     = fea_file,
+  #   clu_dir      = clu_dir,
+  #   ff_sel       = c("sAggrDRM"),
+  #   dd_sel       = dd_sel,
+  #   mm_sel       = c("som"),
+  #   vv_sel       = c("internal"),
+  #   cc_sel       = no_cluster,
+  #   use_clValid2 = FALSE
+  # )
   
   clu2hmp(
     fea_dir  = fea_dir,
@@ -232,7 +232,7 @@ if (operation == 54) {
     clu_dir  = clu_dir,
     dset_dir = imp_dir,
     cc       = no_cluster,
-    cores    = 24
+    cores    = 3
   )
   
   hmp2rep(

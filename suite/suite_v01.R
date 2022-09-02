@@ -136,6 +136,7 @@ fea2clu <- function(
 ############################
 clu2hmp <- function(
   fea_dir,
+  fea_file = NULL,
   clu_dir,
   dset_dir,
   cc,
