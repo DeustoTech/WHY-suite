@@ -123,7 +123,7 @@ fea_dir <- list(
 
 # Cluster folders (ClValid2)
 clu_dir <- list(
-  "all"      = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.07.19_all-40cl/",
+  "all"      = "/home/ubuntu/carlos.quesada/analyses/somObj/2022.07.19_all-40cl/",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
   "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
