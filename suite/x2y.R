@@ -200,8 +200,27 @@ dd_sel_all2 <- list(
 )
 
 ###############################################################################
-operation <- 54
+operation <- 55
 ################################################################################
+
+# 2022.09.05 - Cambio del motor de generacion de HMP
+if (operation == 55) {
+  fea_dir    <- "C:/Users/carlos.quesada/Documents/WHY/2022.07.07 - Todas las features/"
+  fea_file   <- "feats_v3.02.csv"
+  clu_dir    <- "C:/Users/carlos.quesada/Documents/WHY/2022.09.05 - Heatmaps using precomp/2022.07.19_all-40cl/"
+  imp_dir    <- "C:/Users/carlos.quesada/Documents/WHY/2022.09.05 - Heatmaps using precomp/"
+  no_cluster <- 40
+  
+  clu2hmp(
+    fea_dir  = fea_dir,
+    fea_file = fea_file,
+    clu_dir  = clu_dir,
+    dset_dir = imp_dir,
+    cc       = no_cluster,
+    cores    = 3
+  )
+}
+
 
 # 2022.07.11 - TOP 40 with feats v3.00
 if (operation == 54) {
