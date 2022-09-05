@@ -857,18 +857,6 @@ clValid2_heatmaps <- function(
     # Useful vectors
     st   <- c("mean", "sd", "cvar", "median", "mad", "rmad")
     hcol <- c("YlOrRd", "Blues", "Greens", "YlOrRd", "Blues", "Greens")
-    # # Plot heatmaps: outliers are left blank
-    # for(ii in 1:6) {
-    #   plot_heatmap_matrix(
-    #     m           = m[[ii]],
-    #     format_file = "png",
-    #     file_path   = hp_path[ii],
-    #     plot_width  = 1200,
-    #     plot_height = 900,
-    #     subtitle    = paste(st[ii], fname),
-    #     col_palette = hcol[ii]
-    #   )
-    # }
     # Plot heatmaps: outliers are color-filled
     for(ii in 1:6) {
       mm <- m[[ii]]
@@ -883,32 +871,32 @@ clValid2_heatmaps <- function(
         col_palette = hcol[ii]
       )
     }
-    # Plot distributions
-    for(ii in 1:6) {
-      for(jj in 1:9) {
-        if(!is.null(d[[ii]][[jj]])) {
-          plot_distribution(
-            d           = d[[ii]][[jj]],
-            format_file = "png",
-            file_path   = dp_path[[ii]][jj],
-            plot_width  = 800,
-            plot_height = 600,
-            subtitle    = paste(st[ii], distr_vect[jj], fname)
-          )
-        }
-      }
-    }
-    # Plot autocorrelations
-    for(ii in 1:6) {
-      plot_acf(
-        m           = m[[ii]],
-        format_file = "png",
-        file_path   = ap_path[ii],
-        plot_width  = 800,
-        plot_height = 600,
-        subtitle    = paste(st[ii], fname)
-      )
-    }
+    # # Plot distributions
+    # for(ii in 1:6) {
+    #   for(jj in 1:9) {
+    #     if(!is.null(d[[ii]][[jj]])) {
+    #       plot_distribution(
+    #         d           = d[[ii]][[jj]],
+    #         format_file = "png",
+    #         file_path   = dp_path[[ii]][jj],
+    #         plot_width  = 800,
+    #         plot_height = 600,
+    #         subtitle    = paste(st[ii], distr_vect[jj], fname)
+    #       )
+    #     }
+    #   }
+    # }
+    # # Plot autocorrelations
+    # for(ii in 1:6) {
+    #   plot_acf(
+    #     m           = m[[ii]],
+    #     format_file = "png",
+    #     file_path   = ap_path[ii],
+    #     plot_width  = 800,
+    #     plot_height = 600,
+    #     subtitle    = paste(st[ii], fname)
+    #   )
+    # }
 
     #} # CURLY BRACKET FOR FOR-LOOPS
   }
