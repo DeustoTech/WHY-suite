@@ -386,6 +386,49 @@ upper_whisker <- function(x) {
 }
 
 ################################################################################
+# get_heatmap_matrix
+# fnames as data.frame
+################################################################################
+
+get_heatmap_matrix <- function(fnames, .scale=TRUE) {
+  # Align time series!: Get a list of arrays, one list element per file
+  out <- lapply(fnames, align_time_series, .scale)
+  # Turn list of arrays into big array
+  out <- unlist(out)
+  out <- array(out, dim=c(24,371,length(out)/8904))
+  
+  # Create matrix from means
+  o_mean_mat <- apply(out, 2, rowMeans, na.rm=TRUE)
+  # Flip matrix
+  o_mean_mat <- o_mean_mat[nrow(o_mean_mat):1,]
+  
+  # Create matrix from medians
+  o_median_mat <- apply(out, 2, matrixStats::rowMedians, na.rm=TRUE)
+  # Flip matrix
+  o_median_mat <- o_median_mat[nrow(o_median_mat):1,]
+  
+  # Create matrix from standard deviations
+  o_sd_mat <- apply(out, 2, matrixStats::rowSds, na.rm=TRUE)
+  # Flip matrix
+  o_sd_mat <- o_sd_mat[nrow(o_sd_mat):1,]
+  
+  # Create matrix from MADs
+  o_mad_mat <- apply(out, 2, matrixStats::rowMads, na.rm=TRUE)
+  # Flip matrix
+  o_mad_mat <- o_mad_mat[nrow(o_mad_mat):1,]
+  
+  # Coefficient of variance: just divide! 
+  o_rsd_mat <- o_sd_mat / o_mean_mat
+  # o_rsd_mat[!is.finite(o_rsd_mat)] <- NA
+  # Coefficient of MAD (or whatever)
+  o_rmad_mat <- o_mad_mat / o_median_mat
+  # o_rmad_mat[!is.finite(o_rmad_mat)] <- NA
+  
+  return(list(mean=o_mean_mat, sd=o_sd_mat, rsd=o_rsd_mat,
+              median=o_median_mat, mad=o_mad_mat, rmad=o_rmad_mat))
+}
+
+################################################################################
 # fit_distribution()
 #-------------------------------------------------------------------------------
 # For the following named distributions, reasonable starting values will be
@@ -534,21 +577,26 @@ clValid2_heatmaps <- function(
   feats_file,
   clValid_dir,
   dir_names,
-  preco_file,
+  dataset_dir,
   num_cluster,
   scale_hmm,
   num_cores = NULL
 ) {
-  print("<<<---| fea2hmp VERSION 3 |--->>>")
   # Check subfolders
   check_subfolders(clValid_dir)
   # Data dir
   data_dir <- paste0(clValid_dir, "data/")
   
-  # Open features file
-  feats_ext <- tools::file_ext(feats_file)
+  # # Load feats
+  # feats <- data.table::fread(
+  #   file   = feats_file,
+  #   header = TRUE,
+  #   sep    = ","
+  # )
   
-  print("<<<---|   Loading feats   |--->>>")
+  # Open features file
+  feats_ext <- substr(feats_file, nchar(feats_file)-2, nchar(feats_file))
+  
   if (tolower(feats_ext) == "csv") {
     feats <- data.frame(
       data.table::fread(
@@ -557,24 +605,17 @@ clValid2_heatmaps <- function(
         sep    = ","
       )
     )
-  } else if (tolower(feats_ext) == "rdata") {
-    load(feats_file)
   } else {
-    stop("Features file has a wrong extension (.csv or .RData only)")
+    load(feats_file)
   }
   
-  print("<<<---|   Loading preco   |--->>>")
-  # Open preco file
-  preco <- data.table::fread(preco_file)
-  print("<<<---|      Loaded!      |--->>>")
-  
   # LOOP
-  fnames <- list.files(path = data_dir, pattern="clValid2$|somObj$")
+  fnames <- list.files(path = data_dir, pattern="clValid2$|somObj$") #"*.clValid2")
   fun_export <- c(
     "align_time_series",
     "distr_vect",
     "fit_distribution",
-    #"get_heatmap_matrix",
+    "get_heatmap_matrix",
     "get_matrix_index",
     "plot_acf",
     "plot_distribution",
@@ -582,7 +623,7 @@ clValid2_heatmaps <- function(
     "set_row_conditions",
     "upper_whisker"
   )
-  package_list <- c("fitdistrplus", "sgt", "forecast", "ggplot2", "data.table")
+  package_list <- c("fitdistrplus", "sgt", "forecast", "ggplot2")
   
   # Setup parallel backend to use many processors
   if (is.null(num_cores)) {
@@ -605,25 +646,29 @@ clValid2_heatmaps <- function(
   ) %dopar% {
       
   # for(ff in 1:length(fnames)) {
-    # for(cc in 1:num_cluster) {
-
+  #   for(cc in 1:num_cluster) {
+    
     ############################
     ### INITIALIZATION STUFF ###
     ############################
-    # Print stuff
-    print(paste0("File ", fnames[ff], " - Cluster ", cc))
     # Working file name
     w_fname <- fnames[ff]
     # Working config file name
-    w_cname <- paste0(tools::file_path_sans_ext(w_fname), ".config")
-    # Load configuration file
+    w_cname <- gsub(
+      pattern     = "clValid2$|somObj$",
+      x           = w_fname,
+      replacement = "config"
+    )
+      #paste0(strsplit(w_fname, ".clValid2"), ".config")
+    
     w_cpath <- paste0(data_dir, w_cname)
     load(w_cpath)
-    # Set the required feats
+    
     row_conditions <- set_row_conditions(feats, analysis_type)
-    w_feats <- feats[row_conditions, c("data_set", "file")]
-    # Open cluster object
+    
+    w_feats <- feats[row_conditions,]
     w_fpath <- paste0(data_dir, w_fname)
+    
     load(w_fpath)
     
     ##############################
@@ -682,53 +727,25 @@ clValid2_heatmaps <- function(
     ###############################################
     ### GETTING MATRICES AND DATA FOR PLOTTING ###
     ###############################################
-    
     # Get cluster indices
     idx <- cluster_list == cc
-    # Column names in the cluster cc
-    cluster_colnames <- rownames(o$data[[1]])[idx] #paste(w_feats$data_set[idx], w_feats$file[idx], sep="_")
-    # Selection of cluster columns
-    idx <- colnames(preco) %in% cluster_colnames
-    sub_preco <- preco[,..idx]
+    # Set vector of paths
+    paths_vector <-
+      paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
     
-    # Vector of results
-  	o_mean   <- apply(sub_preco, 1, mean, na.rm=T)
-  	o_median <- apply(sub_preco, 1, median, na.rm=T)
-  	o_sd     <- apply(sub_preco, 1, sd, na.rm=T)
-  	o_mad    <- apply(sub_preco, 1, mad, na.rm=T)
-	
-    m <- list(
-      # MEAN matrix
-      mean   = o_mean,
-      # SD matrix
-      sd     = o_sd,
-      # CV matrix
-      rsd    = o_sd / o_mean,
-      # MEDIAN matrix
-      median = o_median,
-      # MAD matrix
-      mad    = o_mad,
-      # RMAD matrix
-      rmad   = o_mad / o_median
-    )
-    
-    # # Set vector of paths
-    # paths_vector <-
-    #   paste0(dataset_dir[w_feats$data_set[idx]], w_feats$file[idx], ".RData")
-    # 
-    # # Get heatmap matrix
-    # m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
-    # # Get distributions
-    # d <- list()
-    # d$mean   <- fit_distribution(m$mean)
-    # d$sd     <- fit_distribution(m$sd)
-    # d$rsd    <- fit_distribution(m$rsd)
-    # d$median <- fit_distribution(m$median)
-    # d$mad    <- fit_distribution(m$mad)
-    # d$rmad   <- fit_distribution(m$rmad)
+    # Get heatmap matrix
+    m <- get_heatmap_matrix(paths_vector, .scale = scale_hmm)
+    # Get distributions
+    d <- list()
+    d$mean   <- fit_distribution(m$mean)
+    d$sd     <- fit_distribution(m$sd)
+    d$rsd    <- fit_distribution(m$rsd)
+    d$median <- fit_distribution(m$median)
+    d$mad    <- fit_distribution(m$mad)
+    d$rmad   <- fit_distribution(m$rmad)
     
     # Cluster loop
-    fname <- paste0(tools::file_path_sans_ext(w_fname), "-", cc)
+    fname <- print(paste0(tools::file_path_sans_ext(w_fname), "-", cc))
     
     ##############################
     ### CREATION OF FILE PATHS ###
@@ -765,24 +782,29 @@ clValid2_heatmaps <- function(
     # Save heatmap matrices
     save(m, idx, file = hd_path)
     # Save distribution lists
-    #save(d, idx, file = dd_path)
+    save(d, idx, file = dd_path)
     
     # Useful vectors
     st   <- c("mean", "sd", "cvar", "median", "mad", "rmad")
     hcol <- c("YlOrRd", "Blues", "Greens", "YlOrRd", "Blues", "Greens")
+    # # Plot heatmaps: outliers are left blank
+    # for(ii in 1:6) {
+    #   plot_heatmap_matrix(
+    #     m           = m[[ii]],
+    #     format_file = "png",
+    #     file_path   = hp_path[ii],
+    #     plot_width  = 1200,
+    #     plot_height = 900,
+    #     subtitle    = paste(st[ii], fname),
+    #     col_palette = hcol[ii]
+    #   )
+    # }
     # Plot heatmaps: outliers are color-filled
     for(ii in 1:6) {
-  	  # Selection of statistic to plot
       mm <- m[[ii]]
-  	  # Outliers are led to saturation
       mm[mm > 1] <- 1
-  	  # Set as a matrix
-  	  mm_mat <- matrix(mm, nrow=24)
-  	  # Flip rows
-  	  mm_mat <- mm_mat[nrow(mm_mat):1,]
-  	  # Plot matrix!
       plot_heatmap_matrix(
-        m           = mm_mat,
+        m           = mm,
         format_file = "png",
         file_path   = kp_path[ii],
         plot_width  = 1200,
@@ -791,56 +813,36 @@ clValid2_heatmaps <- function(
         col_palette = hcol[ii]
       )
     }
-    # # Plot distributions
-    # for(ii in 1:6) {
-    #   for(jj in 1:9) {
-    #     if(!is.null(d[[ii]][[jj]])) {
-    #       plot_distribution(
-    #         d           = d[[ii]][[jj]],
-    #         format_file = "png",
-    #         file_path   = dp_path[[ii]][jj],
-    #         plot_width  = 800,
-    #         plot_height = 600,
-    #         subtitle    = paste(st[ii], distr_vect[jj], fname)
-    #       )
-    #     }
-    #   }
-    # }
-    # # Plot autocorrelations
-    # for(ii in 1:6) {
-    #   plot_acf(
-    #     m           = m[[ii]],
-    #     format_file = "png",
-    #     file_path   = ap_path[ii],
-    #     plot_width  = 800,
-    #     plot_height = 600,
-    #     subtitle    = paste(st[ii], fname)
-    #   )
-    # }
+    # Plot distributions
+    for(ii in 1:6) {
+      for(jj in 1:9) {
+        if(!is.null(d[[ii]][[jj]])) {
+          plot_distribution(
+            d           = d[[ii]][[jj]],
+            format_file = "png",
+            file_path   = dp_path[[ii]][jj],
+            plot_width  = 800,
+            plot_height = 600,
+            subtitle    = paste(st[ii], distr_vect[jj], fname)
+          )
+        }
+      }
+    }
+    # Plot autocorrelations
+    for(ii in 1:6) {
+      plot_acf(
+        m           = m[[ii]],
+        format_file = "png",
+        file_path   = ap_path[ii],
+        plot_width  = 800,
+        plot_height = 600,
+        subtitle    = paste(st[ii], fname)
+      )
+    }
 
-    #} # CURLY BRACKET FOR FOR-LOOPS
+    # } # CURLY BRACKET FOR FOR-LOOPS
   }
   
   # Stop parallelization
   parallel::stopCluster(cl)
 }
-# 
-# clu_dir <- "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.12_all-means-40cl/"
-# 
-# dirs <- list(
-#   dplot  = paste0(clu_dir, "dplot/" ),
-#   hmp    = paste0(clu_dir, "hmp/"   ),
-#   report = paste0(clu_dir, "report/"),
-#   acf    = paste0(clu_dir, "acf/"   ),
-#   distr  = paste0(clu_dir, "distr/" )
-# )
-# 
-# clValid2_heatmaps(
-#   feats_file  = "/home/ubuntu/carlos.quesada/disk/features/feats_v3.02.csv",
-#   clValid_dir = clu_dir,
-#   dir_names   = dirs,
-#   preco_file  = "/home/ubuntu/carlos.quesada/disk/hmp_precomp/mean_csv/all.csv",
-#   num_cluster = 40,
-#   scale_hmm   = TRUE,
-#   num_cores   = 2
-# )

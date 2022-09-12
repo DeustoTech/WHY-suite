@@ -66,9 +66,9 @@ imp_all <- list(
   "kag"      = "/home/ubuntu/carlos.quesada/disk/kag/imp/",
   "por"      = "/home/ubuntu/carlos.quesada/disk/por/imp/",
   "nesemp"   = "/home/ubuntu/carlos.quesada/disk/nesemp/imp/",
-  "nee7_pre" = "/home/ubuntu/carlos.quesada/disk/nee_pre/imp/",
-  "nee7_in"  = "/home/ubuntu/carlos.quesada/disk/nee_in/imp/",
-  "nee7_pst" = "/home/ubuntu/carlos.quesada/disk/nee_pst/imp/"
+  "nee7_pre" = "/home/ubuntu/carlos.quesada/disk/nee7_pre/imp/",
+  "nee7_in"  = "/home/ubuntu/carlos.quesada/disk/nee7_in/imp/",
+  "nee7_pst" = "/home/ubuntu/carlos.quesada/disk/nee7_pst/imp/"
 )
 
 # Metadata files
@@ -123,7 +123,7 @@ fea_dir <- list(
 
 # Cluster folders (ClValid2)
 clu_dir <- list(
-  "all"      = "/home/ubuntu/carlos.quesada/analyses/somObj/2022.07.19_all-40cl/",
+  "all"      = "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.05_nee7_pre",
   "all-km"   = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-kmeans/",
   "all-pam"  = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.03_all-40cl-pam/",
   "edrp"     = "/home/ubuntu/carlos.quesada/analyses/clValid2/2022.03.23_edrp/",
@@ -200,8 +200,33 @@ dd_sel_all2 <- list(
 )
 
 ###############################################################################
-operation <- 55
+operation <- 56
 ################################################################################
+
+# 2022.09.05 - Prueba con NEE7_PRE
+if (operation == 56) {
+  
+  for (ii in 4:40) {
+    fea_dir    <- fea_dir[["all"]]
+    fea_file   <- "feats_v3.00.RData"
+    clu_dir    <- paste0(clu_dir[["all"]], "-", ii, "cl/")
+    imp_dir    <- imp_all
+    dd_sel     <- dd_sel_nee
+    no_cluster <- ii
+    
+    fea2clu(
+      fea_dir      = fea_dir,
+      fea_file     = fea_file,
+      clu_dir      = clu_dir,
+      ff_sel       = c("sAggrDRM"),
+      dd_sel       = dd_sel,
+      mm_sel       = c("som"),
+      vv_sel       = c("internal"),
+      cc_sel       = no_cluster,
+      use_clValid2 = FALSE
+    )
+  }
+}
 
 # 2022.09.05 - Cambio del motor de generacion de HMP
 if (operation == 55) {
@@ -220,7 +245,6 @@ if (operation == 55) {
     cores    = 3
   )
 }
-
 
 # 2022.07.11 - TOP 40 with feats v3.00
 if (operation == 54) {

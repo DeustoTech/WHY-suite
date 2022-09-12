@@ -138,7 +138,7 @@ clu2hmp <- function(
   fea_dir,
   fea_file = NULL,
   clu_dir,
-  dset_dir,
+  preco_file,
   cc,
   cores = NULL
 ) {
@@ -167,7 +167,7 @@ clu2hmp <- function(
     ),
     clValid_dir = clu_dir,
     dir_names   = dirs,
-    dataset_dir = dset_dir,
+    preco_file  = preco_file,
     num_cluster = cc,
     scale_hmm   = TRUE,
     num_cores   = cores
