@@ -100,6 +100,7 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clVal
   row_conditions <- set_row_conditions(feats, analysis_type)
   
   row_names <- paste0(feats$data_set, "_", feats$file)
+  
   feats_aux <- feats[row_conditions, feats_set[[analysis_type$ff]]]
   # feats_aux <- subset(feats_aux, select = feats_set[[analysis_type$ff]])
   feats_aux <- as.matrix(feats_aux)
@@ -233,7 +234,7 @@ feats_set <- list(
 ################################################################################
 
 cluster_features <- function(
-  feats_file, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, use_clValid2=TRUE) {
+  feats, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, use_clValid2=TRUE) {
   
   # Create folders if they do NOT exist
   if (!dir.exists(output_dir)) dir.create(output_dir)
@@ -243,20 +244,20 @@ cluster_features <- function(
   # Change dir to "/data"
   output_dir <- paste0(output_dir, "data/")
   
-  # Open features file
-  feats_ext <- substr(feats_file, nchar(feats_file)-2, nchar(feats_file))
-  
-  if (tolower(feats_ext) == "csv") {
-    feats <- data.frame(
-      data.table::fread(
-        file   = feats_file,
-        header = TRUE,
-        sep    = ","
-      )
-    )
-  } else {
-    load(feats_file)
-  }
+  # # Open features file
+  # feats_ext <- substr(feats_file, nchar(feats_file)-2, nchar(feats_file))
+  # 
+  # if (tolower(feats_ext) == "csv") {
+  #   feats <- data.frame(
+  #     data.table::fread(
+  #       file   = feats_file,
+  #       header = TRUE,
+  #       sep    = ","
+  #     )
+  #   )
+  # } else {
+  #   load(feats_file)
+  # }
   
   ########################
   ##  SETS OF FEATURES  ##
@@ -531,42 +532,42 @@ plot_heatmap_matrix <- function(
 ################################################################################
 
 clValid2_heatmaps <- function(
-  feats_file,
+  feats,
   clValid_dir,
   dir_names,
-  preco_file,
+  preco,
   num_cluster,
   scale_hmm,
   num_cores = NULL
 ) {
-  print("<<<---| fea2hmp VERSION 3 |--->>>")
+  # print("<<<---| fea2hmp VERSION 3 |--->>>")
   # Check subfolders
   check_subfolders(clValid_dir)
   # Data dir
   data_dir <- paste0(clValid_dir, "data/")
   
   # Open features file
-  feats_ext <- tools::file_ext(feats_file)
+  # feats_ext <- tools::file_ext(feats_file)
   
-  print("<<<---|   Loading feats   |--->>>")
-  if (tolower(feats_ext) == "csv") {
-    feats <- data.frame(
-      data.table::fread(
-        file   = feats_file,
-        header = TRUE,
-        sep    = ","
-      )
-    )
-  } else if (tolower(feats_ext) == "rdata") {
-    load(feats_file)
-  } else {
-    stop("Features file has a wrong extension (.csv or .RData only)")
-  }
+  # print("<<<---|   Loading feats   |--->>>")
+  # if (tolower(feats_ext) == "csv") {
+  #   feats <- data.frame(
+  #     data.table::fread(
+  #       file   = feats_file,
+  #       header = TRUE,
+  #       sep    = ","
+  #     )
+  #   )
+  # } else if (tolower(feats_ext) == "rdata") {
+  #   load(feats_file)
+  # } else {
+  #   stop("Features file has a wrong extension (.csv or .RData only)")
+  # }
   
-  print("<<<---|   Loading preco   |--->>>")
-  # Open preco file
-  preco <- data.table::fread(preco_file)
-  print("<<<---|      Loaded!      |--->>>")
+  # print("<<<---|   Loading preco   |--->>>")
+  # # Open preco file
+  # preco <- data.table::fread(preco_file)
+  # print("<<<---|      Loaded!      |--->>>")
   
   # LOOP
   fnames <- list.files(path = data_dir, pattern="clValid2$|somObj$")

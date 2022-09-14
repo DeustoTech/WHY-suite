@@ -49,7 +49,7 @@ raw2imp <- function(
 		to_date                 = to_date
 	  )
   } else {
-  	  extend_dataset_v2_non_parallel(
+  	extend_dataset_v2_non_parallel(
 		input_folder            = raw_dir,
 		output_folder           = imp_dir,
 		dset_key                = dset_key,
@@ -95,8 +95,7 @@ imp2fea <- function(
 ## CLUSTER ANALYSIS ##
 ######################
 fea2clu <- function(
-  fea_dir,
-  fea_file = NULL,
+  feats,
   clu_dir,
   ff_sel,
   dd_sel,
@@ -116,11 +115,7 @@ fea2clu <- function(
   source(paste(getwd(), "src", fea2hmp_src, sep="/"))
   
   cluster_features(
-    feats_file = ifelse(
-      is.null(fea_file),
-      paste0(fea_dir, "feats.csv"),
-      paste0(fea_dir, fea_file)
-    ),
+    feats        = feats,
     output_dir   = clu_dir,
     ff_sel       = ff_sel,
     dd_sel       = dd_sel,
@@ -135,10 +130,9 @@ fea2clu <- function(
 ## GENERATION OF HEATMAPS ##
 ############################
 clu2hmp <- function(
-  fea_dir,
-  fea_file = NULL,
+  feats,
   clu_dir,
-  preco_file,
+  preco,
   cc,
   cores = NULL
 ) {
@@ -160,14 +154,10 @@ clu2hmp <- function(
     distr  = paste0(clu_dir, "distr/" )
   )
   clValid2_heatmaps(
-    feats_file = ifelse(
-      is.null(fea_file),
-      paste0(fea_dir, "feats.csv"),
-      paste0(fea_dir, fea_file)
-    ),
+    feats       = feats,
     clValid_dir = clu_dir,
     dir_names   = dirs,
-    preco_file  = preco_file,
+    preco       = preco,
     num_cluster = cc,
     scale_hmm   = TRUE,
     num_cores   = cores
