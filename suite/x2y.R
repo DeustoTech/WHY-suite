@@ -164,11 +164,23 @@ dd_sel_edrp  <- list(
 dd_sel_por  <- list(
   list(key="por", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
-dd_sel_goi4 <- list(
-  list(key="goi", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
+dd_sel_goi4_pre <- list(
+  list(key="goi4_pre", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
 )
-dd_sel_nee  <- list(
-  list(key="nee", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+dd_sel_goi4_in <- list(
+  list(key="goi4_in", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
+)
+dd_sel_goi4_pst <- list(
+  list(key="goi4_pst", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff="2")
+)
+dd_sel_nee7_pre <- list(
+  list(key="nee7_pre", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
+dd_sel_nee7_in <- list(
+  list(key="nee7_in", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
+)
+dd_sel_nee7_pst <- list(
+  list(key="nee7_pst", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
 )
 dd_sel_lcl  <- list(
   list(key="lcl", is_household=NULL, rel_imputed_na=0.05, ref_atr_tariff=NULL)
@@ -201,15 +213,15 @@ dd_sel_all2 <- list(
 )
 dd_sel_list <- list(
   "edrp"     = dd_sel_edrp,
-  "goi4_in"  = dd_sel_goi4,
-  "goi4_pre" = dd_sel_goi4,
-  "goi4_pst" = dd_sel_goi4,
+  "goi4_in"  = dd_sel_goi4_in,
+  "goi4_pre" = dd_sel_goi4_pre,
+  "goi4_pst" = dd_sel_goi4_pst,
   "iss"      = dd_sel_iss,
   "kag"      = dd_sel_kag,
   "lcl"      = dd_sel_lcl,
-  "nee7_in"  = dd_sel_nee,
-  "nee7_pre" = dd_sel_nee,
-  "nee7_pst" = dd_sel_nee,
+  "nee7_in"  = dd_sel_nee7_in,
+  "nee7_pre" = dd_sel_nee7_pre,
+  "nee7_pst" = dd_sel_nee7_pst,
   "nesemp"   = dd_sel_nesemp,
   "por"      = dd_sel_por,
   "save"     = dd_sel_save,
@@ -217,8 +229,115 @@ dd_sel_list <- list(
 )
 
 ###############################################################################
-operation <- 58
+operation <- 59
 ################################################################################
+
+# 2022.09.13 - TOP40
+if (operation == 59) {
+  ########
+  ## 57 ##
+  ########
+  
+  # LOAD FEATURES FILE
+  print("<<<---| Loading feats |--->>>")
+  feats <- data.frame(
+    data.table::fread(
+      file   = "/home/ubuntu/carlos.quesada/disk/features/feats_v3.02.csv",
+      header = TRUE,
+      sep    = ","
+    )
+  )
+  # LOAD PRECO FILE
+  print("<<<---| Loading preco |--->>>")
+  preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/all.csv")
+  print("<<<---| All loaded!!! |--->>>")
+  
+  for (ii in 30:50) {
+    clu_dir    <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.13_all_dsets_", ii, "_cl/")
+    dd_sel     <- dd_sel_all2
+    no_cluster <- ii
+    
+    print(paste0("<<<---| ", ii, " CLUSTERS |--->>>"))
+    
+    fea2clu(
+      feats        = feats,
+      clu_dir      = clu_dir,
+      ff_sel       = c("sAggrDRM"),
+      dd_sel       = dd_sel,
+      mm_sel       = c("som"),
+      vv_sel       = c("internal"),
+      cc_sel       = no_cluster,
+      use_clValid2 = FALSE
+    )
+    
+    clu2hmp(
+      feats      = feats,
+      clu_dir    = clu_dir,
+      preco      = preco,
+      cc         = no_cluster,
+      cores      = NULL
+    )
+  }
+  
+  ########
+  ## 58 ##
+  ########
+  
+  # DATASETS TO ANALYZE
+  dsets <- c("edrp", "goi4_in", "goi4_pre", "goi4_pst", "iss", "kag", "lcl",
+             "nee7_in", "nee7_pre", "nee7_pst", "nesemp", "por", "save", "sgsc")
+  
+  # # LOAD FEATURES FILE
+  # print("<<<---| Loading feats |--->>>")
+  # feats <- data.frame(
+  #   data.table::fread(
+  #     file   = "/home/ubuntu/carlos.quesada/disk/features/feats_v3.02.csv",
+  #     header = TRUE,
+  #     sep    = ","
+  #   )
+  # )
+  # # LOAD PRECO FILE
+  # print("<<<---| Loading preco |--->>>")
+  # preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/all.csv")
+  # print("<<<---| All loaded!!! |--->>>")
+  
+  for (dset in dsets) {
+    dd_sel <- dd_sel_list[[dset]]
+    no_ts_in_dset <- length(list.files(imp_all[[dset]]))
+    lower_lim <- floor(log2(no_ts_in_dset))
+    upper_lim <- 2*ceiling(log2(no_ts_in_dset))
+    
+    print(paste0("<<<---| THIS WILL GO FROM ", lower_lim, " TO ", upper_lim, " |--->>>"))
+    
+    for (ii in lower_lim:upper_lim) {
+      clu_dir <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_", dset, "_", ii, "_cl/")
+      no_cluster <- ii
+      
+      print(paste0("<<<---| ", toupper(dset), " - ", ii, " CLUSTERS |--->>>"))
+      # Check folder existence
+      #if (dir.exists(clu_dir)) next
+      
+      fea2clu(
+        feats        = feats,
+        clu_dir      = clu_dir,
+        ff_sel       = c("sAggrDRM"),
+        dd_sel       = dd_sel,
+        mm_sel       = c("som"),
+        vv_sel       = c("internal"),
+        cc_sel       = no_cluster,
+        use_clValid2 = FALSE
+      )
+      
+      clu2hmp(
+        feats      = feats,
+        clu_dir    = clu_dir,
+        preco      = preco,
+        cc         = no_cluster,
+        cores      = NULL
+      )
+    }
+  }
+}
 
 # 2022.09.13 - TOP40
 if (operation == 58) {
@@ -241,13 +360,20 @@ if (operation == 58) {
   print("<<<---| All loaded!!! |--->>>")
   
   for (dset in dsets) {
-    dd_sel  <- dd_sel_list[[dset]]
+    dd_sel <- dd_sel_list[[dset]]
+    no_ts_in_dset <- length(list.files(imp_all[[dset]]))
+    lower_lim <- floor(log2(no_ts_in_dset))
+    upper_lim <- 2*ceiling(log2(no_ts_in_dset))
     
-    for (ii in 7:22) {
+    print(paste0("<<<---| THIS WILL GO FROM ", lower_lim, " TO ", upper_lim, " |--->>>"))
+    
+    for (ii in lower_lim:upper_lim) {
       clu_dir <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_", dset, "_", ii, "_cl/")
       no_cluster <- ii
       
-      print(paste0("<<<---| ", toupper(dset), ii, " CLUSTERS |--->>>"))
+      print(paste0("<<<---| ", toupper(dset), " - ", ii, " CLUSTERS |--->>>"))
+      # Check folder existence
+      #if (dir.exists(clu_dir)) next
       
       fea2clu(
         feats        = feats,
@@ -265,7 +391,7 @@ if (operation == 58) {
         clu_dir    = clu_dir,
         preco      = preco,
         cc         = no_cluster,
-        cores      = 2
+        cores      = NULL
       )
     }
   }
