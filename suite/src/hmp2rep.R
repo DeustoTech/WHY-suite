@@ -61,7 +61,7 @@ reporting <- function(
       rmd_title     = rep_title,
       no_card_types = 1,
       hmp_dir       = paste0(clu_dir, "hmp/"),
-      hmm_dir       = paste0(clu_dir, "hmm/"),
+      hmm_dir       = paste0(clu_dir, "dplot/"),
       nofile_path   = paste(getwd(), "src", no_file_src, sep="/"),
       ff            = ff,
       dd            = dd,

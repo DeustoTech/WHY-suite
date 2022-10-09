@@ -63,8 +63,8 @@ params:
 
 ```{r, include=FALSE}
 # CARD TYPES
-card_types_p <- c("hmp_", "hmpsd_", "hmprsd_")
-card_types_m <- c("hmm_", "hmmsd_", "hmmrsd_")
+card_types_p <- c("kp4_", "kp5_", "kp6_")
+card_types_m <- c("hd_", "hd_", "hd_")
 card_types_c <- c("m", "sd", "rsd")
 # Path to hmp graphs
 p_path <- c(params$hmp_dir, params$hmpsd_dir, params$hmprsd_dir)
@@ -162,6 +162,8 @@ for (ff in ff_loop) {
             pct_idx <- "?"
           }
           # Complete txt_list
+          message(card_path)
+          message(idx_path)
           card_idx <- params$no_card_types*cc - (params$no_card_types-xx)
           if (file.exists(card_path)) {
             txt_list$img[card_idx] <- paste0("![](", card_path, ")")

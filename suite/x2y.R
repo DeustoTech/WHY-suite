@@ -229,8 +229,178 @@ dd_sel_list <- list(
 )
 
 ###############################################################################
-operation <- 59
+operation <- 61
 ################################################################################
+
+# 2022.09.13 - TOP40
+if (operation == 61) {
+  # LOAD FEATURES FILE
+  print("<<<---| Loading feats |--->>>")
+  feats <- data.frame(
+    data.table::fread(
+      file   = "/home/ubuntu/carlos.quesada/disk/features/feats_v3.02.csv",
+      header = TRUE,
+      sep    = ","
+    )
+  )
+  # LOAD PRECO FILE
+  print("<<<---| Loading preco |--->>>")
+  preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/preco.csv")
+  print("<<<---| All loaded!!! |--->>>")
+  
+  # LOAD FILES TO EXCLUDE
+  load("/home/ubuntu/carlos.quesada/R_scripts/hmm_distances/excluded_ts.RData")
+  excuded_ts$exclude_flag <- FALSE
+  
+  ########
+  ## 58 ##
+  ########
+  
+  # DATASETS TO ANALYZE
+  dsets <- c(
+    "edrp", "goi4_in", "goi4_pre", "goi4_pst", "iss", "lcl",
+    "save", "sgsc","por", "nee7_in", "nee7_pst", "nee7_pre", "kag"
+    #"nesemp",
+  )
+  
+  for (dset in dsets) {
+    dd_sel <- dd_sel_list[[dset]]
+    no_ts_in_dset <- length(list.files(imp_all[[dset]]))
+    lower_lim <- 2 
+    upper_lim <- ifelse(dset %in% c("nee7_in", "nee7_pst", "nee7_pre", "kag"), 20, 30)
+    
+    print(paste0("<<<---| THIS WILL GO FROM ", lower_lim, " TO ", upper_lim, " |--->>>"))
+    
+    for (ii in lower_lim:upper_lim) {
+      clu_dir <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_", dset, "_", ii, "_cl/")
+      no_cluster <- ii
+      
+      print(paste0("<<<---| ", toupper(dset), " - ", ii, " CLUSTERS |--->>>"))
+      # Check folder existence
+      if (dir.exists(clu_dir)) next
+      
+      fea2clu(
+        feats        = feats,
+        clu_dir      = clu_dir,
+        ff_sel       = c("sAggrDRM"), 
+        dd_sel       = dd_sel,
+        mm_sel       = c("som"),
+        vv_sel       = c("internal"),
+        cc_sel       = no_cluster,
+        use_clValid2 = FALSE,
+        exclude      = excluded_ts
+      )
+      
+      clu2hmp(
+        feats      = feats,
+        clu_dir    = clu_dir,
+        preco      = preco,
+        cc         = no_cluster,
+        cores      = NULL,
+        exclude    = excluded_ts
+      )
+    }
+  }
+  
+  for (ii in 30:50) {
+    clu_dir    <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.13_all_dsets_", ii, "_cl/")
+    dd_sel     <- dd_sel_all2
+    no_cluster <- ii
+
+    print(paste0("<<<---| ", ii, " CLUSTERS |--->>>"))
+    # Check folder existence
+    if (dir.exists(clu_dir)) next
+
+    fea2clu(
+      feats        = feats,
+      clu_dir      = clu_dir,
+      ff_sel       = c("sAggrDRM"),
+      dd_sel       = dd_sel,
+      mm_sel       = c("som"),
+      vv_sel       = c("internal"),
+      cc_sel       = no_cluster,
+      use_clValid2 = FALSE,
+      exclude      = excluded_ts
+    )
+
+    clu2hmp(
+      feats      = feats,
+      clu_dir    = clu_dir,
+      preco      = preco,
+      cc         = no_cluster,
+      cores      = NULL,
+      exclude    = excluded_ts
+    )
+  }
+}
+
+# 2022.09.27 - Reports
+if (operation == 60) {
+  rep_title <- c(
+    "EDRP [GB] 13 cl",
+    "GoiEner pre-COVID [ES] 14 cl", 
+    "GoiEner in-COVID [ES] 13 cl",
+    "GoiEner post-COVID [ES] 14 cl",
+    "ISSDA [IE] 22 cl",
+    "Kaggle [various locations] 10 cl",
+    "Low Carbon London [GB] 26 cl",
+    "NEEA pre-COVID [US] 5 cl",
+    "NEEA in-COVID [US] 7 cl",
+    "NEEA post-COVID [US] 7 cl",
+    "Elergone Energia [PT] 10 cl",
+    "SAVE [GB] 15 cl",
+    "SGSC [AU] 13 cl",
+    "ALL 37 cl"
+  )
+  clu_dir <- c(
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_edrp_13_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_goi4_pre_14_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_goi4_in_13_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_goi4_pst_14_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_iss_22_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_kag_10_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_lcl_26_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_nee7_pre_5_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_nee7_in_7_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_nee7_pst_7_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_por_10_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_save_15_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.14_sgsc_13_cl/",
+    "/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.13_all_dsets_37_cl/"
+  )
+  rep_fname <- paste0(gsub(" ", "_", tolower(rep_title)), ".html")
+  keys <- c("edrp", "goi_pre", "goi_in", "goi_pst", "iss", "kag", "lcl", 
+            "nee_pre", "nee_in", "nee_pst", "por", "save", "sgsc", "all")
+  clux <- c(13, 14, 13, 14, 22, 10, 26, 5, 7, 7, 10, 15, 13, 37)
+  dset <- list(
+    dd_sel_list[["edrp"]],
+    dd_sel_list[["goi4_pre"]],
+    dd_sel_list[["goi4_in"]],
+    dd_sel_list[["goi4_pst"]],
+    dd_sel_list[["iss"]],
+    dd_sel_list[["kag"]],
+    dd_sel_list[["lcl"]],
+    dd_sel_list[["nee7_pre"]],
+    dd_sel_list[["nee7_in"]],
+    dd_sel_list[["nee7_pst"]],
+    dd_sel_list[["por"]],
+    dd_sel_list[["save"]],
+    dd_sel_list[["sgsc"]],
+    dd_sel_all2
+  )
+  
+  for (ii in 1:14)
+    hmp2rep(
+      rep_type  = c("basic"),
+      rep_title = rep_title[ii],
+      clu_dir   = clu_dir[ii],
+      rep_fname = rep_fname[ii],
+      ff        = c("sAggrDRM"),
+      dd        = dset[[ii]],
+      mm        = c("som"),
+      cc        = clux[ii]
+    )
+}
 
 # 2022.09.13 - TOP40
 if (operation == 59) {
@@ -249,43 +419,20 @@ if (operation == 59) {
   )
   # LOAD PRECO FILE
   print("<<<---| Loading preco |--->>>")
-  preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/all.csv")
+  preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/preco.csv")
   print("<<<---| All loaded!!! |--->>>")
-  
-  for (ii in 30:50) {
-    clu_dir    <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.13_all_dsets_", ii, "_cl/")
-    dd_sel     <- dd_sel_all2
-    no_cluster <- ii
-    
-    print(paste0("<<<---| ", ii, " CLUSTERS |--->>>"))
-    
-    fea2clu(
-      feats        = feats,
-      clu_dir      = clu_dir,
-      ff_sel       = c("sAggrDRM"),
-      dd_sel       = dd_sel,
-      mm_sel       = c("som"),
-      vv_sel       = c("internal"),
-      cc_sel       = no_cluster,
-      use_clValid2 = FALSE
-    )
-    
-    clu2hmp(
-      feats      = feats,
-      clu_dir    = clu_dir,
-      preco      = preco,
-      cc         = no_cluster,
-      cores      = NULL
-    )
-  }
   
   ########
   ## 58 ##
   ########
   
   # DATASETS TO ANALYZE
-  dsets <- c("edrp", "goi4_in", "goi4_pre", "goi4_pst", "iss", "kag", "lcl",
-             "nee7_in", "nee7_pre", "nee7_pst", "nesemp", "por", "save", "sgsc")
+  dsets <- c(#"edrp", "goi4_in", "goi4_pre", "goi4_pst", "iss", "kag", "lcl",
+             #"save", "sgsc","por", 
+             #"nee7_in", "nee7_pst",
+			 "nee7_pre"
+             #"nesemp",
+             )
   
   # # LOAD FEATURES FILE
   # print("<<<---| Loading feats |--->>>")
@@ -304,8 +451,8 @@ if (operation == 59) {
   for (dset in dsets) {
     dd_sel <- dd_sel_list[[dset]]
     no_ts_in_dset <- length(list.files(imp_all[[dset]]))
-    lower_lim <- floor(log2(no_ts_in_dset))
-    upper_lim <- 2*ceiling(log2(no_ts_in_dset))
+    lower_lim <- 10 #floor(log2(no_ts_in_dset))
+    upper_lim <- 25 #2*ceiling(log2(no_ts_in_dset))
     
     print(paste0("<<<---| THIS WILL GO FROM ", lower_lim, " TO ", upper_lim, " |--->>>"))
     
@@ -315,7 +462,7 @@ if (operation == 59) {
       
       print(paste0("<<<---| ", toupper(dset), " - ", ii, " CLUSTERS |--->>>"))
       # Check folder existence
-      #if (dir.exists(clu_dir)) next
+      if (dir.exists(clu_dir)) next
       
       fea2clu(
         feats        = feats,
@@ -337,6 +484,35 @@ if (operation == 59) {
       )
     }
   }
+  
+  # for (ii in 30:50) {
+  #   clu_dir    <- paste0("/home/ubuntu/carlos.quesada/analyses/somObj/2022.09.13_all_dsets_", ii, "_cl/")
+  #   dd_sel     <- dd_sel_all2
+  #   no_cluster <- ii
+  #   
+  #   print(paste0("<<<---| ", ii, " CLUSTERS |--->>>"))
+  #   # Check folder existence
+  #   if (dir.exists(clu_dir)) next
+  #   
+  #   fea2clu(
+  #     feats        = feats,
+  #     clu_dir      = clu_dir,
+  #     ff_sel       = c("sAggrDRM"),
+  #     dd_sel       = dd_sel,
+  #     mm_sel       = c("som"),
+  #     vv_sel       = c("internal"),
+  #     cc_sel       = no_cluster,
+  #     use_clValid2 = FALSE
+  #   )
+  #   
+  #   clu2hmp(
+  #     feats      = feats,
+  #     clu_dir    = clu_dir,
+  #     preco      = preco,
+  #     cc         = no_cluster,
+  #     cores      = NULL
+  #   )
+  # }
 }
 
 # 2022.09.13 - TOP40

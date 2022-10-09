@@ -102,7 +102,8 @@ fea2clu <- function(
   mm_sel,
   vv_sel,
   cc_sel,
-  use_clValid2 = TRUE
+  use_clValid2 = TRUE,
+  exclude      = NULL
 ) {
   print("######################")
   print("######################")
@@ -122,7 +123,8 @@ fea2clu <- function(
     mm_sel       = mm_sel,
     vv_sel       = vv_sel,
     cc_sel       = cc_sel,
-    use_clValid2 = use_clValid2
+    use_clValid2 = use_clValid2,
+    exclude      = exclude
   )
 }
 
@@ -134,7 +136,8 @@ clu2hmp <- function(
   clu_dir,
   preco,
   cc,
-  cores = NULL
+  cores   = NULL,
+  exclude = NULL
 ) {
   print("###################")
   print("###################")
@@ -160,7 +163,8 @@ clu2hmp <- function(
     preco       = preco,
     num_cluster = cc,
     scale_hmm   = TRUE,
-    num_cores   = cores
+    num_cores   = cores,
+    exclude     = exclude
   )
 }
 

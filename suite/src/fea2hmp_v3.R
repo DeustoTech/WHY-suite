@@ -27,7 +27,7 @@ distr_vect <- c(
 ##  Function to select the row conditions (common to analysis and heatmaps)
 ################################################################################
 
-set_row_conditions <- function(feats, dd) {
+set_row_conditions <- function(feats, dd, exclude) {
   # Initialization
   nrow_feats <- nrow(feats)
   row_conditions <- rep(FALSE, nrow_feats)
@@ -64,9 +64,18 @@ set_row_conditions <- function(feats, dd) {
       cond_trf <-
         substr(feats$ref_atr_tariff,1,1) == dd[[ii]]$ref_atr_tariff
     
+    # Condition 5: Directly excluded files
+    if (is.null(exclude))
+      cond_exc <- rep(TRUE, nrow_feats)
+    else
+      browser()
+      feats2exclude <- left_join(feats, exclude)
+      feats2exclude$exclude_flag[is.na(feats2exclude$exclude_flag)] <- TRUE
+      cond_exc <- feats2exclude$exclude_flag
+    
     # Check all conditions
     row_conditions <- row_conditions | (
-      cond_key & cond_imp & cond_hhd & cond_trf & cond_min & cond_3qt
+      cond_key & cond_imp & cond_hhd & cond_trf & cond_min & cond_3qt & cond_exc
     )
   }
   
@@ -81,7 +90,7 @@ set_row_conditions <- function(feats, dd) {
 ##  R file with the analysis functions of the Rmd file
 ################################################################################
 
-call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clValid2) {
+call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clValid2, exclude) {
   # Set file name
   ff_name <- analysis_type$ff
   key     <- unique(sapply(1:length(analysis_type$dd),
@@ -102,7 +111,7 @@ call_clValid2 <- function(output_dir, analysis_type, feats, feats_set, use_clVal
   nrow_feats <- nrow(feats)
   
   # Set row conditions
-  row_conditions <- set_row_conditions(feats, analysis_type$dd)
+  row_conditions <- set_row_conditions(feats, analysis_type$dd, exclude)
   
   row_names <- paste0(feats$data_set, "_", feats$file)
   
@@ -239,7 +248,8 @@ feats_set <- list(
 ################################################################################
 
 cluster_features <- function(
-  feats, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, use_clValid2=TRUE) {
+  feats, output_dir, ff_sel, dd_sel, mm_sel, vv_sel, cc_sel, use_clValid2=TRUE, exclude
+) {
   
   # Create folders if they do NOT exist
   if (!dir.exists(output_dir)) dir.create(output_dir)
@@ -294,7 +304,7 @@ cluster_features <- function(
   }
   
   for (cluster_code_ii in cluster_codes) {
-    call_clValid2(output_dir, cluster_code_ii, feats, feats_set, use_clValid2)
+    call_clValid2(output_dir, cluster_code_ii, feats, feats_set, use_clValid2, exclude)
   }
 }
 
@@ -593,7 +603,8 @@ clValid2_heatmaps <- function(
   preco,
   num_cluster,
   scale_hmm,
-  num_cores = NULL
+  num_cores = NULL,
+  exclude
 ) {
   # print("<<<---| fea2hmp VERSION 3 |--->>>")
   # Check subfolders
@@ -675,7 +686,7 @@ clValid2_heatmaps <- function(
       w_cpath <- paste0(data_dir, w_cname)
       load(w_cpath)
       # Set the required feats
-      row_conditions <- set_row_conditions(feats, analysis_type$dd)
+      row_conditions <- set_row_conditions(feats, analysis_type$dd, exclude)
       w_feats <- feats[row_conditions, c("data_set", "file")]
       # Open cluster object
       w_fpath <- paste0(data_dir, w_fname)
