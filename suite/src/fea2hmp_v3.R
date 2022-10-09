@@ -15,6 +15,7 @@ library(forecast)
 library(ggplot2)
 library(fitdistrplus)
 library(sgt) # skewed generalized t distribution
+library(dplyr)
 
 set.seed(1981)
 
@@ -68,7 +69,6 @@ set_row_conditions <- function(feats, dd, exclude) {
     if (is.null(exclude))
       cond_exc <- rep(TRUE, nrow_feats)
     else
-      browser()
       feats2exclude <- left_join(feats, exclude)
       feats2exclude$exclude_flag[is.na(feats2exclude$exclude_flag)] <- TRUE
       cond_exc <- feats2exclude$exclude_flag

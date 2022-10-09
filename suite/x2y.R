@@ -246,11 +246,12 @@ if (operation == 61) {
   # LOAD PRECO FILE
   print("<<<---| Loading preco |--->>>")
   preco <- data.table::fread("/home/ubuntu/carlos.quesada/disk/hmp_precomp/median_csv/preco.csv")
-  print("<<<---| All loaded!!! |--->>>")
   
   # LOAD FILES TO EXCLUDE
+  print("<<<---| Loading exclu |--->>>")
   load("/home/ubuntu/carlos.quesada/R_scripts/hmm_distances/excluded_ts.RData")
-  excuded_ts$exclude_flag <- FALSE
+  excluded_ts$exclude_flag <- FALSE
+  print("<<<---| All loaded!!! |--->>>")
   
   ########
   ## 58 ##
